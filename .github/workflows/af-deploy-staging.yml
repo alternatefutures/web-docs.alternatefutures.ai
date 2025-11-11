@@ -1,4 +1,6 @@
 name: ⚡️ Deploy Documentation (Staging)
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
