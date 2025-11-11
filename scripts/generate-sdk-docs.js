@@ -37,10 +37,22 @@ function runTypeDoc() {
   console.log('📖 Running TypeDoc...');
 
   try {
-    execSync(`npx typedoc --plugin typedoc-plugin-markdown --out ${DOCS_DIR}/generated src/index.ts`, {
-      cwd: SDK_REPO,
-      stdio: 'inherit'
-    });
+    execSync(
+      [
+        "npx",
+        "typedoc",
+        "--plugin",
+        "typedoc-plugin-markdown",
+        "--out",
+        `${DOCS_DIR}/generated`,
+        "src/index.ts"
+      ],
+      {
+        cwd: SDK_REPO,
+        stdio: 'inherit',
+        shell: false
+      }
+    );
     console.log('✅ TypeDoc generation complete');
   } catch (error) {
     console.error('❌ TypeDoc generation failed:', error.message);
