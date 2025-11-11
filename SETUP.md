@@ -62,7 +62,7 @@ pnpm docs:generate
 
 1. **Clone all three repositories as siblings:**
    ```
-   Projects/fleek/
+   Projects/alternatefutures/
    ├── altfutures-docs/
    ├── cloud-cli/
    └── cloud-sdk/
