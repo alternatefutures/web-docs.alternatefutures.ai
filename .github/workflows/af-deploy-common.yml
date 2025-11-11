@@ -1,4 +1,6 @@
 name: ⚡️ Deploy Documentation (Common)
+permissions:
+  contents: read
 
 on:
   workflow_call:
