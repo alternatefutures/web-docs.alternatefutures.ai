@@ -10,7 +10,7 @@
  * 4. Outputs to docs/sdk/api.md
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -37,10 +37,22 @@ function runTypeDoc() {
   console.log('📖 Running TypeDoc...');
 
   try {
-    execSync(`npx typedoc --plugin typedoc-plugin-markdown --out ${DOCS_DIR}/generated src/index.ts`, {
-      cwd: SDK_REPO,
-      stdio: 'inherit'
-    });
+    execFileSync(
+      "npx",
+      [
+        "typedoc",
+        "--plugin",
+        "typedoc-plugin-markdown",
+        "--out",
+        `${DOCS_DIR}/generated`,
+        "src/index.ts"
+      ],
+      {
+        cwd: SDK_REPO,
+        stdio: 'inherit',
+        shell: false
+      }
+    );
     console.log('✅ TypeDoc generation complete');
   } catch (error) {
     console.error('❌ TypeDoc generation failed:', error.message);
