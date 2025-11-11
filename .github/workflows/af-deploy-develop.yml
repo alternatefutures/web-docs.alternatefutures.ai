@@ -11,6 +11,8 @@ on:
 
 jobs:
   deploy-to-develop:
+    permissions:
+      contents: read
     uses: ./.github/workflows/af-deploy-common.yml
     with:
       environment: develop
