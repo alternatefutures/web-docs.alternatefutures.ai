@@ -10,7 +10,7 @@
  * 4. Outputs to docs/cli/commands.md
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -35,10 +35,14 @@ if (!existsSync(CLI_REPO)) {
  */
 function runCliCommand(args = []) {
   try {
-    const output = execSync(`node ${CLI_REPO}/dist/index.js ${args.join(' ')}`, {
-      encoding: 'utf8',
-      cwd: CLI_REPO
-    });
+    const output = execFileSync(
+      'node',
+      [`${CLI_REPO}/dist/index.js`, ...args],
+      {
+        encoding: 'utf8',
+        cwd: CLI_REPO
+      }
+    );
     return output;
   } catch (error) {
     return error.stdout || error.message;
