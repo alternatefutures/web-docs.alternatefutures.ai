@@ -21,6 +21,11 @@
   ],
   "author": "Alternate Futures",
   "license": "MIT",
+  "pnpm": {
+    "overrides": {
+      "esbuild": ">=0.25.0"
+    }
+  },
   "devDependencies": {
     "markdown-it-container": "^4.0.0",
     "typedoc": "^0.25.7",
