@@ -18,7 +18,7 @@ Before you begin, make sure you have:
 
 - **An Alternate Futures account** - [Sign up here](https://app.alternatefutures.ai) (free, no credit card required)
   - You can sign in with email, Google, GitHub, or a Web3 wallet
-- **Node.js 18 or later** - [Download here](https://nodejs.org/) if you don't have it
+- **Node.js 18 or later** - [Download here](https://nodejs.org/en/download) if you don't have it
   - Check your version with `node --version`
 - **A project to deploy** (optional for learning)
   - Any static site (HTML, CSS, JavaScript)
