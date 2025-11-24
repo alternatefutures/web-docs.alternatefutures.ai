@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "markdown-it-container": "^4.0.0",
-    "typedoc": "^0.25.7",
-    "typedoc-plugin-markdown": "^4.0.3",
+    "typedoc": "^0.28.14",
+    "typedoc-plugin-markdown": "^4.9.0",
 
     "vitepress": "^1.0.0"
   }
