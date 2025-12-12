@@ -10,7 +10,11 @@ export default defineConfig({
     /^\.\/classes\//,
     /^\.\/interfaces\//,
     /^\.\/modules\//,
-    /^\.\/enums\//
+    /^\.\/enums\//,
+    // Ignore dead links to pages not yet created
+    '/guides/registry-api',
+    './team',
+    '/guides/monitoring'
   ],
 
   markdown: {

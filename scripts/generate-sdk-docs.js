@@ -19,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const DOCS_DIR = join(__dirname, '../docs/sdk');
-const SDK_REPO = join(__dirname, '../../../cloud-sdk'); // Assuming repos are siblings
+const SDK_REPO = join(__dirname, '../../package-cloud-sdk'); // SDK repo in alternatefutures folder
 
 console.log('🔧 Generating SDK documentation...\n');
 

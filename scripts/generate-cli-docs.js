@@ -19,7 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const DOCS_DIR = join(__dirname, '../docs/cli');
-const CLI_REPO = join(__dirname, '../../../cloud-cli'); // Assuming repos are siblings
+const CLI_REPO = join(__dirname, '../../package-cloud-cli'); // CLI repo in alternatefutures folder
 
 console.log('🔧 Generating CLI documentation...\n');
 

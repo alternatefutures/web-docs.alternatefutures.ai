@@ -1,4 +1,4 @@
-name: Deploy Documentation
+name: Deploy Documentation to IPFS
 
 on:
   push:
@@ -10,20 +10,17 @@ on:
   repository_dispatch:
     types: [docs-update]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 # Allow only one concurrent deployment
 concurrency:
-  group: pages
+  group: ipfs-deploy
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      AF_TOKEN: ${{ secrets.AF_TOKEN }}
+      AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
     steps:
       - name: Checkout docs repo
         uses: actions/checkout@v4
@@ -81,25 +78,11 @@ jobs:
       - name: Generate SDK documentation
         run: cd cloud-sdk && pnpm docs:generate
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
       - name: Build with VitePress
         run: pnpm docs:build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vitepress/dist
+      - name: Install AlternateFutures CLI
+        run: npm i -g @alternatefutures/cli
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy to IPFS
+        run: af sites deploy
