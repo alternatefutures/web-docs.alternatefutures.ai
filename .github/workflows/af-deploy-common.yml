@@ -97,5 +97,6 @@ jobs:
       - name: Install Alternate Futures CLI
         run: npm install -g @alternatefutures/cli
 
+      # CLI reads from af.config.json for site slug and distDir
       - name: Deploy to Alternate Futures
-        run: af sites deploy docs/.vitepress/dist --network ${{ inputs.network }}
+        run: af sites deploy
