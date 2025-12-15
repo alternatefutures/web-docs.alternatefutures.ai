@@ -40,7 +40,7 @@ jobs:
         with:
           repository: alternatefutures/cloud-cli
           path: cloud-cli
-          ref: ${{ inputs.branch }}
+          ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Checkout cloud-sdk repo
@@ -48,7 +48,7 @@ jobs:
         with:
           repository: alternatefutures/cloud-sdk
           path: cloud-sdk
-          ref: ${{ inputs.branch }}
+          ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Setup Node.js
@@ -88,8 +88,11 @@ jobs:
       - name: Generate SDK documentation
         run: cd cloud-sdk && pnpm docs:generate
 
+      # Run docs:build directly instead of build to avoid redundant generation
+      # The docs repo's build script runs generate:all which uses local paths
+      # that don't work in CI (looks for ../../package-cloud-cli)
       - name: Build with VitePress
-        run: pnpm run build
+        run: pnpm run docs:build
 
       - name: Install Alternate Futures CLI
         run: npm install -g @alternatefutures/cli
