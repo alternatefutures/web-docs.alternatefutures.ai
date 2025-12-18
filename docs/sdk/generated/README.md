@@ -1,7 +1,3 @@
-# SDK API Reference
-
-> This documentation is auto-generated from the `cloud-sdk` repository using TypeDoc.
-
 @alternatefutures/sdk
 
 # @alternatefutures/sdk

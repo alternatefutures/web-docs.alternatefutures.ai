@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Alternate Futures Docs',
   description: 'Documentation for the Alternate Futures DePIN platform',
-  base: '/altfutures-docs/',
+  base: '/',
   ignoreDeadLinks: [
     // Ignore TypeDoc-generated relative links in SDK API docs
     /^\.\/README$/,
