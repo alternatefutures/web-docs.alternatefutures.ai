@@ -1,5 +1,6 @@
 // .vitepress/theme/index.js
 import DefaultTheme from 'vitepress/theme'
+import './tailwind.css'
 import './custom.css'
 import VPFeatureCustom from './VPFeatureCustom.vue'
 import Layout from './Layout.vue'

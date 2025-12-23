@@ -1,9 +1,23 @@
 import { defineConfig } from 'vitepress'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   title: 'Alternate Futures Docs',
   description: 'Documentation for the Alternate Futures DePIN platform',
   base: '/',
+
+  vite: {
+    resolve: {
+      alias: {
+        'docs/.vitepress/theme/lib/utils': path.resolve(__dirname, './theme/lib/utils.ts'),
+        'docs/.vitepress/theme/components': path.resolve(__dirname, './theme/components')
+      }
+    }
+  },
+
   ignoreDeadLinks: [
     // Ignore TypeDoc-generated relative links in SDK API docs
     /^\.\/README$/,

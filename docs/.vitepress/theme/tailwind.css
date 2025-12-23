@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/**
+ * Alternate Futures Brand Colors - shadcn/ui Theme
+ * Converted from hex to HSL for shadcn compatibility
+ */
+
+@layer base {
+  :root {
+    /* Backgrounds - Warm Cream */
+    --background: 34 33% 95%; /* #F9F5EE */
+    --foreground: 0 0% 0%; /* #000000 */
+
+    /* Card */
+    --card: 34 33% 95%;
+    --card-foreground: 0 0% 0%;
+
+    /* Popover */
+    --popover: 34 33% 95%;
+    --popover-foreground: 0 0% 0%;
+
+    /* Primary - Alternate Futures Blue */
+    --primary: 232 100% 50%; /* #0026FF */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Cyan/Teal */
+    --secondary: 186 44% 84%; /* #C8E0E4 */
+    --secondary-foreground: 220 22% 24%; /* #2E334B */
+
+    /* Muted */
+    --muted: 36 25% 90%; /* #E8E5DD */
+    --muted-foreground: 220 11% 46%; /* #6B7280 */
+
+    /* Accent - Orange/Peach */
+    --accent: 22 100% 84%; /* #FFC7AA */
+    --accent-foreground: 220 22% 24%; /* #2E334B */
+
+    /* Destructive - Orange/Rust */
+    --destructive: 16 100% 37%; /* #BF3100 */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border */
+    --border: 36 25% 90%;
+    --input: 36 25% 90%;
+    --ring: 232 100% 50%;
+
+    /* Radius */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Backgrounds - Deep Black */
+    --background: 0 0% 4%; /* #0A0A0A */
+    --foreground: 0 0% 100%;
+
+    /* Card */
+    --card: 0 0% 8%; /* #141414 */
+    --card-foreground: 0 0% 100%;
+
+    /* Popover */
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Primary - Lighter Blue for dark mode */
+    --primary: 225 100% 68%; /* #5B7FFF */
+    --primary-foreground: 0 0% 0%;
+
+    /* Secondary - Dark Teal */
+    --secondary: 192 100% 13%; /* #073642 */
+    --secondary-foreground: 34 33% 95%; /* #F9F5EE */
+
+    /* Muted */
+    --muted: 0 0% 12%; /* #1E1E1E */
+    --muted-foreground: 0 0% 78%; /* #C8C8C8 */
+
+    /* Accent - Orange for dark mode */
+    --accent: 22 100% 84%; /* #FFC7AA */
+    --accent-foreground: 220 22% 24%; /* #2E334B */
+
+    /* Destructive - Lighter red for dark mode */
+    --destructive: 11 100% 61%; /* #FF5B3D */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border */
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 225 100% 68%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+/**
+ * Custom Font - Instrument Sans
+ */
+@layer base {
+  body {
+    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  code {
+    font-family: ui-monospace, 'SF Mono', 'Consolas', monospace;
+  }
+}
