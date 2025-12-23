@@ -781,10 +781,49 @@
   color: var(--vp-c-text-1);
 }
 
+/* Hero text styling */
+.VPHero .text {
+  font-size: 1.5rem !important;
+  line-height: 1.4 !important;
+}
+
+@media (min-width: 640px) {
+  .VPHero .text {
+    font-size: 1.75rem !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .text {
+    font-size: 2rem !important;
+  }
+}
+
 /* Navbar */
 .VPNavBar {
   background-color: var(--vp-c-bg);
   border-bottom: 1px solid var(--vp-c-bg-mute);
+}
+
+/* Logo styling - maintain aspect ratio */
+.VPNavBarTitle .logo,
+.VPNavBarTitle .VPImage.logo,
+.VPNavBarTitle img,
+.VPImage.logo {
+  height: 28px !important;
+  width: auto !important;
+  max-width: 180px;
+  object-fit: contain !important;
+}
+
+/* Ensure the logo container doesn't constrain width */
+.VPNavBarTitle {
+  flex-shrink: 0;
+}
+
+.VPNavBarTitle .title-container {
+  display: flex;
+  align-items: center;
 }
 
 .VPNavBarTitle .title {

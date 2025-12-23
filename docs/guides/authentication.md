@@ -77,14 +77,20 @@ API key management via the web interface is currently in development. In the mea
 
 **CLI:**
 ```bash
-export AF_API_KEY="your-api-key"
+export AF_TOKEN="your-personal-access-token"
+export AF_PROJECT_ID="your-project-id"
 af sites list
 ```
 
 **SDK:**
 ```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
 const af = new AlternateFuturesSdk({
-  apiKey: process.env.AF_API_KEY
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 ```
 

@@ -45,7 +45,11 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: '/logo.svg',
+    logo: {
+      src: '/logo.svg',
+      alt: 'Alternate Futures'
+    },
+    siteTitle: false, // Hide the text title since the logo contains the brand name
 
     nav: [
       { text: 'Home', link: '/' },
@@ -128,6 +132,7 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/sdk/' },
             { text: 'Installation', link: '/sdk/installation' },
+            { text: 'Quick Start', link: '/sdk/quickstart' },
             { text: 'API Reference', link: '/sdk/api' }
           ]
         }

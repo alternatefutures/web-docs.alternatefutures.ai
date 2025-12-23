@@ -93,9 +93,23 @@ function processGeneratedDocs() {
 
 /**
  * Generate quick reference from package exports
+ * NOTE: This file is manually maintained at docs/sdk/quickstart.md
+ * Do not overwrite it with auto-generated content
  */
 function generateQuickReference() {
-  console.log('📚 Generating quick reference...');
+  console.log('📚 Checking quick reference...');
+
+  const quickRefPath = join(DOCS_DIR, 'quickstart.md');
+
+  // Check if manual quickstart exists and preserve it
+  if (existsSync(quickRefPath)) {
+    const content = readFileSync(quickRefPath, 'utf8');
+    // If file has substantial content (more than a basic template), preserve it
+    if (content.length > 500) {
+      console.log('✅ Quickstart.md already exists with manual content, preserving it');
+      return;
+    }
+  }
 
   const packageJsonPath = join(SDK_REPO, 'package.json');
 
@@ -106,23 +120,54 @@ function generateQuickReference() {
 
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 
-  let quickRef = '# Quick Reference\n\n';
+  let quickRef = '# SDK Quickstart\n\n';
+  quickRef += 'Get started with the Alternate Futures SDK in under 5 minutes.\n\n';
   quickRef += '## Installation\n\n';
-  quickRef += '```bash\n';
+  quickRef += '::: code-group\n\n';
+  quickRef += '```bash [npm]\n';
   quickRef += `npm install ${packageJson.name}\n`;
   quickRef += '```\n\n';
+  quickRef += '```bash [pnpm]\n';
+  quickRef += `pnpm add ${packageJson.name}\n`;
+  quickRef += '```\n\n';
+  quickRef += '```bash [yarn]\n';
+  quickRef += `yarn add ${packageJson.name}\n`;
+  quickRef += '```\n\n';
+  quickRef += ':::\n\n';
 
-  quickRef += '## Basic Usage\n\n';
+  quickRef += '## Basic Setup\n\n';
+  quickRef += '### Node.js\n\n';
   quickRef += '```typescript\n';
-  quickRef += `import { AlternateFutures } from '${packageJson.name}';\n\n`;
-  quickRef += 'const af = new AlternateFutures({ apiKey: process.env.AF_API_KEY });\n\n';
-  quickRef += '// Use the SDK\n';
-  quickRef += 'const agents = await af.agents.list();\n';
+  quickRef += `import { AlternateFuturesSdk, PersonalAccessTokenService } from '${packageJson.name}/node';\n\n`;
+  quickRef += '// Create the access token service\n';
+  quickRef += 'const accessTokenService = new PersonalAccessTokenService({\n';
+  quickRef += '  personalAccessToken: process.env.AF_TOKEN,\n';
+  quickRef += '  projectId: process.env.AF_PROJECT_ID,\n';
+  quickRef += '});\n\n';
+  quickRef += '// Initialize the SDK\n';
+  quickRef += 'const af = new AlternateFuturesSdk({\n';
+  quickRef += '  accessTokenService,\n';
+  quickRef += '});\n\n';
+  quickRef += '// You\'re ready to go!\n';
+  quickRef += 'const sites = await af.sites().list();\n';
+  quickRef += 'console.log(\'Sites:\', sites);\n';
+  quickRef += '```\n\n';
+
+  quickRef += '### Browser\n\n';
+  quickRef += '```typescript\n';
+  quickRef += `import { AlternateFuturesSdk, StaticAccessTokenService } from '${packageJson.name}';\n\n`;
+  quickRef += '// For browser apps, use StaticAccessTokenService\n';
+  quickRef += 'const accessTokenService = new StaticAccessTokenService({\n';
+  quickRef += '  token: \'your-access-token\',\n';
+  quickRef += '  projectId: \'your-project-id\',\n';
+  quickRef += '});\n\n';
+  quickRef += 'const af = new AlternateFuturesSdk({\n';
+  quickRef += '  accessTokenService,\n';
+  quickRef += '});\n';
   quickRef += '```\n\n';
 
   quickRef += 'For complete API documentation, see the [API Reference](./api.md).\n';
 
-  const quickRefPath = join(DOCS_DIR, 'quickstart.md');
   writeFileSync(quickRefPath, quickRef, 'utf8');
 
   console.log(`✨ Quick reference generated at: ${quickRefPath}`);

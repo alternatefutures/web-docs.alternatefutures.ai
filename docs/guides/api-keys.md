@@ -43,32 +43,32 @@ API keys support granular permissions:
 
 ### CLI
 
-Set as environment variable:
+Set as environment variables:
 
 ```bash
-export AF_API_KEY="af_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AF_TOKEN="pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AF_PROJECT_ID="prj_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 af sites list
-```
-
-Or pass directly:
-
-```bash
-af sites list --api-key af_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ### SDK
 
-Pass to SDK constructor:
+Use the PersonalAccessTokenService for server-side applications:
 
 ```typescript
-import { AlternateFuturesSdk } from '@alternatefutures/sdk';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: process.env.AF_TOKEN,
+  projectId: process.env.AF_PROJECT_ID,
+});
 
 const af = new AlternateFuturesSdk({
-  apiKey: process.env.AF_API_KEY
+  accessTokenService,
 });
 
 // Use the SDK
-const sites = await af.sites.list();
+const sites = await af.sites().list();
 ```
 
 ### HTTP API
@@ -76,8 +76,10 @@ const sites = await af.sites.list();
 Include in Authorization header:
 
 ```bash
-curl https://api.alternatefutures.ai/v1/sites \
-  -H "Authorization: Bearer af_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+curl https://api.alternatefutures.ai/graphql \
+  -H "Authorization: Bearer pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ sites { id name } }"}'
 ```
 
 ## Managing API Keys
@@ -135,15 +137,21 @@ Deleted keys are removed from all logs and cannot be recovered.
 
 ## Key Formats
 
-API keys follow this format:
+Personal Access Tokens follow this format:
 
 ```
-af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-- Prefix: `af_live_` (production) or `af_test_` (development)
-- Length: 40 characters total (8 char prefix + 32 char random string)
+- Prefix: `pat_` (Personal Access Token)
+- Length: 36 characters total (4 char prefix + 32 char random string)
 - Characters: Base62 encoded (a-z, A-Z, 0-9)
+
+Project IDs follow this format:
+
+```
+prj_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
 ## Rate Limits
 

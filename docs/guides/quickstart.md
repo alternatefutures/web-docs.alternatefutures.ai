@@ -70,57 +70,60 @@ This will open your browser where you can sign in with:
 
 After signing in, the CLI automatically saves your credentials. You're ready to deploy!
 
-### Option 2: API Key (Recommended for CI/CD and Automation)
+### Option 2: Personal Access Token (Recommended for CI/CD and Automation)
 
-If you prefer API keys or need to automate deployments:
+If you prefer tokens or need to automate deployments:
 
-1. Visit [https://app.alternatefutures.ai/api-keys](https://app.alternatefutures.ai/api-keys)
-2. Click **"Create New Key"**
-3. Give it a name (e.g., "My Development Key")
-4. You will be presented with options for setting permissions on your key:
-   - If you're going through the tutorials, choose **"All"** for full access
-   - For security purposes in production, limit permissions to only necessary functions for its use (e.g., `sites:write` for deployments only)
-5. Copy the key (it starts with `af_...`)
-6. Set it as an environment variable:
+1. Log in via the CLI first: `af login`
+2. Create a Personal Access Token: `af pat create --name "My Development Token"`
+3. Copy the token (it starts with `pat_...`)
+4. Note your project ID from `af projects list`
+5. Set them as environment variables:
 
 ::: code-group
 
 ```bash [CLI]
-# Set API key as environment variable
-export AF_API_KEY=af_your_key_here
+# Set environment variables
+export AF_TOKEN=pat_your_token_here
+export AF_PROJECT_ID=prj_your_project_id
 
 # Or add to your .bashrc/.zshrc for persistence
-echo 'export AF_API_KEY=af_your_key_here' >> ~/.bashrc
+echo 'export AF_TOKEN=pat_your_token_here' >> ~/.bashrc
+echo 'export AF_PROJECT_ID=prj_your_project_id' >> ~/.bashrc
 ```
 
 ```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-// Initialize with API key
+// Initialize with personal access token
 const af = new AlternateFuturesSdk({
-  apiKey: process.env.AF_API_KEY
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 ```
 
 :::
 
 ::: security Security Best Practices
-**Never commit API keys to version control.** Here's why and how to keep them safe:
+**Never commit tokens to version control.** Here's why and how to keep them safe:
 
 **What are environment variables?**
-Environment variables store sensitive information (like API keys) outside your code files. This keeps secrets safe and lets you use different keys in development vs. production.
+Environment variables store sensitive information (like tokens) outside your code files. This keeps secrets safe and lets you use different tokens in development vs. production.
 
 **How to use them:**
-1. Store your key in a `.env` file:
+1. Store your token in a `.env` file:
    ```
-   AF_API_KEY=af_your_key_here
+   AF_TOKEN=pat_your_token_here
+   AF_PROJECT_ID=prj_your_project_id
    ```
 2. Add `.env` to your `.gitignore` file so Git doesn't track it
-3. Your code reads from `process.env.AF_API_KEY` instead of hardcoding the key
+3. Your code reads from `process.env.AF_TOKEN` instead of hardcoding the key
 
 **Why this matters:**
-- If you commit keys to Git, they're visible in your repository history forever
-- Anyone with access to your repo could steal your keys and rack up charges on your account
+- If you commit tokens to Git, they're visible in your repository history forever
+- Anyone with access to your repo could steal your tokens and rack up charges on your account
 - `.gitignore` tells Git to ignore certain files (like `.env`) when committing
 
 **New to these concepts?**
@@ -142,10 +145,10 @@ Environment variables store sensitive information (like API keys) outside your c
 - Check your internet connection
 - Make sure you have an account at [https://app.alternatefutures.ai](https://app.alternatefutures.ai)
 
-**"Invalid API key"**
-- Double-check you copied the entire key (starts with `af_`)
+**"Invalid token"**
+- Double-check you copied the entire token (starts with `pat_`)
 - Make sure there are no extra spaces
-- Generate a new key if needed
+- Generate a new token if needed: `af pat create --name "New Token"`
 
 ## Step 3: Deploy Your First Site
 
@@ -180,8 +183,9 @@ npm install
 # Build for production
 npm run build
 
-# Deploy (build output is in ./dist)
-af sites deploy ./dist --network ipfs
+# Initialize and deploy (build output is in ./dist)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-react) | [React Docs](https://react.dev/) | [Vite Docs](https://vitejs.dev/)
@@ -199,8 +203,9 @@ npm install
 # Build static export
 npm run build
 
-# Deploy (build output is in ./out)
-af sites deploy ./out --network ipfs
+# Initialize and deploy (build output is in ./out)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-nextjs) | [Next.js Docs](https://nextjs.org/docs)
@@ -218,8 +223,9 @@ npm install
 # Build for production
 npm run build
 
-# Deploy (build output is in ./dist)
-af sites deploy ./dist --network ipfs
+# Initialize and deploy (build output is in ./dist)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-vue) | [Vue.js Docs](https://vuejs.org/guide/) | [Vite Docs](https://vitejs.dev/)
@@ -237,8 +243,9 @@ npm install
 # Build for production
 npm run build
 
-# Deploy (build output is in ./dist)
-af sites deploy ./dist --network ipfs
+# Initialize and deploy (build output is in ./dist)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-astro) | [Astro Docs](https://docs.astro.build/)
@@ -256,8 +263,9 @@ npm install
 # Build static export
 npm run build
 
-# Deploy (build output is in ./build)
-af sites deploy ./build --network ipfs
+# Initialize and deploy (build output is in ./build)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-sveltekit) | [SvelteKit Docs](https://kit.svelte.dev/docs)
@@ -272,8 +280,9 @@ cd my-site
 # Build for production (requires Hugo installed)
 hugo
 
-# Deploy (build output is in ./public)
-af sites deploy ./public --network ipfs
+# Initialize and deploy (build output is in ./public)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-hugo) | [Hugo Docs](https://gohugo.io/documentation/)
@@ -291,8 +300,9 @@ npm install
 # Build for production
 npm run docs:build
 
-# Deploy (build output is in ./docs/.vitepress/dist)
-af sites deploy ./docs/.vitepress/dist --network ipfs
+# Initialize and deploy (build output is in ./docs/.vitepress/dist)
+af sites init
+af sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-vitepress) | [VitePress Docs](https://vitepress.dev/)
@@ -361,37 +371,45 @@ Now let's deploy your site to a decentralized storage network. You have three op
 
 ::: code-group
 
-```bash [CLI - IPFS]
-# Deploy to IPFS (recommended for getting started)
-af sites deploy ./dist --network ipfs
+```bash [CLI]
+# Initialize site configuration (creates af.config.json)
+af sites init
+
+# Follow the prompts to configure:
+# - Site name
+# - Build command (optional)
+# - Output directory (dist, build, etc.)
+# - Storage network (IPFS, Filecoin, Arweave)
+
+# Deploy the site
+af sites deploy
 
 # You should see output like:
+# ✓ Building site...
 # ✓ Uploading files to IPFS...
 # ✓ Deployment successful!
 # ✓ CID: bafybei...
 # ✓ URL: https://ipfs.io/ipfs/bafybei...
 ```
 
-```bash [CLI - Filecoin]
-# Deploy to Filecoin (best for large files)
-af sites deploy ./dist --network filecoin
-```
-
-```bash [CLI - Arweave]
-# Deploy to Arweave (permanent storage)
-af sites deploy ./dist --network arweave
-```
-
 ```typescript [SDK]
-// Deploy a site
-const site = await af.sites.create({
-  name: 'My First Site',
-  source: './dist',
-  network: 'ipfs'
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+// Initialize the SDK
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
-console.log('Site URL:', site.url);
-console.log('CID:', site.cid);
+// Upload to IPFS
+const result = await af.ipfs().add('./dist');
+console.log('CID:', result.pin.cid);
+
+// List your sites
+const sites = await af.sites().list();
+console.log('Sites:', sites);
 ```
 
 :::
@@ -416,20 +434,31 @@ When you deployed, Alternate Futures:
 # List all your sites
 af sites list
 
+# View deployments for a specific site
+af sites deployments --slug my-site
+
 # Output shows:
-# - Site name
-# - Network (ipfs, filecoin, arweave)
+# - Site name and slug
 # - CID
 # - URL
 # - Deployment date
 ```
 
 ```typescript [SDK]
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
+});
+
 // List all sites
-const sites = await af.sites.list();
+const sites = await af.sites().list();
 
 sites.forEach(site => {
-  console.log(`${site.name}: ${site.url}`);
+  console.log(`${site.name}: ${site.slug}`);
 });
 ```
 

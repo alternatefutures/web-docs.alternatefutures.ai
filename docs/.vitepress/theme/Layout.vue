@@ -3,6 +3,7 @@ import { useRoute } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { nextTick, onMounted, watch } from 'vue'
 
+const { Layout } = DefaultTheme
 const route = useRoute()
 
 const updateLangForActiveTab = (group) => {
@@ -171,5 +172,38 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <DefaultTheme.Layout />
+  <Layout>
+    <template #home-hero-info-before>
+      <div class="hero-wordmark">
+        <img src="/wordmark.svg" alt="Alternate Futures" class="wordmark-img" />
+      </div>
+    </template>
+  </Layout>
 </template>
+
+<style scoped>
+.hero-wordmark {
+  display: flex;
+  justify-content: center;
+  margin-bottom: calc(1.5rem + 15px);
+}
+
+.wordmark-img {
+  height: 72px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+@media (min-width: 640px) {
+  .wordmark-img {
+    height: 88px;
+  }
+}
+
+@media (min-width: 960px) {
+  .wordmark-img {
+    height: 100px;
+  }
+}
+</style>

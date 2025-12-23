@@ -1,10 +1,15 @@
 # SDK Documentation
 
-The Alternate Futures SDK provides a JavaScript/TypeScript library for programmatic access to the platform.
+The Alternate Futures SDK provides a JavaScript/TypeScript library for programmatic access to the platform. Build decentralized applications with IPFS storage, serverless functions, and more.
+
+## Features
+
+- **Type-Safe** - Full TypeScript support with comprehensive type definitions
+- **Multi-Platform** - Works in both Node.js and browser environments
+- **Complete API Access** - Sites, storage, domains, IPNS, ENS, functions, and billing
+- **Multiple Auth Methods** - Personal access tokens, static tokens, and OAuth flows
 
 ## Installation
-
-Install the SDK using npm, pnpm, or yarn:
 
 ::: code-group
 
@@ -24,114 +29,206 @@ yarn add @alternatefutures/sdk
 
 ## Quick Start
 
-### For Node.js Projects
+### Node.js
 
 ```typescript
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-// Initialize with API key
+// Initialize with personal access token
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: process.env.AF_TOKEN,
+  projectId: process.env.AF_PROJECT_ID,
+});
+
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService,
 });
 
-// List agents
-const agents = await af.agents.list();
+// List your sites
+const sites = await af.sites().list();
+console.log('Sites:', sites);
 
-// Deploy a site
-const deployment = await af.sites.deploy({
-  name: 'My Site',
-  network: 'ipfs',
-  directory: './dist'
-});
-
-// Create an agent
-const agent = await af.agents.create({
-  name: 'Crypto Guru',
-  type: 'eliza',
-  character: {
-    name: 'Crypto Guru',
-    bio: 'Expert crypto analyst',
-    traits: ['analytical'],
-    topics: ['crypto', 'DeFi']
-  }
-});
+// Upload to IPFS
+const result = await af.ipfs().add('./dist');
+console.log('CID:', result.pin.cid);
 ```
 
-### For Browser Applications
+### Browser
 
 ```typescript
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/browser';
+import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
 
-// Or simply:
-// import { AlternateFuturesSdk } from '@alternatefutures/sdk';
-// (defaults to browser version)
+const accessTokenService = new StaticAccessTokenService({
+  token: 'your-access-token',
+  projectId: 'your-project-id',
+});
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: 'your-token'
+  accessTokenService,
 });
 
 // Use SDK methods
-const agents = await af.agents.list();
+const sites = await af.sites().list();
 ```
 
 **Note:** The Node.js version (`@alternatefutures/sdk/node`) provides access to filesystem-dependent features like directory uploads. The browser version has a narrower feature set suitable for web applications.
 
-## Documentation
+## SDK Clients
 
-- [Installation Guide](./installation) - Detailed installation and setup
-- [API Reference](./api) - Complete API documentation (auto-generated)
+| Client | Method | Description |
+|--------|--------|-------------|
+| **Sites** | `af.sites()` | Deploy and manage static sites |
+| **Projects** | `af.projects()` | Manage projects and settings |
+| **Domains** | `af.domains()` | Custom domain configuration |
+| **Storage** | `af.storage()` | Manage stored files |
+| **IPFS** | `af.ipfs()` | Direct IPFS operations (Node.js only) |
+| **IPNS** | `af.ipns()` | IPNS record management |
+| **ENS** | `af.ens()` | ENS domain integration |
+| **Functions** | `af.functions()` | Serverless function management |
+| **Applications** | `af.applications()` | OAuth application management |
+| **Private Gateways** | `af.privateGateways()` | IPFS gateway management |
+| **User** | `af.user()` | User account information |
+| **Billing** | `af.billing()` | Billing and usage data |
 
-## TypeScript Support
+## Authentication Options
 
-The SDK is written in TypeScript and provides full type definitions:
+The SDK supports three authentication methods:
+
+### 1. Personal Access Token (Server-Side)
+
+Best for backend services, scripts, and CI/CD pipelines.
 
 ```typescript
-import { AlternateFutures, type Agent, type Site } from '@alternatefutures/sdk';
+import { PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-const af = new AlternateFutures({ apiKey: '' });
-
-// Fully typed
-const agent: Agent = await af.agents.get('agent-id');
-const site: Site = await af.sites.get('site-id');
-```
-
-## Authentication
-
-The SDK supports multiple authentication methods:
-
-### API Key (Server-side)
-
-```typescript
-const af = new AlternateFutures({
-  apiKey: 'af_your_api_key_here'
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: process.env.AF_TOKEN,
+  projectId: process.env.AF_PROJECT_ID,
 });
 ```
 
-### OAuth (Browser)
+### 2. Static Access Token (Browser)
+
+Best for client-side apps where the token is already available.
 
 ```typescript
-const af = new AlternateFutures();
+import { StaticAccessTokenService } from '@alternatefutures/sdk';
 
-await af.auth.login({ provider: 'google' });
-const user = await af.auth.getCurrentUser();
+const accessTokenService = new StaticAccessTokenService({
+  token: 'jwt-token',
+  projectId: 'project-id',
+});
 ```
 
-### Web3 Wallet
+### 3. Application Access Token (OAuth)
+
+Best for building applications with user authentication.
 
 ```typescript
-import { ethers } from 'ethers';
+import { ApplicationAccessTokenService } from '@alternatefutures/sdk';
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const address = await signer.getAddress();
+const accessTokenService = new ApplicationAccessTokenService({
+  clientId: 'your-client-id',
+});
 
-const message = await af.auth.getSignMessage(address);
-const signature = await signer.signMessage(message);
+// Trigger user login
+await accessTokenService.login();
+```
 
-await af.auth.loginWithWallet({ address, signature });
+## Common Examples
+
+### Deploy a Site
+
+```typescript
+// Create a new site
+const site = await af.sites().create({ name: 'my-site' });
+
+// Upload content to IPFS
+const upload = await af.ipfs().add('./dist');
+
+// Create deployment
+const deployment = await af.sites().createDeployment({
+  siteId: site.id,
+  cid: upload.pin.cid,
+});
+```
+
+### Manage Storage
+
+```typescript
+// List all stored files
+const files = await af.storage().list();
+
+// Get file details
+const file = await af.storage().get({ cid: 'bafybei...' });
+
+// Delete a file
+await af.storage().delete({ cid: 'bafybei...' });
+```
+
+### Work with IPNS
+
+```typescript
+// Create IPNS record
+const ipns = await af.ipns().create({ siteId: 'site_abc123' });
+
+// Publish new content
+await af.ipns().publish({
+  name: ipns.name,
+  hash: 'bafybei...',
+});
+
+// List all IPNS records
+const records = await af.ipns().list();
+```
+
+### Custom Domains
+
+```typescript
+// Add a domain to a site
+const domain = await af.domains().create({
+  siteId: 'site_abc123',
+  hostname: 'www.example.com',
+});
+
+// Verify DNS configuration
+const verified = await af.domains().verify({ id: domain.id });
+```
+
+## TypeScript Support
+
+The SDK provides full TypeScript definitions:
+
+```typescript
+import {
+  AlternateFuturesSdk,
+  PersonalAccessTokenService,
+  type Site,
+  type Deployment,
+  type Domain,
+  type IpnsRecord,
+  type StoragePin,
+  type Project,
+  type AFFunction,
+} from '@alternatefutures/sdk/node';
+
+// Types are automatically inferred
+const sites: Site[] = await af.sites().list();
 ```
 
 ## Requirements
 
 - Node.js 18.0.0 or higher
-- Works in both Node.js and browser environments
+- Works in both Node.js and modern browser environments
+
+## Documentation
+
+- **[Installation Guide](./installation)** - Detailed installation and configuration
+- **[Quick Start](./quickstart)** - Get started in 5 minutes
+- **[API Reference](./api)** - Complete API documentation
+
+## Getting Help
+
+- **[CLI Documentation](/cli/)** - Command-line interface
+- **[Guides](/guides/)** - Tutorials and best practices
+- **[GitHub Issues](https://github.com/alternatefutures)** - Report bugs or request features
