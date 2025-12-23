@@ -4,7 +4,7 @@ layout: home
 hero:
   name: ""
   text: Alternate Cloud Documentation <span class="beta-badge">BETA</span>
-  tagline: Deploy AI agents and static sites to decentralized infrastructure
+  tagline: Deploy AI agents, cloud functions and sites to decentralized infrastructure
   actions:
     - theme: brand
       text: Get Started

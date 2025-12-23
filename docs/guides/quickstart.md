@@ -114,7 +114,7 @@ Environment variables store sensitive information (like tokens) outside your cod
 
 **How to use them:**
 1. Store your token in a `.env` file:
-   ```
+   ```env
    AF_TOKEN=pat_your_token_here
    AF_PROJECT_ID=prj_your_project_id
    ```
