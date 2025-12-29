@@ -666,6 +666,198 @@ af pat delete pat_abc123
 
 ---
 
+## Observability
+
+Query and manage APM observability data (traces, logs, metrics). Use `af observability` or the short alias `af obs`.
+
+### `af observability traces`
+
+List recent traces with optional filtering.
+
+```bash
+# List recent traces
+af observability traces
+
+# Filter by service name
+af observability traces --service api-gateway
+
+# Filter by status (OK, ERROR, UNSET)
+af observability traces --status ERROR
+
+# Filter by minimum duration (slow requests only)
+af observability traces --min-duration 500
+
+# Look back more hours
+af observability traces --hours 24
+
+# Limit results
+af observability traces --limit 100
+
+# Combine filters
+af obs traces --service checkout --status ERROR --hours 4
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--service <name>` | Filter by service name |
+| `--status <code>` | Filter by status (OK, ERROR, UNSET) |
+| `--min-duration <ms>` | Minimum duration in milliseconds |
+| `--hours <number>` | Look back N hours (default: 1) |
+| `--limit <number>` | Maximum traces to return (default: 20) |
+
+### `af observability trace <traceId>`
+
+Get detailed information about a specific trace, including all spans.
+
+```bash
+af observability trace abc123def456789...
+
+# Short alias
+af obs trace abc123def456789...
+```
+
+**Output includes:**
+- Trace metadata (ID, service, duration, span count)
+- List of all spans with timing and status
+- Span relationships (parent/child)
+
+### `af observability logs`
+
+Query logs with filtering options.
+
+```bash
+# Recent logs
+af observability logs
+
+# Filter by service
+af observability logs --service database-worker
+
+# Filter by severity level
+af observability logs --severity ERROR
+af observability logs --severity WARN
+
+# Search in log body
+af observability logs --search "connection refused"
+
+# Combine filters
+af obs logs --service checkout-service --severity ERROR --search payment --hours 12
+
+# Adjust time range and limit
+af obs logs --hours 24 --limit 200
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--service <name>` | Filter by service name |
+| `--severity <level>` | Filter by severity (DEBUG, INFO, WARN, ERROR) |
+| `--search <text>` | Search text in log body |
+| `--hours <number>` | Look back N hours (default: 1) |
+| `--limit <number>` | Maximum logs to return (default: 50) |
+
+### `af observability services`
+
+List all services with performance statistics.
+
+```bash
+# Get service statistics for last 24 hours
+af observability services
+
+# Look at a longer period
+af observability services --hours 168  # 7 days
+
+# Short alias
+af obs services --hours 48
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--hours <number>` | Look back N hours (default: 24) |
+
+**Output includes:**
+- Service name
+- Trace and span counts
+- Error count and error rate
+- Latency percentiles (avg, p50, p95, p99)
+
+### `af observability usage`
+
+Show telemetry usage and estimated cost for billing period.
+
+```bash
+# Usage for last 30 days
+af observability usage
+
+# Custom period
+af observability usage --days 7
+af obs usage --days 90
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--days <number>` | Look back N days (default: 30) |
+
+**Output includes:**
+- Spans, metrics, and logs ingested
+- Total data volume
+- Estimated cost ($0.35/GB)
+
+### `af observability settings`
+
+View current observability settings for the project.
+
+```bash
+af observability settings
+af obs settings
+```
+
+**Output includes:**
+- Enabled telemetry types (traces, metrics, logs)
+- Sampling rate
+- Retention periods
+- Rate limits
+
+### `af observability settings:update`
+
+Update observability settings for the project.
+
+```bash
+# Enable/disable telemetry types
+af observability settings:update --traces true
+af observability settings:update --metrics false
+af observability settings:update --logs true
+
+# Adjust sampling rate (0.0 to 1.0)
+af observability settings:update --sample-rate 0.5
+
+# Change retention periods
+af observability settings:update --trace-retention 14
+af observability settings:update --log-retention 30
+
+# Multiple updates at once
+af obs settings:update --sample-rate 0.1 --trace-retention 7 --log-retention 7
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--traces <boolean>` | Enable or disable trace collection |
+| `--metrics <boolean>` | Enable or disable metrics collection |
+| `--logs <boolean>` | Enable or disable log collection |
+| `--sample-rate <rate>` | Sampling rate from 0.0 to 1.0 |
+| `--trace-retention <days>` | Trace retention in days |
+| `--log-retention <days>` | Log retention in days |
+
+---
+
 ## Billing
 
 View billing information and usage metrics.

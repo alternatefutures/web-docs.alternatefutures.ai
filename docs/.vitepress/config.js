@@ -91,7 +91,8 @@ export default defineConfig({
             { text: 'Deploying Sites', link: '/guides/sites' },
             { text: 'Cloud Functions', link: '/guides/functions' },
             { text: 'Managing Agents', link: '/guides/agents' },
-            { text: 'Storage Management', link: '/guides/storage' }
+            { text: 'Storage Management', link: '/guides/storage' },
+            { text: 'Observability & APM', link: '/guides/observability' }
           ]
         },
         {
