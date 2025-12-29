@@ -22,6 +22,7 @@ npm install @alternatefutures/sdk
 | [Billing](#billing) | `Customer`, `Subscription`, `Invoice`, `Payment`, `PaymentMethod`, `CurrentUsage` |
 | [Projects & Applications](#projects--applications) | `Project`, `Application` |
 | [Gateways](#gateways) | `PrivateGateway` |
+| [Framework Integration](#framework-integration) | React hooks, Svelte stores, SvelteKit server-side |
 
 ---
 
@@ -695,6 +696,1160 @@ import {
   type Invoice,
   type CurrentUsage,
 } from '@alternatefutures/sdk/node';
+```
+
+---
+
+## Framework Integration
+
+The SDK works seamlessly with modern frontend frameworks. This section provides production-ready patterns for React and Svelte applications.
+
+### Initializing the SDK
+
+::: code-group
+
+```tsx [React]
+// src/lib/af-client.ts
+import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
+
+let afInstance: AlternateFuturesSdk | null = null;
+
+export function getAFClient(token: string, projectId: string): AlternateFuturesSdk {
+  if (!afInstance) {
+    const accessTokenService = new StaticAccessTokenService({
+      token,
+      projectId,
+    });
+    afInstance = new AlternateFuturesSdk({ accessTokenService });
+  }
+  return afInstance;
+}
+
+// For authenticated contexts, create a hook
+// src/hooks/useAFClient.ts
+import { useMemo } from 'react';
+import { useAuth } from './useAuth'; // Your auth context
+import { getAFClient } from '../lib/af-client';
+
+export function useAFClient() {
+  const { token, projectId } = useAuth();
+
+  return useMemo(() => {
+    if (!token || !projectId) return null;
+    return getAFClient(token, projectId);
+  }, [token, projectId]);
+}
+```
+
+```svelte [Svelte]
+<!-- src/lib/af-client.ts -->
+<script context="module" lang="ts">
+import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
+import { derived, type Readable } from 'svelte/store';
+import { authStore } from './stores/auth'; // Your auth store
+
+let afInstance: AlternateFuturesSdk | null = null;
+
+function createClient(token: string, projectId: string): AlternateFuturesSdk {
+  const accessTokenService = new StaticAccessTokenService({
+    token,
+    projectId,
+  });
+  return new AlternateFuturesSdk({ accessTokenService });
+}
+
+// Reactive SDK client that updates when auth changes
+export const afClient: Readable<AlternateFuturesSdk | null> = derived(
+  authStore,
+  ($auth) => {
+    if (!$auth.token || !$auth.projectId) return null;
+    if (!afInstance) {
+      afInstance = createClient($auth.token, $auth.projectId);
+    }
+    return afInstance;
+  }
+);
+</script>
+```
+
+:::
+
+### Fetching and Displaying Sites
+
+::: code-group
+
+```tsx [React]
+// src/components/SitesList.tsx
+import { useState, useEffect } from 'react';
+import type { Site } from '@alternatefutures/sdk';
+import { useAFClient } from '../hooks/useAFClient';
+
+interface SitesListState {
+  sites: Site[];
+  loading: boolean;
+  error: string | null;
+}
+
+export function SitesList() {
+  const af = useAFClient();
+  const [state, setState] = useState<SitesListState>({
+    sites: [],
+    loading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    if (!af) return;
+
+    let cancelled = false;
+
+    async function fetchSites() {
+      try {
+        setState(prev => ({ ...prev, loading: true, error: null }));
+        const sites = await af.sites().list();
+        if (!cancelled) {
+          setState({ sites, loading: false, error: null });
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: err instanceof Error ? err.message : 'Failed to fetch sites',
+          }));
+        }
+      }
+    }
+
+    fetchSites();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [af]);
+
+  if (state.loading) {
+    return <div className="loading">Loading sites...</div>;
+  }
+
+  if (state.error) {
+    return <div className="error">Error: {state.error}</div>;
+  }
+
+  if (state.sites.length === 0) {
+    return <div className="empty">No sites found. Create your first site!</div>;
+  }
+
+  return (
+    <ul className="sites-list">
+      {state.sites.map((site) => (
+        <li key={site.id} className="site-item">
+          <h3>{site.name}</h3>
+          <p className="slug">{site.slug}</p>
+          <span className="deployments">
+            {site.deployments?.length ?? 0} deployments
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+```svelte [Svelte]
+<!-- src/components/SitesList.svelte -->
+<script lang="ts">
+  import type { Site } from '@alternatefutures/sdk';
+  import { afClient } from '$lib/af-client';
+  import { onMount } from 'svelte';
+
+  let sites: Site[] = [];
+  let loading = true;
+  let error: string | null = null;
+
+  // Reactive fetch when client becomes available
+  $: if ($afClient) {
+    fetchSites();
+  }
+
+  async function fetchSites() {
+    if (!$afClient) return;
+
+    loading = true;
+    error = null;
+
+    try {
+      sites = await $afClient.sites().list();
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to fetch sites';
+    } finally {
+      loading = false;
+    }
+  }
+</script>
+
+{#if loading}
+  <div class="loading">Loading sites...</div>
+{:else if error}
+  <div class="error">Error: {error}</div>
+{:else if sites.length === 0}
+  <div class="empty">No sites found. Create your first site!</div>
+{:else}
+  <ul class="sites-list">
+    {#each sites as site (site.id)}
+      <li class="site-item">
+        <h3>{site.name}</h3>
+        <p class="slug">{site.slug}</p>
+        <span class="deployments">
+          {site.deployments?.length ?? 0} deployments
+        </span>
+      </li>
+    {/each}
+  </ul>
+{/if}
+
+<style>
+  .sites-list {
+    list-style: none;
+    padding: 0;
+  }
+  .site-item {
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+  .slug {
+    color: #666;
+    font-family: monospace;
+  }
+</style>
+```
+
+:::
+
+### File Upload with Progress Indicator
+
+::: code-group
+
+```tsx [React]
+// src/components/FileUploader.tsx
+import { useState, useCallback } from 'react';
+import type { UploadProgress, UploadPinResponse } from '@alternatefutures/sdk';
+import { useAFClient } from '../hooks/useAFClient';
+
+interface UploadState {
+  uploading: boolean;
+  progress: number;
+  error: string | null;
+  result: UploadPinResponse | null;
+}
+
+export function FileUploader() {
+  const af = useAFClient();
+  const [state, setState] = useState<UploadState>({
+    uploading: false,
+    progress: 0,
+    error: null,
+    result: null,
+  });
+
+  const handleProgressUpdate = useCallback((progress: UploadProgress) => {
+    if (progress.totalSize) {
+      const percent = Math.round((progress.loadedSize / progress.totalSize) * 100);
+      setState(prev => ({ ...prev, progress: percent }));
+    }
+  }, []);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !af) return;
+
+    setState({
+      uploading: true,
+      progress: 0,
+      error: null,
+      result: null,
+    });
+
+    try {
+      // Read file as ArrayBuffer
+      const content = await file.arrayBuffer();
+
+      const result = await af.storage().uploadFile({
+        file: {
+          content,
+          path: file.name,
+        },
+        onUploadProgress: handleProgressUpdate,
+      });
+
+      setState({
+        uploading: false,
+        progress: 100,
+        error: null,
+        result,
+      });
+    } catch (err) {
+      setState(prev => ({
+        ...prev,
+        uploading: false,
+        error: err instanceof Error ? err.message : 'Upload failed',
+      }));
+    }
+  };
+
+  return (
+    <div className="file-uploader">
+      <input
+        type="file"
+        onChange={handleFileChange}
+        disabled={state.uploading || !af}
+      />
+
+      {state.uploading && (
+        <div className="progress-container">
+          <div
+            className="progress-bar"
+            style={{ width: `${state.progress}%` }}
+          />
+          <span className="progress-text">{state.progress}%</span>
+        </div>
+      )}
+
+      {state.error && (
+        <div className="error">Upload failed: {state.error}</div>
+      )}
+
+      {state.result && (
+        <div className="success">
+          <p>File uploaded successfully!</p>
+          <code>CID: {state.result.pin.cid}</code>
+          {state.result.duplicate && (
+            <p className="note">This file was already uploaded.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+```svelte [Svelte]
+<!-- src/components/FileUploader.svelte -->
+<script lang="ts">
+  import type { UploadProgress, UploadPinResponse } from '@alternatefutures/sdk';
+  import { afClient } from '$lib/af-client';
+
+  let uploading = false;
+  let progress = 0;
+  let error: string | null = null;
+  let result: UploadPinResponse | null = null;
+
+  function handleProgressUpdate(progressData: UploadProgress) {
+    if (progressData.totalSize) {
+      progress = Math.round((progressData.loadedSize / progressData.totalSize) * 100);
+    }
+  }
+
+  async function handleFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !$afClient) return;
+
+    uploading = true;
+    progress = 0;
+    error = null;
+    result = null;
+
+    try {
+      // Read file as ArrayBuffer
+      const content = await file.arrayBuffer();
+
+      result = await $afClient.storage().uploadFile({
+        file: {
+          content,
+          path: file.name,
+        },
+        onUploadProgress: handleProgressUpdate,
+      });
+
+      progress = 100;
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Upload failed';
+    } finally {
+      uploading = false;
+    }
+  }
+</script>
+
+<div class="file-uploader">
+  <input
+    type="file"
+    on:change={handleFileChange}
+    disabled={uploading || !$afClient}
+  />
+
+  {#if uploading}
+    <div class="progress-container">
+      <div class="progress-bar" style="width: {progress}%"></div>
+      <span class="progress-text">{progress}%</span>
+    </div>
+  {/if}
+
+  {#if error}
+    <div class="error">Upload failed: {error}</div>
+  {/if}
+
+  {#if result}
+    <div class="success">
+      <p>File uploaded successfully!</p>
+      <code>CID: {result.pin.cid}</code>
+      {#if result.duplicate}
+        <p class="note">This file was already uploaded.</p>
+      {/if}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .progress-container {
+    position: relative;
+    height: 24px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .progress-bar {
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.2s ease;
+  }
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+  }
+  .success {
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+  .error {
+    color: #d32f2f;
+    margin-top: 1rem;
+  }
+</style>
+```
+
+:::
+
+### Authentication State Management
+
+::: code-group
+
+```tsx [React]
+// src/contexts/AuthContext.tsx
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { AlternateFuturesSdk, ApplicationAccessTokenService } from '@alternatefutures/sdk';
+
+interface AuthState {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  token: string | null;
+  projectId: string | null;
+  error: string | null;
+}
+
+interface AuthContextValue extends AuthState {
+  login: () => Promise<void>;
+  logout: () => void;
+  selectProject: (projectId: string) => void;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+const CLIENT_ID = import.meta.env.VITE_AF_CLIENT_ID;
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<AuthState>({
+    isAuthenticated: false,
+    isLoading: true,
+    token: null,
+    projectId: null,
+    error: null,
+  });
+
+  const [accessTokenService] = useState(
+    () => new ApplicationAccessTokenService({ clientId: CLIENT_ID })
+  );
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem('af_token');
+    const storedProjectId = localStorage.getItem('af_project_id');
+
+    if (storedToken && storedProjectId) {
+      setState({
+        isAuthenticated: true,
+        isLoading: false,
+        token: storedToken,
+        projectId: storedProjectId,
+        error: null,
+      });
+    } else {
+      setState(prev => ({ ...prev, isLoading: false }));
+    }
+  }, []);
+
+  const login = useCallback(async () => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      await accessTokenService.login();
+
+      // After successful login, the token is available
+      const token = await accessTokenService.getAccessToken();
+
+      if (token) {
+        localStorage.setItem('af_token', token);
+        setState(prev => ({
+          ...prev,
+          isAuthenticated: true,
+          isLoading: false,
+          token,
+        }));
+      }
+    } catch (err) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: err instanceof Error ? err.message : 'Login failed',
+      }));
+    }
+  }, [accessTokenService]);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('af_token');
+    localStorage.removeItem('af_project_id');
+    setState({
+      isAuthenticated: false,
+      isLoading: false,
+      token: null,
+      projectId: null,
+      error: null,
+    });
+  }, []);
+
+  const selectProject = useCallback((projectId: string) => {
+    localStorage.setItem('af_project_id', projectId);
+    setState(prev => ({ ...prev, projectId }));
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ ...state, login, logout, selectProject }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+// Example usage in a component
+// src/components/LoginButton.tsx
+export function LoginButton() {
+  const { isAuthenticated, isLoading, login, logout, error } = useAuth();
+
+  if (isLoading) {
+    return <button disabled>Loading...</button>;
+  }
+
+  if (isAuthenticated) {
+    return <button onClick={logout}>Sign Out</button>;
+  }
+
+  return (
+    <div>
+      <button onClick={login}>Sign In with Alternate Futures</button>
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
+}
+```
+
+```svelte [Svelte]
+<!-- src/lib/stores/auth.ts -->
+<script context="module" lang="ts">
+import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
+import { ApplicationAccessTokenService } from '@alternatefutures/sdk';
+
+interface AuthState {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  token: string | null;
+  projectId: string | null;
+  error: string | null;
+}
+
+const CLIENT_ID = import.meta.env.VITE_AF_CLIENT_ID;
+
+function createAuthStore() {
+  const accessTokenService = new ApplicationAccessTokenService({
+    clientId: CLIENT_ID,
+  });
+
+  // Initialize from localStorage if in browser
+  const initialState: AuthState = {
+    isAuthenticated: false,
+    isLoading: true,
+    token: null,
+    projectId: null,
+    error: null,
+  };
+
+  const { subscribe, set, update } = writable<AuthState>(initialState);
+
+  // Check for existing session
+  if (browser) {
+    const storedToken = localStorage.getItem('af_token');
+    const storedProjectId = localStorage.getItem('af_project_id');
+
+    if (storedToken && storedProjectId) {
+      set({
+        isAuthenticated: true,
+        isLoading: false,
+        token: storedToken,
+        projectId: storedProjectId,
+        error: null,
+      });
+    } else {
+      update(state => ({ ...state, isLoading: false }));
+    }
+  }
+
+  return {
+    subscribe,
+
+    async login() {
+      update(state => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        await accessTokenService.login();
+        const token = await accessTokenService.getAccessToken();
+
+        if (token && browser) {
+          localStorage.setItem('af_token', token);
+          update(state => ({
+            ...state,
+            isAuthenticated: true,
+            isLoading: false,
+            token,
+          }));
+        }
+      } catch (err) {
+        update(state => ({
+          ...state,
+          isLoading: false,
+          error: err instanceof Error ? err.message : 'Login failed',
+        }));
+      }
+    },
+
+    logout() {
+      if (browser) {
+        localStorage.removeItem('af_token');
+        localStorage.removeItem('af_project_id');
+      }
+      set({
+        isAuthenticated: false,
+        isLoading: false,
+        token: null,
+        projectId: null,
+        error: null,
+      });
+    },
+
+    selectProject(projectId: string) {
+      if (browser) {
+        localStorage.setItem('af_project_id', projectId);
+      }
+      update(state => ({ ...state, projectId }));
+    },
+  };
+}
+
+export const authStore = createAuthStore();
+</script>
+
+<!-- src/components/LoginButton.svelte -->
+<script lang="ts">
+  import { authStore } from '$lib/stores/auth';
+
+  const { isAuthenticated, isLoading, error } = $authStore;
+</script>
+
+{#if $authStore.isLoading}
+  <button disabled>Loading...</button>
+{:else if $authStore.isAuthenticated}
+  <button on:click={() => authStore.logout()}>Sign Out</button>
+{:else}
+  <div>
+    <button on:click={() => authStore.login()}>
+      Sign In with Alternate Futures
+    </button>
+    {#if $authStore.error}
+      <p class="error">{$authStore.error}</p>
+    {/if}
+  </div>
+{/if}
+
+<style>
+  .error {
+    color: #d32f2f;
+    margin-top: 0.5rem;
+  }
+</style>
+```
+
+:::
+
+### SvelteKit Server-Side Integration
+
+For SvelteKit applications, you can also use the SDK on the server side with personal access tokens.
+
+```typescript
+// src/routes/api/sites/+server.ts
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+import { AF_TOKEN, AF_PROJECT_ID } from '$env/static/private';
+
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: AF_TOKEN,
+  projectId: AF_PROJECT_ID,
+});
+
+const af = new AlternateFuturesSdk({ accessTokenService });
+
+export const GET: RequestHandler = async () => {
+  try {
+    const sites = await af.sites().list();
+    return json({ sites });
+  } catch (error) {
+    console.error('Failed to fetch sites:', error);
+    return json(
+      { error: 'Failed to fetch sites' },
+      { status: 500 }
+    );
+  }
+};
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const { name } = await request.json();
+
+    if (!name || typeof name !== 'string') {
+      return json(
+        { error: 'Site name is required' },
+        { status: 400 }
+      );
+    }
+
+    const site = await af.sites().create({ name });
+    return json({ site }, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create site:', error);
+    return json(
+      { error: 'Failed to create site' },
+      { status: 500 }
+    );
+  }
+};
+```
+
+### React Custom Hooks for Common Operations
+
+```tsx
+// src/hooks/useSites.ts
+import { useState, useEffect, useCallback } from 'react';
+import type { Site } from '@alternatefutures/sdk';
+import { useAFClient } from './useAFClient';
+
+interface UseSitesResult {
+  sites: Site[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+  createSite: (name: string) => Promise<Site | null>;
+  deleteSite: (id: string) => Promise<boolean>;
+}
+
+export function useSites(): UseSitesResult {
+  const af = useAFClient();
+  const [sites, setSites] = useState<Site[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSites = useCallback(async () => {
+    if (!af) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await af.sites().list();
+      setSites(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch sites');
+    } finally {
+      setLoading(false);
+    }
+  }, [af]);
+
+  useEffect(() => {
+    fetchSites();
+  }, [fetchSites]);
+
+  const createSite = useCallback(async (name: string): Promise<Site | null> => {
+    if (!af) return null;
+
+    try {
+      const site = await af.sites().create({ name });
+      setSites(prev => [...prev, site]);
+      return site;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create site');
+      return null;
+    }
+  }, [af]);
+
+  const deleteSite = useCallback(async (id: string): Promise<boolean> => {
+    if (!af) return false;
+
+    try {
+      await af.sites().delete({ id });
+      setSites(prev => prev.filter(site => site.id !== id));
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete site');
+      return false;
+    }
+  }, [af]);
+
+  return {
+    sites,
+    loading,
+    error,
+    refetch: fetchSites,
+    createSite,
+    deleteSite,
+  };
+}
+
+// src/hooks/useStorage.ts
+import { useState, useCallback } from 'react';
+import type { StoragePin, UploadProgress, UploadPinResponse } from '@alternatefutures/sdk';
+import { useAFClient } from './useAFClient';
+
+interface UseStorageResult {
+  files: StoragePin[];
+  loading: boolean;
+  uploading: boolean;
+  uploadProgress: number;
+  error: string | null;
+  fetchFiles: () => Promise<void>;
+  uploadFile: (file: File) => Promise<UploadPinResponse | null>;
+  deleteFile: (cid: string) => Promise<boolean>;
+}
+
+export function useStorage(): UseStorageResult {
+  const af = useAFClient();
+  const [files, setFiles] = useState<StoragePin[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchFiles = useCallback(async () => {
+    if (!af) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await af.storage().list();
+      setFiles(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch files');
+    } finally {
+      setLoading(false);
+    }
+  }, [af]);
+
+  const uploadFile = useCallback(async (file: File): Promise<UploadPinResponse | null> => {
+    if (!af) return null;
+
+    setUploading(true);
+    setUploadProgress(0);
+    setError(null);
+
+    try {
+      const content = await file.arrayBuffer();
+
+      const result = await af.storage().uploadFile({
+        file: { content, path: file.name },
+        onUploadProgress: (progress: UploadProgress) => {
+          if (progress.totalSize) {
+            setUploadProgress(
+              Math.round((progress.loadedSize / progress.totalSize) * 100)
+            );
+          }
+        },
+      });
+
+      // Refresh file list after upload
+      await fetchFiles();
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  }, [af, fetchFiles]);
+
+  const deleteFile = useCallback(async (cid: string): Promise<boolean> => {
+    if (!af) return false;
+
+    try {
+      await af.storage().delete({ cid });
+      setFiles(prev => prev.filter(file => file.cid !== cid));
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete file');
+      return false;
+    }
+  }, [af]);
+
+  return {
+    files,
+    loading,
+    uploading,
+    uploadProgress,
+    error,
+    fetchFiles,
+    uploadFile,
+    deleteFile,
+  };
+}
+```
+
+### Svelte Stores for Common Operations
+
+```typescript
+// src/lib/stores/sites.ts
+import { writable, derived, get } from 'svelte/store';
+import type { Site } from '@alternatefutures/sdk';
+import { afClient } from '$lib/af-client';
+
+interface SitesState {
+  sites: Site[];
+  loading: boolean;
+  error: string | null;
+}
+
+function createSitesStore() {
+  const { subscribe, set, update } = writable<SitesState>({
+    sites: [],
+    loading: false,
+    error: null,
+  });
+
+  return {
+    subscribe,
+
+    async fetch() {
+      const client = get(afClient);
+      if (!client) return;
+
+      update(state => ({ ...state, loading: true, error: null }));
+
+      try {
+        const sites = await client.sites().list();
+        set({ sites, loading: false, error: null });
+      } catch (err) {
+        update(state => ({
+          ...state,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Failed to fetch sites',
+        }));
+      }
+    },
+
+    async create(name: string): Promise<Site | null> {
+      const client = get(afClient);
+      if (!client) return null;
+
+      try {
+        const site = await client.sites().create({ name });
+        update(state => ({
+          ...state,
+          sites: [...state.sites, site],
+        }));
+        return site;
+      } catch (err) {
+        update(state => ({
+          ...state,
+          error: err instanceof Error ? err.message : 'Failed to create site',
+        }));
+        return null;
+      }
+    },
+
+    async delete(id: string): Promise<boolean> {
+      const client = get(afClient);
+      if (!client) return false;
+
+      try {
+        await client.sites().delete({ id });
+        update(state => ({
+          ...state,
+          sites: state.sites.filter(site => site.id !== id),
+        }));
+        return true;
+      } catch (err) {
+        update(state => ({
+          ...state,
+          error: err instanceof Error ? err.message : 'Failed to delete site',
+        }));
+        return false;
+      }
+    },
+  };
+}
+
+export const sitesStore = createSitesStore();
+
+// src/lib/stores/storage.ts
+import { writable, get } from 'svelte/store';
+import type { StoragePin, UploadProgress, UploadPinResponse } from '@alternatefutures/sdk';
+import { afClient } from '$lib/af-client';
+
+interface StorageState {
+  files: StoragePin[];
+  loading: boolean;
+  uploading: boolean;
+  uploadProgress: number;
+  error: string | null;
+}
+
+function createStorageStore() {
+  const { subscribe, set, update } = writable<StorageState>({
+    files: [],
+    loading: false,
+    uploading: false,
+    uploadProgress: 0,
+    error: null,
+  });
+
+  return {
+    subscribe,
+
+    async fetch() {
+      const client = get(afClient);
+      if (!client) return;
+
+      update(state => ({ ...state, loading: true, error: null }));
+
+      try {
+        const files = await client.storage().list();
+        update(state => ({ ...state, files, loading: false }));
+      } catch (err) {
+        update(state => ({
+          ...state,
+          loading: false,
+          error: err instanceof Error ? err.message : 'Failed to fetch files',
+        }));
+      }
+    },
+
+    async upload(file: File): Promise<UploadPinResponse | null> {
+      const client = get(afClient);
+      if (!client) return null;
+
+      update(state => ({
+        ...state,
+        uploading: true,
+        uploadProgress: 0,
+        error: null,
+      }));
+
+      try {
+        const content = await file.arrayBuffer();
+
+        const result = await client.storage().uploadFile({
+          file: { content, path: file.name },
+          onUploadProgress: (progress: UploadProgress) => {
+            if (progress.totalSize) {
+              update(state => ({
+                ...state,
+                uploadProgress: Math.round(
+                  (progress.loadedSize / progress.totalSize!) * 100
+                ),
+              }));
+            }
+          },
+        });
+
+        // Refresh file list
+        await this.fetch();
+        return result;
+      } catch (err) {
+        update(state => ({
+          ...state,
+          error: err instanceof Error ? err.message : 'Upload failed',
+        }));
+        return null;
+      } finally {
+        update(state => ({ ...state, uploading: false }));
+      }
+    },
+
+    async delete(cid: string): Promise<boolean> {
+      const client = get(afClient);
+      if (!client) return false;
+
+      try {
+        await client.storage().delete({ cid });
+        update(state => ({
+          ...state,
+          files: state.files.filter(file => file.cid !== cid),
+        }));
+        return true;
+      } catch (err) {
+        update(state => ({
+          ...state,
+          error: err instanceof Error ? err.message : 'Failed to delete file',
+        }));
+        return false;
+      }
+    },
+  };
+}
+
+export const storageStore = createStorageStore();
 ```
 
 ---
