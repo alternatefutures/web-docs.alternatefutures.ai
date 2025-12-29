@@ -1,482 +1,708 @@
 # SDK API Reference
 
-> This documentation is auto-generated from the `cloud-sdk` repository using TypeDoc.
+Complete API reference for the `@alternatefutures/sdk` package. This page documents all public types, interfaces, and classes available in the SDK.
 
-@alternatefutures/sdk
+## Installation
 
-# @alternatefutures/sdk
+```bash
+npm install @alternatefutures/sdk
+```
 
-## Table of contents
+## Quick Reference
 
-### Classes
+| Category | Types |
+|----------|-------|
+| [Core](#core-classes) | `AlternateFuturesSdk`, `Client` |
+| [Authentication](#authentication) | `PersonalAccessTokenService`, `StaticAccessTokenService`, `ApplicationAccessTokenService` |
+| [Sites & Deployments](#sites--deployments) | `Site`, `Deployment`, `Zone` |
+| [Domains](#domains) | `Domain`, `DomainStatus` |
+| [Storage](#storage) | `StoragePin`, `IpfsFile`, `UploadPinResponse`, `UploadProgress` |
+| [IPNS & ENS](#ipns--ens) | `IpnsRecord`, `EnsRecord` |
+| [Functions](#functions) | `AFFunction`, `AFFunctionStatus` |
+| [Billing](#billing) | `Customer`, `Subscription`, `Invoice`, `Payment`, `PaymentMethod`, `CurrentUsage` |
+| [Projects & Applications](#projects--applications) | `Project`, `Application` |
+| [Gateways](#gateways) | `PrivateGateway` |
 
-- [AlternateFuturesSdk](./api/classes/AlternateFuturesSdk.md)
-- [ApplicationAccessTokenService](./api/classes/ApplicationAccessTokenService.md)
-- [PersonalAccessTokenService](./api/classes/PersonalAccessTokenService.md)
-- [StaticAccessTokenService](./api/classes/StaticAccessTokenService.md)
+---
 
-### Interfaces
+## Core Classes
 
-- [ApplicationWhiteLabelDomain](./api/interfaces/ApplicationWhiteLabelDomain.md)
-- [ApplicationWhitelistDomain](./api/interfaces/ApplicationWhitelistDomain.md)
-- [Client](./api/interfaces/Client.md)
+### AlternateFuturesSdk
 
-### Type Aliases
+The main SDK class that provides access to all platform functionality.
 
-- [AFFunction](./api/README.md#affunction)
-- [AFFunctionStatus](./api/README.md#affunctionstatus)
-- [Application](./api/README.md#application)
-- [CurrentUsage](./api/README.md#currentusage)
-- [Customer](./api/README.md#customer)
-- [Deployment](./api/README.md#deployment)
-- [Domain](./api/README.md#domain)
-- [DomainStatus](./api/README.md#domainstatus)
-- [EnsRecord](./api/README.md#ensrecord)
-- [Invoice](./api/README.md#invoice)
-- [InvoiceLineItem](./api/README.md#invoicelineitem)
-- [IpfsFile](./api/README.md#ipfsfile)
-- [IpnsRecord](./api/README.md#ipnsrecord)
-- [Payment](./api/README.md#payment)
-- [PaymentMethod](./api/README.md#paymentmethod)
-- [PrivateGateway](./api/README.md#privategateway)
-- [Project](./api/README.md#project)
-- [Site](./api/README.md#site)
-- [StoragePin](./api/README.md#storagepin)
-- [Subscription](./api/README.md#subscription)
-- [UploadContentOptions](./api/README.md#uploadcontentoptions)
-- [UploadPinResponse](./api/README.md#uploadpinresponse)
-- [UploadProgress](./api/README.md#uploadprogress)
-- [UsageMetric](./api/README.md#usagemetric)
-- [UsageRecord](./api/README.md#usagerecord)
-- [Zone](./api/README.md#zone)
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-### Functions
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: process.env.AF_TOKEN,
+  projectId: process.env.AF_PROJECT_ID,
+});
 
-- [createClient](./api/README.md#createclient)
+const af = new AlternateFuturesSdk({ accessTokenService });
 
-## Type Aliases
+// Access SDK clients
+const sites = await af.sites().list();
+const storage = await af.storage().list();
+```
 
-### AFFunction
+**Methods:**
 
-Ƭ **AFFunction**: `Omit`\<`OriginalAFFunction`, ``"projectId"`` \| ``"site"``\>
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `sites()` | `SitesClient` | Site and deployment management |
+| `projects()` | `ProjectsClient` | Project management |
+| `domains()` | `DomainsClient` | Custom domain configuration |
+| `storage()` | `StorageClient` | File storage operations |
+| `ipfs()` | `IpfsClient` | Direct IPFS operations (Node.js only) |
+| `ipns()` | `IpnsClient` | IPNS record management |
+| `ens()` | `EnsClient` | ENS domain integration |
+| `functions()` | `FunctionsClient` | Serverless functions |
+| `applications()` | `ApplicationsClient` | OAuth application management |
+| `privateGateways()` | `PrivateGatewaysClient` | IPFS gateway management |
+| `user()` | `UserClient` | User account information |
+| `billing()` | `BillingClient` | Billing and usage data |
 
-#### Defined in
+### Client
 
-[src/clients/functions.ts:14](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/functions.ts#L14)
+Low-level GraphQL client interface for advanced use cases.
 
-___
+```typescript
+import { createClient } from '@alternatefutures/sdk';
 
-### AFFunctionStatus
+const client = createClient({
+  // Optional configuration
+});
 
-Ƭ **AFFunctionStatus**: ``"ACTIVE"`` \| ``"INACTIVE"``
+// Execute raw queries
+const result = await client.query({
+  site: {
+    __args: { id: 'site_abc123' },
+    id: true,
+    name: true,
+    slug: true,
+  },
+});
+```
 
-#### Defined in
+**Methods:**
 
-node_modules/.pnpm/@alternatefutures+utils-genql-client@0.2.0/node_modules/@alternatefutures/utils-genql-client/dist/schema.ts:551
+| Method | Description |
+|--------|-------------|
+| `query(request)` | Execute a GraphQL query |
+| `mutation(request)` | Execute a GraphQL mutation |
 
-___
+---
 
-### Application
+## Authentication
 
-Ƭ **Application**: `Omit`\<`ApplicationWithRelations`, ``"__typename"`` \| ``"whitelistDomains"``\> & \{ `whitelistDomains`: `string`[]  } & \{ `whiteLabelDomains`: `string`[]  }
+### PersonalAccessTokenService
 
-#### Defined in
+Server-side authentication using personal access tokens. Best for backend services, scripts, and CI/CD pipelines.
 
-[src/clients/applications.ts:8](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/applications.ts#L8)
+```typescript
+import { PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-___
+const accessTokenService = new PersonalAccessTokenService({
+  personalAccessToken: process.env.AF_TOKEN,  // Required
+  projectId: process.env.AF_PROJECT_ID,       // Required
+});
+```
 
-### CurrentUsage
+**Constructor Options:**
 
-Ƭ **CurrentUsage**: `Object`
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `personalAccessToken` | `string` | Yes | Your personal access token |
+| `projectId` | `string` | Yes | Target project ID |
 
-#### Type declaration
+### StaticAccessTokenService
 
-| Name | Type |
-| :------ | :------ |
-| `bandwidth` | [`UsageMetric`](README.md#usagemetric) |
-| `compute` | [`UsageMetric`](README.md#usagemetric) |
-| `periodEnd?` | `number` |
-| `periodStart?` | `number` |
-| `requests` | [`UsageMetric`](README.md#usagemetric) |
-| `storage` | [`UsageMetric`](README.md#usagemetric) |
-| `total` | `number` |
+Browser-side authentication when you already have a JWT token.
 
-#### Defined in
+```typescript
+import { StaticAccessTokenService } from '@alternatefutures/sdk';
 
-[src/clients/billing.ts:96](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L96)
+const accessTokenService = new StaticAccessTokenService({
+  token: 'jwt-token',
+  projectId: 'project-id',
+});
+```
 
-___
+**Constructor Options:**
 
-### Customer
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `token` | `string` | Yes | JWT access token |
+| `projectId` | `string` | Yes | Target project ID |
 
-Ƭ **Customer**: `Object`
+### ApplicationAccessTokenService
 
-#### Type declaration
+OAuth-based authentication for building applications with user login.
 
-| Name | Type |
-| :------ | :------ |
-| `createdAt` | `number` |
-| `email?` | `string` |
-| `id` | `string` |
-| `name?` | `string` |
+```typescript
+import { ApplicationAccessTokenService } from '@alternatefutures/sdk';
 
-#### Defined in
+const accessTokenService = new ApplicationAccessTokenService({
+  clientId: 'your-client-id',
+});
 
-[src/clients/billing.ts:9](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L9)
+// Trigger user login flow
+await accessTokenService.login();
+```
 
-___
+**Constructor Options:**
 
-### Deployment
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `clientId` | `string` | Yes | Your application's Client ID |
 
-Ƭ **Deployment**: `Pick`\<`DeploymentWithRelations`, ``"id"`` \| ``"status"`` \| ``"storageType"`` \| ``"siteId"`` \| ``"cid"`` \| ``"updatedAt"`` \| ``"createdAt"``\>
+---
 
-#### Defined in
-
-[src/clients/sites.ts:22](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/sites.ts#L22)
-
-___
-
-### Domain
-
-Ƭ **Domain**: `Pick`\<`DomainWithRelations`, ``"id"`` \| ``"zone"`` \| ``"hostname"`` \| ``"isVerified"`` \| ``"updatedAt"`` \| ``"createdAt"`` \| ``"dnsConfigs"`` \| ``"status"``\> & \{ `arnsName?`: `string` ; `dnsCheckAttempts?`: `number` ; `dnsVerifiedAt?`: `string` ; `domainType?`: ``"WEB2"`` \| ``"ARNS"`` \| ``"ENS"`` \| ``"IPNS"`` ; `ensName?`: `string` ; `expectedARecord?`: `string` ; `expectedCname?`: `string` ; `ipnsHash?`: `string` ; `lastDnsCheck?`: `string` ; `sslAutoRenew?`: `boolean` ; `sslExpiresAt?`: `string` ; `sslIssuedAt?`: `string` ; `sslStatus?`: ``"NONE"`` \| ``"PENDING"`` \| ``"ACTIVE"`` \| ``"EXPIRED"`` \| ``"FAILED"`` ; `txtVerificationStatus?`: ``"PENDING"`` \| ``"VERIFIED"`` \| ``"FAILED"`` ; `txtVerificationToken?`: `string` ; `verified?`: `boolean`  }
-
-#### Defined in
-
-[src/clients/domains.ts:23](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/domains.ts#L23)
-
-___
-
-### DomainStatus
-
-Ƭ **DomainStatus**: ``"ACTIVE"`` \| ``"CREATED"`` \| ``"CREATING"`` \| ``"CREATING_FAILED"`` \| ``"DELETING"`` \| ``"DELETING_FAILED"`` \| ``"VERIFYING"`` \| ``"VERIFYING_FAILED"``
-
-#### Defined in
-
-node_modules/.pnpm/@alternatefutures+utils-genql-client@0.2.0/node_modules/@alternatefutures/utils-genql-client/dist/schema.ts:375
-
-___
-
-### EnsRecord
-
-Ƭ **EnsRecord**: `Omit`\<`EnsRecordWithRelations`, ``"site"`` \| ``"ipnsRecord"``\> & \{ `ipnsRecord`: `Pick`\<`EnsRecordWithRelations`[``"ipnsRecord"``], ``"id"`` \| ``"name"`` \| ``"hash"``\> & \{ `id`: `string`  } ; `site`: `Pick`\<`EnsRecordWithRelations`[``"site"``], ``"id"``\>  }
-
-#### Defined in
-
-[src/clients/ens.ts:7](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/ens.ts#L7)
-
-___
-
-### Invoice
-
-Ƭ **Invoice**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `amountDue` | `number` |
-| `amountPaid` | `number` |
-| `createdAt` | `number` |
-| `currency` | `string` |
-| `dueDate?` | `number` |
-| `id` | `string` |
-| `invoiceNumber` | `string` |
-| `lineItems?` | [`InvoiceLineItem`](README.md#invoicelineitem)[] |
-| `paidAt?` | `number` |
-| `pdfUrl?` | `string` |
-| `periodEnd?` | `number` |
-| `periodStart?` | `number` |
-| `status` | ``"DRAFT"`` \| ``"OPEN"`` \| ``"PAID"`` \| ``"VOID"`` \| ``"UNCOLLECTIBLE"`` |
-| `subtotal` | `number` |
-| `tax` | `number` |
-| `total` | `number` |
-
-#### Defined in
-
-[src/clients/billing.ts:60](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L60)
-
-___
-
-### InvoiceLineItem
-
-Ƭ **InvoiceLineItem**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `amount` | `number` |
-| `description` | `string` |
-| `id` | `string` |
-| `quantity` | `number` |
-| `unitPrice` | `number` |
-
-#### Defined in
-
-[src/clients/billing.ts:52](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L52)
-
-___
-
-### IpfsFile
-
-Ƭ **IpfsFile**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `content` | `ArrayBuffer` \| `string` |
-| `path?` | `string` |
-
-#### Defined in
-
-[src/clients/ipfs.ts:17](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/ipfs.ts#L17)
-
-___
-
-### IpnsRecord
-
-Ƭ **IpnsRecord**: `Pick`\<`IpnsRecordWithRelations`, ``"id"`` \| ``"name"`` \| ``"hash"``\> & \{ `ensRecords`: `Pick`\<`IpnsRecordWithRelations`[``"ensRecords"``][`number`], ``"id"``\>[]  }
-
-#### Defined in
-
-[src/clients/ipns.ts:37](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/ipns.ts#L37)
-
-___
-
-### Payment
-
-Ƭ **Payment**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `amount` | `number` |
-| `blockchain?` | `string` |
-| `createdAt` | `number` |
-| `currency` | `string` |
-| `id` | `string` |
-| `invoiceId?` | `string` |
-| `provider?` | `string` |
-| `status` | ``"PENDING"`` \| ``"SUCCEEDED"`` \| ``"FAILED"`` |
-| `txHash?` | `string` |
-
-#### Defined in
-
-[src/clients/billing.ts:79](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L79)
-
-___
-
-### PaymentMethod
-
-Ƭ **PaymentMethod**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `blockchain?` | `string` |
-| `cardBrand?` | `string` |
-| `cardExpMonth?` | `number` |
-| `cardExpYear?` | `number` |
-| `cardLast4?` | `string` |
-| `createdAt` | `number` |
-| `id` | `string` |
-| `isDefault` | `boolean` |
-| `provider?` | `string` |
-| `type` | ``"CARD"`` \| ``"CRYPTO"`` |
-| `walletAddress?` | `string` |
-
-#### Defined in
-
-[src/clients/billing.ts:16](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L16)
-
-___
-
-### PrivateGateway
-
-Ƭ **PrivateGateway**: `Omit`\<`PrivateGatewayWithRelations`, ``"project"`` \| ``"domains"`` \| ``"domainsPaginated"`` \| ``"primaryDomain"``\> & \{ `project`: `Pick`\<`Project`, ``"id"``\>  }
-
-#### Defined in
-
-[src/clients/privateGateway.ts:26](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/privateGateway.ts#L26)
-
-___
-
-### Project
-
-Ƭ **Project**: `Omit`\<`ProjectWithRelations`, ``"currentUserMembership"`` \| ``"memberships"`` \| ``"membershipsPaginated"``\>
-
-#### Defined in
-
-[src/clients/projects.ts:26](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/projects.ts#L26)
-
-___
+## Sites & Deployments
 
 ### Site
 
-Ƭ **Site**: `Pick`\<`SiteWithRelations`, ``"id"`` \| ``"name"`` \| ``"slug"``\> & \{ `deployments`: [`Deployment`](README.md#deployment)[] ; `domains`: `Pick`\<`SiteWithRelations`[``"domains"``][`number`], ``"id"`` \| ``"hostname"``\>[] ; `ipnsRecords`: `Pick`\<`SiteWithRelations`[``"ipnsRecords"``][`number`], ``"id"``\>[] ; `primaryDomain?`: `Pick`\<`DomainWithRelations`, ``"id"`` \| ``"hostname"``\> ; `zones`: `Pick`\<`SiteWithRelations`[``"zones"``][`number`], ``"id"`` \| ``"status"``\>[]  }
+Represents a deployed static site.
 
-#### Defined in
+```typescript
+import type { Site } from '@alternatefutures/sdk';
 
-[src/clients/sites.ts:27](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/sites.ts#L27)
+const site: Site = await af.sites().get({ slug: 'my-site' });
+console.log(site.name, site.slug);
+```
 
-___
+**Properties:**
 
-### StoragePin
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique site identifier |
+| `name` | `string` | Display name |
+| `slug` | `string` | URL-friendly identifier |
+| `deployments` | `Deployment[]` | List of deployments |
+| `domains` | `{ id, hostname }[]` | Associated domains |
+| `primaryDomain` | `{ id, hostname }` | Primary domain (optional) |
+| `ipnsRecords` | `{ id }[]` | Associated IPNS records |
+| `zones` | `{ id, status }[]` | CDN zones |
 
-Ƭ **StoragePin**: `Pick`\<`Pin`, ``"cid"`` \| ``"filename"`` \| ``"extension"`` \| ``"arweavePin"``\> & \{ `arweaveId?`: `string` ; `filecoinDealIds?`: `string`  }
+### Deployment
 
-#### Defined in
+Represents a single deployment of a site.
 
-[src/clients/storage.ts:36](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/storage.ts#L36)
+```typescript
+import type { Deployment } from '@alternatefutures/sdk';
 
-___
+const deployments: Deployment[] = await af.sites().listDeployments({
+  siteId: 'site_abc123',
+});
+```
 
-### Subscription
+**Properties:**
 
-Ƭ **Subscription**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `basePricePerSeat` | `number` |
-| `cancelAt?` | `number` |
-| `createdAt` | `number` |
-| `currentPeriodEnd` | `number` |
-| `currentPeriodStart` | `number` |
-| `id` | `string` |
-| `plan` | ``"FREE"`` \| ``"STARTER"`` \| ``"PRO"`` \| ``"ENTERPRISE"`` |
-| `seats` | `number` |
-| `status` | ``"ACTIVE"`` \| ``"CANCELED"`` \| ``"PAST_DUE"`` \| ``"UNPAID"`` \| ``"TRIALING"`` |
-| `trialEnd?` | `number` |
-| `usageMarkup` | `number` |
-
-#### Defined in
-
-[src/clients/billing.ts:38](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L38)
-
-___
-
-### UploadContentOptions
-
-Ƭ **UploadContentOptions**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `functionName?` | `string` |
-| `siteId?` | `string` |
-
-#### Defined in
-
-[src/clients/uploadProxy.ts:60](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/uploadProxy.ts#L60)
-
-___
-
-### UploadPinResponse
-
-Ƭ **UploadPinResponse**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `duplicate` | `boolean` |
-| `pin` | `Pick`\<`Pin`, ``"cid"`` \| ``"size"``\> |
-
-#### Defined in
-
-[src/clients/uploadProxy.ts:65](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/uploadProxy.ts#L65)
-
-___
-
-### UploadProgress
-
-Ƭ **UploadProgress**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `loadedSize` | `number` |
-| `totalSize?` | `number` |
-
-#### Defined in
-
-[src/clients/uploadProxy.ts:36](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/uploadProxy.ts#L36)
-
-___
-
-### UsageMetric
-
-Ƭ **UsageMetric**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `amount` | `number` |
-| `quantity` | `number` |
-
-#### Defined in
-
-[src/clients/billing.ts:91](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L91)
-
-___
-
-### UsageRecord
-
-Ƭ **UsageRecord**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `amount` | `number` |
-| `createdAt` | `number` |
-| `id` | `string` |
-| `metricType` | ``"storage"`` \| ``"bandwidth"`` \| ``"compute"`` \| ``"requests"`` |
-| `periodEnd` | `number` |
-| `periodStart` | `number` |
-| `quantity` | `number` |
-| `recordedAt` | `number` |
-| `unitPrice` | `number` |
-
-#### Defined in
-
-[src/clients/billing.ts:106](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/billing.ts#L106)
-
-___
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique deployment identifier |
+| `status` | `string` | Deployment status |
+| `storageType` | `string` | Storage network (IPFS, Arweave) |
+| `siteId` | `string` | Parent site ID |
+| `cid` | `string` | Content identifier (IPFS CID) |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
 
 ### Zone
 
-Ƭ **Zone**: `Pick`\<`ZoneWithRelations`, ``"id"`` \| ``"originUrl"`` \| ``"createdAt"`` \| ``"updatedAt"`` \| ``"type"`` \| ``"status"``\>
+CDN zone configuration for a site.
 
-#### Defined in
+**Properties:**
 
-[src/clients/domains.ts:53](https://github.com/alternatefutures/package-cloud-sdk/blob/273a62c96e00913c611937c569246427892cbf80/src/clients/domains.ts#L53)
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Zone identifier |
+| `originUrl` | `string` | Origin server URL |
+| `type` | `string` | Zone type |
+| `status` | `string` | Zone status |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+---
+
+## Domains
+
+### Domain
+
+Custom domain configuration.
+
+```typescript
+import type { Domain } from '@alternatefutures/sdk';
+
+const domain: Domain = await af.domains().create({
+  siteId: 'site_abc123',
+  hostname: 'www.example.com',
+});
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Domain identifier |
+| `hostname` | `string` | Full domain name |
+| `zone` | `object` | Associated zone |
+| `isVerified` | `boolean` | DNS verification status |
+| `status` | `DomainStatus` | Current status |
+| `dnsConfigs` | `object[]` | Required DNS records |
+| `domainType` | `"WEB2" \| "ARNS" \| "ENS" \| "IPNS"` | Domain type |
+| `sslStatus` | `"NONE" \| "PENDING" \| "ACTIVE" \| "EXPIRED" \| "FAILED"` | SSL certificate status |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+### DomainStatus
+
+```typescript
+type DomainStatus =
+  | "ACTIVE"
+  | "CREATED"
+  | "CREATING"
+  | "CREATING_FAILED"
+  | "DELETING"
+  | "DELETING_FAILED"
+  | "VERIFYING"
+  | "VERIFYING_FAILED";
+```
+
+---
+
+## Storage
+
+### StoragePin
+
+Represents a pinned file in storage.
+
+```typescript
+import type { StoragePin } from '@alternatefutures/sdk';
+
+const files: StoragePin[] = await af.storage().list();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `cid` | `string` | Content identifier |
+| `filename` | `string` | Original filename |
+| `extension` | `string` | File extension |
+| `arweavePin` | `object` | Arweave pin info (if applicable) |
+| `arweaveId` | `string` | Arweave transaction ID (optional) |
+| `filecoinDealIds` | `string` | Filecoin deal IDs (optional) |
+
+### IpfsFile
+
+Input type for IPFS uploads.
+
+```typescript
+import type { IpfsFile } from '@alternatefutures/sdk';
+
+const file: IpfsFile = {
+  content: Buffer.from('Hello, World!'),
+  path: 'hello.txt',
+};
+```
+
+**Properties:**
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `content` | `ArrayBuffer \| string` | Yes | File content |
+| `path` | `string` | No | File path/name |
+
+### UploadPinResponse
+
+Response from upload operations.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `duplicate` | `boolean` | Whether content already existed |
+| `pin` | `{ cid, size }` | Pin details |
+
+### UploadProgress
+
+Progress callback data during uploads.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `loadedSize` | `number` | Bytes uploaded |
+| `totalSize` | `number` | Total bytes (optional) |
+
+### UploadContentOptions
+
+Options for content uploads.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `siteId` | `string` | Target site ID (optional) |
+| `functionName` | `string` | Target function name (optional) |
+
+---
+
+## IPNS & ENS
+
+### IpnsRecord
+
+InterPlanetary Naming System record for mutable content addressing.
+
+```typescript
+import type { IpnsRecord } from '@alternatefutures/sdk';
+
+const record: IpnsRecord = await af.ipns().create({
+  siteId: 'site_abc123',
+});
+
+// Update the record to point to new content
+await af.ipns().publish({
+  name: record.name,
+  hash: 'bafybei...',
+});
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Record identifier |
+| `name` | `string` | IPNS name (k51qzi...) |
+| `hash` | `string` | Current IPFS CID |
+| `ensRecords` | `{ id }[]` | Linked ENS records |
+
+### EnsRecord
+
+Ethereum Name Service record linking .eth domains to IPFS content.
+
+```typescript
+import type { EnsRecord } from '@alternatefutures/sdk';
+
+const ensRecords: EnsRecord[] = await af.ens().list();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Record identifier |
+| `site` | `{ id }` | Associated site |
+| `ipnsRecord` | `{ id, name, hash }` | Linked IPNS record |
+
+---
 
 ## Functions
 
-### createClient
+### AFFunction
 
-▸ **createClient**(`options?`): [`Client`](interfaces/Client.md)
+Serverless function definition.
 
-#### Parameters
+```typescript
+import type { AFFunction } from '@alternatefutures/sdk';
 
-| Name | Type |
-| :------ | :------ |
-| `options?` | `ClientOptions` |
+const functions: AFFunction[] = await af.functions().list();
+```
 
-#### Returns
+**Note:** Function properties are inherited from the platform's function schema, excluding internal fields like `projectId` and `site`.
 
-[`Client`](interfaces/Client.md)
+### AFFunctionStatus
 
-#### Defined in
+```typescript
+type AFFunctionStatus = "ACTIVE" | "INACTIVE";
+```
 
-node_modules/.pnpm/@alternatefutures+utils-genql-client@0.2.0/node_modules/@alternatefutures/utils-genql-client/dist/index.ts:34
+---
+
+## Billing
+
+### Customer
+
+Billing customer information.
+
+```typescript
+import type { Customer } from '@alternatefutures/sdk';
+
+const customer: Customer = await af.billing().getCustomer();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Customer identifier |
+| `email` | `string` | Email address (optional) |
+| `name` | `string` | Display name (optional) |
+| `createdAt` | `number` | Unix timestamp |
+
+### Subscription
+
+Active subscription details.
+
+```typescript
+import type { Subscription } from '@alternatefutures/sdk';
+
+const subscription: Subscription = await af.billing().getSubscription();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Subscription identifier |
+| `plan` | `"FREE" \| "STARTER" \| "PRO" \| "ENTERPRISE"` | Plan type |
+| `status` | `"ACTIVE" \| "CANCELED" \| "PAST_DUE" \| "UNPAID" \| "TRIALING"` | Status |
+| `seats` | `number` | Number of seats |
+| `basePricePerSeat` | `number` | Price per seat |
+| `usageMarkup` | `number` | Usage markup percentage |
+| `currentPeriodStart` | `number` | Period start (Unix timestamp) |
+| `currentPeriodEnd` | `number` | Period end (Unix timestamp) |
+| `trialEnd` | `number` | Trial end date (optional) |
+| `cancelAt` | `number` | Cancellation date (optional) |
+| `createdAt` | `number` | Creation timestamp |
+
+### Invoice
+
+Billing invoice.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Invoice identifier |
+| `invoiceNumber` | `string` | Human-readable number |
+| `status` | `"DRAFT" \| "OPEN" \| "PAID" \| "VOID" \| "UNCOLLECTIBLE"` | Invoice status |
+| `currency` | `string` | Currency code (e.g., "USD") |
+| `subtotal` | `number` | Subtotal amount |
+| `tax` | `number` | Tax amount |
+| `total` | `number` | Total amount |
+| `amountDue` | `number` | Amount due |
+| `amountPaid` | `number` | Amount paid |
+| `lineItems` | `InvoiceLineItem[]` | Line items (optional) |
+| `periodStart` | `number` | Billing period start (optional) |
+| `periodEnd` | `number` | Billing period end (optional) |
+| `dueDate` | `number` | Due date (optional) |
+| `paidAt` | `number` | Payment date (optional) |
+| `pdfUrl` | `string` | PDF download URL (optional) |
+| `createdAt` | `number` | Creation timestamp |
+
+### InvoiceLineItem
+
+Individual line item on an invoice.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Line item identifier |
+| `description` | `string` | Item description |
+| `quantity` | `number` | Quantity |
+| `unitPrice` | `number` | Price per unit |
+| `amount` | `number` | Total amount |
+
+### Payment
+
+Payment transaction.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Payment identifier |
+| `amount` | `number` | Payment amount |
+| `currency` | `string` | Currency code |
+| `status` | `"PENDING" \| "SUCCEEDED" \| "FAILED"` | Payment status |
+| `provider` | `string` | Payment provider (optional) |
+| `invoiceId` | `string` | Associated invoice ID (optional) |
+| `blockchain` | `string` | Blockchain network for crypto (optional) |
+| `txHash` | `string` | Transaction hash for crypto (optional) |
+| `createdAt` | `number` | Creation timestamp |
+
+### PaymentMethod
+
+Saved payment method.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Payment method identifier |
+| `type` | `"CARD" \| "CRYPTO"` | Payment type |
+| `isDefault` | `boolean` | Whether this is the default method |
+| `cardBrand` | `string` | Card brand (Visa, Mastercard, etc.) |
+| `cardLast4` | `string` | Last 4 digits of card |
+| `cardExpMonth` | `number` | Card expiration month |
+| `cardExpYear` | `number` | Card expiration year |
+| `walletAddress` | `string` | Crypto wallet address (optional) |
+| `blockchain` | `string` | Blockchain network (optional) |
+| `provider` | `string` | Payment provider (optional) |
+| `createdAt` | `number` | Creation timestamp |
+
+### CurrentUsage
+
+Current billing period usage.
+
+```typescript
+import type { CurrentUsage } from '@alternatefutures/sdk';
+
+const usage: CurrentUsage = await af.billing().getCurrentUsage();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `bandwidth` | `UsageMetric` | Bandwidth usage |
+| `compute` | `UsageMetric` | Compute usage |
+| `requests` | `UsageMetric` | Request count |
+| `storage` | `UsageMetric` | Storage usage |
+| `total` | `number` | Total cost |
+| `periodStart` | `number` | Period start (optional) |
+| `periodEnd` | `number` | Period end (optional) |
+
+### UsageMetric
+
+Individual usage metric.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `quantity` | `number` | Usage quantity |
+| `amount` | `number` | Cost amount |
+
+### UsageRecord
+
+Historical usage record.
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Record identifier |
+| `metricType` | `"storage" \| "bandwidth" \| "compute" \| "requests"` | Metric type |
+| `quantity` | `number` | Usage quantity |
+| `unitPrice` | `number` | Price per unit |
+| `amount` | `number` | Total amount |
+| `periodStart` | `number` | Period start |
+| `periodEnd` | `number` | Period end |
+| `recordedAt` | `number` | Recording timestamp |
+| `createdAt` | `number` | Creation timestamp |
+
+---
+
+## Projects & Applications
+
+### Project
+
+Project configuration and settings.
+
+```typescript
+import type { Project } from '@alternatefutures/sdk';
+
+const projects: Project[] = await af.projects().list();
+```
+
+**Note:** Project properties are inherited from the platform's project schema, excluding membership-related fields.
+
+### Application
+
+OAuth application for SDK authentication.
+
+```typescript
+import type { Application } from '@alternatefutures/sdk';
+
+const apps: Application[] = await af.applications().list();
+```
+
+**Properties include:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `whitelistDomains` | `string[]` | Allowed domains for CORS |
+| `whiteLabelDomains` | `string[]` | Custom branding domains |
+
+---
+
+## Gateways
+
+### PrivateGateway
+
+Private IPFS gateway configuration.
+
+```typescript
+import type { PrivateGateway } from '@alternatefutures/sdk';
+
+const gateways: PrivateGateway[] = await af.privateGateways().list();
+```
+
+**Properties include:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `project` | `{ id }` | Parent project |
+
+Additional properties are inherited from the platform's gateway schema.
+
+---
+
+## Error Handling
+
+All SDK methods throw errors that can be caught and handled:
+
+```typescript
+import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+
+try {
+  const site = await af.sites().get({ slug: 'nonexistent' });
+} catch (error) {
+  if (error.code === 'NOT_FOUND') {
+    console.error('Site not found');
+  } else if (error.code === 'UNAUTHORIZED') {
+    console.error('Check your access token');
+  } else {
+    throw error;
+  }
+}
+```
+
+---
+
+## TypeScript Support
+
+Import types directly from the SDK:
+
+```typescript
+import {
+  AlternateFuturesSdk,
+  PersonalAccessTokenService,
+  type Site,
+  type Deployment,
+  type Domain,
+  type StoragePin,
+  type IpnsRecord,
+  type EnsRecord,
+  type AFFunction,
+  type Project,
+  type Subscription,
+  type Invoice,
+  type CurrentUsage,
+} from '@alternatefutures/sdk/node';
+```
+
+---
+
+## Related Documentation
+
+- [SDK Overview](./index) - Getting started with the SDK
+- [Quick Start](./quickstart) - Deploy your first site in 5 minutes
+- [Installation Guide](./installation) - Detailed setup instructions
+- [CLI Reference](/cli/commands) - Command-line interface
+- [Guides](/guides/) - Tutorials and best practices
