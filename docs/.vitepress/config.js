@@ -27,8 +27,7 @@ export default defineConfig({
     /^\.\/enums\//,
     // Ignore dead links to pages not yet created
     '/guides/registry-api',
-    './team',
-    '/guides/monitoring'
+    './team'
   ],
 
   markdown: {
@@ -69,7 +68,9 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guides', link: '/guides/' },
       { text: 'CLI', link: '/cli/' },
-      { text: 'SDK', link: '/sdk/' }
+      { text: 'SDK', link: '/sdk/' },
+      { text: 'Brand', link: '/brand-guide' },
+      { text: 'Changelog', link: '/changelog' }
       // { text: 'App', link: 'https://app.alternatefutures.ai' } // Temporarily hidden during development
     ],
 
@@ -114,10 +115,30 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Migration',
+          collapsed: true,
+          items: [
+            { text: 'From Fleek', link: '/guides/migrate-from-fleek' },
+            { text: 'From Netlify', link: '/guides/migrate-from-netlify' },
+            { text: 'From Spheron', link: '/guides/migrate-from-spheron' },
+            { text: 'From Vercel', link: '/guides/migrate-from-vercel' }
+          ]
+        },
+        {
+          text: 'Framework Guides',
+          collapsed: true,
+          items: [
+            { text: 'Deploy Next.js', link: '/guides/deploy-nextjs' },
+            { text: 'Deploy React', link: '/guides/deploy-react' },
+            { text: 'Deploy Astro', link: '/guides/deploy-astro' }
+          ]
+        },
+        {
           text: 'Advanced',
           items: [
             { text: 'CI/CD Integration', link: '/guides/cicd' },
-            { text: 'Best Practices', link: '/guides/best-practices' }
+            { text: 'Best Practices', link: '/guides/best-practices' },
+            { text: 'Troubleshooting', link: '/troubleshooting' }
           ]
         },
         {
@@ -151,6 +172,35 @@ export default defineConfig({
             { text: 'API Reference', link: '/sdk/api' }
           ]
         }
+      ],
+
+      '/brand-guide': [
+        {
+          text: 'Brand Guide',
+          items: [
+            { text: 'Overview', link: '/brand-guide' }
+          ]
+        }
+      ],
+
+      '/troubleshooting': [
+        {
+          text: 'Help',
+          items: [
+            { text: 'Troubleshooting', link: '/troubleshooting' },
+            { text: 'Changelog', link: '/changelog' }
+          ]
+        }
+      ],
+
+      '/changelog': [
+        {
+          text: 'Help',
+          items: [
+            { text: 'Troubleshooting', link: '/troubleshooting' },
+            { text: 'Changelog', link: '/changelog' }
+          ]
+        }
       ]
     },
 
@@ -161,7 +211,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2025 Alternate Futures'
+      copyright: 'Copyright © 2025-2026 Alternate Futures'
     },
 
     search: {
@@ -171,6 +221,12 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['link', { rel: 'stylesheet', href: 'https://use.typekit.net/qqp2xqh.css' }]
+    ['link', { rel: 'stylesheet', href: 'https://use.typekit.net/qqp2xqh.css' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap'
+    }]
   ]
 })
