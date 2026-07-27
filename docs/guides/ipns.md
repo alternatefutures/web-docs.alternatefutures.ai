@@ -1,3 +1,7 @@
+---
+description: Create mutable pointers to IPFS content with IPNS on Alternate Futures for stable URLs that update without changing links.
+---
+
 # IPNS (InterPlanetary Name System)
 
 Use IPNS to create mutable pointers to your IPFS content, enabling dynamic updates without changing URLs.
@@ -32,7 +36,7 @@ graph LR
 
 ```bash [CLI]
 # Create IPNS record for a site
-af ipns create --site-id <site-id>
+acc ipns create --site-id <site-id>
 
 # The IPNS record will automatically point to
 # the site's latest deployment
@@ -62,7 +66,7 @@ console.log('Current Hash:', ipnsRecord.hash);
 
 ```bash [CLI]
 # List all IPNS records
-af ipns list
+acc ipns list
 ```
 
 ```typescript [SDK]
@@ -88,7 +92,7 @@ You can also manually publish a new hash:
 
 ```bash [CLI]
 # Publish new content to IPNS record
-af ipns publish \
+acc ipns publish \
   --ipns-id <ipns-id> \
   --hash <new-ipfs-cid>
 ```
@@ -111,7 +115,7 @@ Check what content an IPNS name currently points to:
 
 ```bash [CLI]
 # Resolve IPNS name to current CID
-af ipns resolve --name <ipns-name>
+acc ipns resolve --name <ipns-name>
 ```
 
 ```typescript [SDK]
@@ -131,7 +135,7 @@ console.log('Current CID:', resolved);
 
 ```bash [CLI]
 # Delete an IPNS record
-af ipns delete --ipns-id <ipns-id>
+acc ipns delete --ipns-id <ipns-id>
 ```
 
 ```typescript [SDK]
@@ -179,7 +183,7 @@ IPNS records automatically update when you deploy:
 
 ```bash
 # Deploy new version of site
-af sites deploy ./dist --site-id <site-id>
+acc sites deploy ./dist --site-id <site-id>
 
 # IPNS record automatically updates to new CID
 # Users accessing /ipns/<name> see new version
@@ -289,7 +293,7 @@ Improve IPNS performance:
 **Solutions:**
 - Wait 2-3 minutes for propagation
 - Try different gateway
-- Verify IPNS record exists: `af ipns list`
+- Verify IPNS record exists: `acc ipns list`
 - Check network connectivity to IPFS
 
 ### Old Content Still Showing
@@ -299,7 +303,7 @@ Improve IPNS performance:
 **Solutions:**
 - Clear browser cache
 - Wait for propagation (2-5 minutes)
-- Verify publish succeeded: `af ipns resolve`
+- Verify publish succeeded: `acc ipns resolve`
 - Try different IPFS gateway
 
 ### Slow Resolution

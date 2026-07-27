@@ -1,3 +1,7 @@
+---
+description: Store and distribute Docker images on a fully decentralized container registry running on Akash Network with IPFS storage.
+---
+
 # Decentralized Container Registry
 
 ## Overview
@@ -166,7 +170,7 @@ https://ipfs.alternatefutures.ai/ipfs/<CID>
 ### List Images
 
 ```bash
-af registry list
+acc registry list
 ```
 
 Shows all your container images with:
@@ -179,7 +183,7 @@ Shows all your container images with:
 ### Image Details
 
 ```bash
-af registry info myapp:latest
+acc registry info myapp:latest
 ```
 
 Displays:
@@ -192,7 +196,7 @@ Displays:
 ### Push Image
 
 ```bash
-af registry push myapp:latest
+acc registry push myapp:latest
 ```
 
 Tags and pushes to `registry.alternatefutures.ai/myapp:latest`
@@ -200,7 +204,7 @@ Tags and pushes to `registry.alternatefutures.ai/myapp:latest`
 ### Pull Image
 
 ```bash
-af registry pull myapp:latest
+acc registry pull myapp:latest
 ```
 
 Pulls from decentralized registry
@@ -398,7 +402,7 @@ docker login registry.alternatefutures.ai
 
 **Solution**: Verify image name and tag
 ```bash
-af registry list  # Check available images
+acc registry list  # Check available images
 ```
 
 ## Next Steps

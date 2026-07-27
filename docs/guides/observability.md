@@ -1,3 +1,7 @@
+---
+description: Monitor your deployments with distributed tracing, metrics, and logging using Alternate Futures Observability and APM.
+---
+
 # Observability & APM
 
 Monitor your applications with distributed tracing, metrics, and logging. The Alternate Futures Observability platform provides full APM (Application Performance Monitoring) capabilities for your deployed services.
@@ -249,10 +253,13 @@ logger.emit({
 ::: code-group
 
 ```typescript [Query Traces]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN,
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Query traces from the last hour
@@ -374,24 +381,24 @@ services.forEach(service => {
 
 ```bash [List Traces]
 # List recent traces
-af observability traces
+acc observability traces
 
 # Filter by service
-af observability traces --service api-gateway
+acc observability traces --service api-gateway
 
 # Filter by status (errors only)
-af observability traces --status ERROR
+acc observability traces --status ERROR
 
 # Filter by duration (slow requests)
-af observability traces --min-duration 500
+acc observability traces --min-duration 500
 
 # Look back further in time
-af observability traces --hours 24 --limit 100
+acc observability traces --hours 24 --limit 100
 ```
 
 ```bash [Get Trace Details]
 # View specific trace
-af observability trace abc123def456...
+acc observability trace abc123def456...
 
 # Output shows:
 # Trace Details:
@@ -414,20 +421,20 @@ af observability trace abc123def456...
 
 ```bash [Query Logs]
 # Recent logs
-af observability logs
+acc observability logs
 
 # Filter by severity
-af observability logs --severity ERROR
-af observability logs --severity WARN
+acc observability logs --severity ERROR
+acc observability logs --severity WARN
 
 # Search in log body
-af observability logs --search "connection failed"
+acc observability logs --search "connection failed"
 
 # Filter by service
-af observability logs --service database-worker
+acc observability logs --service database-worker
 
 # Combine filters
-af observability logs \
+acc observability logs \
   --service checkout-service \
   --severity ERROR \
   --hours 4
@@ -435,10 +442,10 @@ af observability logs \
 
 ```bash [Service Statistics]
 # Get service performance overview
-af observability services
+acc observability services
 
 # Look at last 7 days
-af observability services --hours 168
+acc observability services --hours 168
 
 # Output shows:
 # Found 5 service(s) with telemetry data:
@@ -456,10 +463,10 @@ af observability services --hours 168
 
 ```bash [Check Usage & Cost]
 # View telemetry usage for billing period
-af observability usage
+acc observability usage
 
 # Look at specific period
-af observability usage --days 7
+acc observability usage --days 7
 
 # Output shows:
 # Telemetry Usage Summary:
@@ -482,16 +489,16 @@ af observability usage --days 7
 
 ```bash [View/Update Settings]
 # View current settings
-af observability settings
+acc observability settings
 
 # Enable/disable telemetry types
-af observability settings:update --traces true --metrics false
+acc observability settings:update --traces true --metrics false
 
 # Adjust sampling rate (0.0 to 1.0)
-af observability settings:update --sample-rate 0.5
+acc observability settings:update --sample-rate 0.5
 
 # Change retention periods
-af observability settings:update --trace-retention 14 --log-retention 30
+acc observability settings:update --trace-retention 14 --log-retention 30
 ```
 
 :::
@@ -530,12 +537,12 @@ await af.observability().updateSettings('prj_abc123', {
 
 ```bash [CLI]
 # View settings
-af observability settings
+acc observability settings
 
 # Update individual settings
-af observability settings:update --sample-rate 0.5
-af observability settings:update --trace-retention 14
-af observability settings:update --logs false
+acc observability settings:update --sample-rate 0.5
+acc observability settings:update --trace-retention 14
+acc observability settings:update --logs false
 ```
 
 :::
@@ -624,7 +631,7 @@ Includes:
 Use the CLI to check current usage:
 
 ```bash
-af observability usage --days 30
+acc observability usage --days 30
 ```
 
 **Typical data sizes:**
@@ -756,7 +763,7 @@ const response = await fetch('https://other-service/api', {
 
 ```bash
 # Check settings
-af observability settings
+acc observability settings
 
 # Verify connectivity
 curl -X POST https://otel.alternatefutures.ai/v1/traces \

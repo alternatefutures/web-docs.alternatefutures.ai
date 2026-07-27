@@ -1,3 +1,7 @@
+---
+description: Connect your Alternate Futures sites to ENS domains for decentralized, human-readable .eth URLs pointing to IPFS content.
+---
+
 # ENS (Ethereum Name Service)
 
 Connect your Alternate Futures sites to Ethereum Name Service (ENS) domains for decentralized, human-readable URLs.
@@ -22,7 +26,7 @@ ENS (Ethereum Name Service) is a distributed, open naming system based on the Et
 
 ```bash [CLI]
 # Create an ENS record for your site
-af ens create
+acc ens create
 
 # You'll be prompted for:
 # - ENS name (e.g., mysite.eth)
@@ -56,7 +60,7 @@ console.log('Content hash:', ensRecord.ipnsRecord.hash);
 
 ```bash [CLI]
 # List all ENS records
-af ens list
+acc ens list
 ```
 
 ```typescript [SDK]
@@ -77,7 +81,7 @@ records.forEach(record => {
 
 ```bash [CLI]
 # Get details for a specific ENS record
-af ens detail
+acc ens detail
 
 # You'll be prompted to select the ENS record
 ```
@@ -102,7 +106,7 @@ After creating an ENS record, you need to manually update your ENS domain's cont
 
 ```bash [CLI]
 # Verify your ENS setup
-af ens verify
+acc ens verify
 
 # This checks if your ENS domain's content hash
 # matches the IPNS record from Alternate Futures
@@ -123,7 +127,7 @@ console.log('Set your ENS content hash to:', record.ipnsRecord.hash);
 
 1. **Get your IPNS hash** from Alternate Futures:
    ```bash
-   af ens detail
+   acc ens detail
    # Note the IPNS hash (starts with /ipns/...)
    ```
 
@@ -137,7 +141,7 @@ console.log('Set your ENS content hash to:', record.ipnsRecord.hash);
 
 6. **Verify** the setup:
    ```bash
-   af ens verify
+   acc ens verify
    ```
 
 ## Deleting an ENS Record
@@ -146,7 +150,7 @@ console.log('Set your ENS content hash to:', record.ipnsRecord.hash);
 
 ```bash [CLI]
 # Delete an ENS record
-af ens delete
+acc ens delete
 
 # You'll be prompted to select which ENS record to delete
 ```
@@ -220,7 +224,7 @@ No manual ENS updates needed after initial setup!
 
 ### ENS Verification Fails
 
-**Problem:** `af ens verify` shows mismatch
+**Problem:** `acc ens verify` shows mismatch
 
 **Solutions:**
 - Wait 5-10 minutes for Ethereum blockchain confirmation
@@ -235,7 +239,7 @@ No manual ENS updates needed after initial setup!
 **Solutions:**
 - Confirm browser has ENS support (try Brave)
 - Use `.eth.link` gateway: `mysite.eth.link`
-- Check IPNS record is published: `af ipns list`
+- Check IPNS record is published: `acc ipns list`
 - Verify content hash in ENS manager
 
 ### Content Not Updating
@@ -243,7 +247,7 @@ No manual ENS updates needed after initial setup!
 **Problem:** ENS shows old version of site
 
 **Solutions:**
-- Check IPNS record updated: `af ipns list`
+- Check IPNS record updated: `acc ipns list`
 - IPNS propagation can take 5-10 minutes
 - Clear browser cache
 - Try different ENS gateway

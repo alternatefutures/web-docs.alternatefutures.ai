@@ -1,3 +1,7 @@
+---
+description: Deploy your own OpenRegistry and IPFS container registry stack on Akash Network with this step-by-step guide.
+---
+
 # Deploying the Decentralized Registry
 
 This guide walks you through deploying your own OpenRegistry + IPFS stack on Akash Network.
@@ -556,7 +560,7 @@ akash provider lease-logs \
 
 - [Use Your Registry](/guides/decentralized-registry) - Push and pull images
 - [CLI Integration](/cli/commands) - Add registry commands to CLI
-- [Monitoring](/guides/monitoring) - Set up alerts and dashboards
+- **Monitoring** - Set up alerts and dashboards (guide coming soon)
 
 ## Support
 

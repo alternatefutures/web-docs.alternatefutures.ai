@@ -1,3 +1,7 @@
+---
+description: Authenticate with Alternate Futures using email magic links, SMS OTP, Web3 wallets, or social OAuth providers.
+---
+
 # Authentication
 
 Alternate Futures supports multiple authentication methods for maximum flexibility.
@@ -79,7 +83,7 @@ API key management via the web interface is currently in development. In the mea
 ```bash
 export AF_TOKEN="your-personal-access-token"
 export AF_PROJECT_ID="your-project-id"
-af sites list
+acc sites list
 ```
 
 **SDK:**

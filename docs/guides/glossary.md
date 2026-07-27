@@ -1,3 +1,7 @@
+---
+description: Definitions of IPFS, Filecoin, Arweave, ENS, IPNS, and other technical terms used in the Alternate Futures platform.
+---
+
 # Glossary
 
 A comprehensive guide to technical terms used throughout the Alternate Futures documentation.
@@ -274,19 +278,19 @@ Encryption certificates that enable HTTPS for secure web connections. The lock i
 
 A text-based interface for interacting with software. The Alternate Futures CLI lets you deploy from your terminal.
 
-**Example:** `af sites deploy ./dist --network ipfs`
+**Example:** `acc sites deploy ./dist --network ipfs`
 
 ### SDK (Software Development Kit)
 
 A set of tools and libraries for developers to build applications. The Alternate Futures SDK provides programmatic access.
 
-**Languages:** JavaScript/TypeScript, Python (coming soon)
+**Languages:** JavaScript/TypeScript (Node.js and browser)
 
 ### Environment Variables
 
 Configuration values stored outside your code, typically for secrets or environment-specific settings.
 
-**Example:** `AF_API_KEY=af_123...`
+**Example:** `AF_TOKEN=af_pat_123...`
 
 **Storage:** `.env` files locally, platform settings in production.
 

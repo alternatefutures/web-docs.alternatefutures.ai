@@ -1,3 +1,7 @@
+---
+description: Get started with the Alternate Futures SDK in under 5 minutes. Deploy sites and upload to IPFS programmatically.
+---
+
 # SDK Quickstart
 
 Get started with the Alternate Futures SDK in under 5 minutes.

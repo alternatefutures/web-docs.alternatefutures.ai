@@ -1,3 +1,7 @@
+---
+description: Create OAuth 2.0 applications and manage whitelisted domains for CORS and authentication on Alternate Futures.
+---
+
 # Applications
 
 Applications in Alternate Futures allow you to create OAuth applications and manage whitelisted domains for CORS and authentication purposes.
@@ -16,7 +20,7 @@ Applications are OAuth 2.0 applications that can authenticate users and access t
 
 ```bash [CLI]
 # Create a new application
-af applications create
+acc applications create
 
 # You'll be prompted for:
 # - Application name
@@ -47,7 +51,7 @@ console.log('Client ID:', app.clientId);
 
 ```bash [CLI]
 # List all applications
-af applications list
+acc applications list
 ```
 
 ```typescript [SDK]
@@ -68,7 +72,7 @@ applications.forEach(app => {
 
 ```bash [CLI]
 # Update an application
-af applications update
+acc applications update
 
 # You'll be prompted to:
 # 1. Select the application
@@ -92,7 +96,7 @@ await af.applications().update({
 
 ```bash [CLI]
 # Delete an application
-af applications delete
+acc applications delete
 
 # You'll be prompted to select which application to delete
 ```
@@ -134,12 +138,12 @@ Create separate applications for different environments:
 
 ```bash
 # Development app
-af applications create
+acc applications create
 # Name: My App (Dev)
 # Domains: http://localhost:3000
 
 # Production app
-af applications create
+acc applications create
 # Name: My App (Prod)
 # Domains: https://myapp.com, https://www.myapp.com
 ```

@@ -1,3 +1,7 @@
+---
+description: Overview of the Alternate Futures web dashboard for managing agents, sites, storage, and billing.
+---
+
 # Dashboard Overview
 
 ::: warning Web App Under Development

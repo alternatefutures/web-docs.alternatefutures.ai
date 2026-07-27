@@ -1,3 +1,7 @@
+---
+description: Deploy serverless edge functions on decentralized infrastructure with optional SGX encryption using Alternate Futures Cloud Functions.
+---
+
 # Cloud Functions
 
 Deploy serverless edge functions on decentralized infrastructure with Alternate Futures Functions.
@@ -27,17 +31,20 @@ Functions run in a secure JavaScript/TypeScript runtime with:
 
 ```bash [CLI]
 # Create a new function
-af functions create --name my-function
+acc functions create --name my-function
 
 # Create and attach to a site
-af functions create --name my-function --site-id <site-id>
+acc functions create --name my-function --site-id <site-id>
 ```
 
 ```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Create a function
@@ -116,18 +123,18 @@ export default async function handler(request) {
 
 ```bash [CLI]
 # Deploy function code
-af functions deploy \
+acc functions deploy \
   --function-id <function-id> \
   --code ./dist
 
 # Deploy with SGX security
-af functions deploy \
+acc functions deploy \
   --function-id <function-id> \
   --code ./dist \
   --sgx
 
 # Deploy with assets
-af functions deploy \
+acc functions deploy \
   --function-id <function-id> \
   --code ./dist \
   --assets ./public
@@ -159,7 +166,7 @@ console.log('Deployment ID:', deployment.id);
 
 ```bash [CLI]
 # List all functions
-af functions list
+acc functions list
 ```
 
 ```typescript [SDK]
@@ -181,7 +188,7 @@ functions.forEach(func => {
 
 ```bash [CLI]
 # List deployments for a function
-af functions list-deployments --function-id <function-id>
+acc functions list-deployments --function-id <function-id>
 ```
 
 ```typescript [SDK]
@@ -205,7 +212,7 @@ deployments.forEach(dep => {
 
 ```bash [CLI]
 # Update function configuration
-af functions update \
+acc functions update \
   --function-id <function-id> \
   --name new-name \
   --routes '/api/v2/*=handler.js'
@@ -231,7 +238,7 @@ await af.functions().update({
 
 ```bash [CLI]
 # Delete a function
-af functions delete --function-id <function-id>
+acc functions delete --function-id <function-id>
 ```
 
 ```typescript [SDK]
@@ -283,7 +290,7 @@ Set variables during deployment or in your build process.
 Enable SGX for enhanced security and privacy:
 
 ```bash
-af functions deploy \
+acc functions deploy \
   --function-id <function-id> \
   --code ./dist \
   --sgx

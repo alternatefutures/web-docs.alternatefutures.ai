@@ -1,3 +1,7 @@
+---
+description: The Alternate Futures JavaScript/TypeScript SDK for programmatic access to sites, storage, domains, IPNS, ENS, and cloud functions.
+---
+
 # SDK Documentation
 
 The Alternate Futures SDK provides a JavaScript/TypeScript library for programmatic access to the platform. Build decentralized applications with IPFS storage, serverless functions, and more.

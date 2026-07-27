@@ -1,3 +1,7 @@
+---
+description: Learn how to deploy sites, AI agents, and cloud functions to decentralized infrastructure with Alternate Futures platform guides.
+---
+
 # Platform Guides
 
 Welcome to the Alternate Futures platform guides. These guides will help you get started and master the platform.

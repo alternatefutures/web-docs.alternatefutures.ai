@@ -1,3 +1,7 @@
+---
+description: Connect custom domains from any registrar to your Alternate Futures sites with SSL certificates and DNS configuration.
+---
+
 # Custom Domains
 
 Bring your own domain from any registrar (GoDaddy, Namecheap, Cloudflare, etc.) and point it to your AlternateFutures site.
@@ -21,9 +25,37 @@ Custom domains provide:
 
 ### Step 1: Create Domain
 
-Use the GraphQL API or SDK to add your domain:
+::: code-group
 
-```graphql
+```bash [CLI]
+# Add a custom domain to your site
+acc domains create --siteSlug my-site --hostname example.com
+
+# The CLI will return the verification details
+# including any DNS records you need to configure
+```
+
+```typescript [SDK]
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
+});
+
+// Add a custom domain
+const domain = await af.domains().create({
+  siteId: 'site_abc123',
+  hostname: 'example.com',
+});
+
+console.log('Domain created:', domain.hostname);
+console.log('Verification status:', domain.isVerified);
+```
+
+```graphql [GraphQL (Advanced)]
 mutation {
   createDomain(input: {
     hostname: "example.com"
@@ -37,6 +69,8 @@ mutation {
   }
 }
 ```
+
+:::
 
 **Verification Methods:**
 - `TXT` - TXT record verification (works with root domains and subdomains)
@@ -152,16 +186,28 @@ mutation {
 
 After adding DNS records, verify your domain:
 
-```graphql
+::: code-group
+
+```bash [CLI]
+# Verify DNS configuration for your domain
+acc domains verify --hostname example.com
+
+# Check domain details
+acc domains detail --hostname example.com
+```
+
+```typescript [SDK]
+// Verify DNS configuration
+const verified = await af.domains().verify({ id: domain.id });
+console.log('Verified:', verified);
+```
+
+```graphql [GraphQL (Advanced)]
 mutation {
   verifyDomain(domainId: "domain-123")
 }
-```
 
-This checks DNS propagation and updates the domain status. You may need to wait a few minutes for DNS changes to propagate globally.
-
-**Check verification status:**
-```graphql
+# Check verification status:
 query {
   domain(id: "domain-123") {
     id
@@ -173,6 +219,10 @@ query {
   }
 }
 ```
+
+:::
+
+This checks DNS propagation and updates the domain status. You may need to wait a few minutes for DNS changes to propagate globally.
 
 ## SSL/TLS Certificates
 

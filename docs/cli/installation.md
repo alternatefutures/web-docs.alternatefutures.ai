@@ -1,3 +1,7 @@
+---
+description: Install and configure the Alternate Futures CLI on macOS, Linux, or Windows with npm, pnpm, or yarn.
+---
+
 # CLI Installation
 
 Complete guide to installing and configuring the Alternate Futures CLI.
@@ -38,7 +42,7 @@ yarn global add @alternatefutures/cli
 After installation, verify the CLI is working:
 
 ```bash
-af --version
+acc --version
 ```
 
 You should see the version number displayed. If you see "command not found", try:
@@ -54,7 +58,7 @@ Before using the CLI, you need to authenticate with your Alternate Futures accou
 ### Interactive Login (Recommended)
 
 ```bash
-af login
+acc login
 ```
 
 This opens your browser where you can sign in with:
@@ -70,7 +74,7 @@ After signing in, the CLI automatically saves your credentials.
 For environments without a browser (SSH, containers):
 
 ```bash
-af login --email
+acc login --email
 ```
 
 This sends a verification code to your email.
@@ -98,10 +102,10 @@ If you have multiple projects, select one:
 
 ```bash
 # List available projects
-af projects list
+acc projects list
 
 # Switch to a project
-af projects switch --id prj_abc123
+acc projects switch --id prj_abc123
 ```
 
 ### Site Configuration
@@ -110,10 +114,10 @@ Initialize a site configuration file in your project:
 
 ```bash
 cd my-project
-af sites init
+acc sites init
 ```
 
-This creates `af.config.json`:
+This creates `acc.config.json`:
 
 ```json
 {
@@ -194,7 +198,7 @@ jobs:
         run: npm install -g @alternatefutures/cli
 
       - name: Deploy
-        run: af sites deploy
+        run: acc sites deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -203,7 +207,7 @@ jobs:
 Or generate it automatically:
 
 ```bash
-af sites ci --provider github
+acc sites ci --provider github
 ```
 
 ### GitLab CI
@@ -218,7 +222,7 @@ deploy:
     - npm ci
     - npm run build
     - npm install -g @alternatefutures/cli
-    - af sites deploy
+    - acc sites deploy
   variables:
     AF_TOKEN: $AF_TOKEN
     AF_PROJECT_ID: $AF_PROJECT_ID
@@ -248,7 +252,7 @@ yarn global upgrade @alternatefutures/cli
 
 ## Troubleshooting
 
-### "Command not found: af"
+### "Command not found: acc"
 
 - Ensure the global npm directory is in your PATH
 - Try restarting your terminal
@@ -257,7 +261,7 @@ yarn global upgrade @alternatefutures/cli
 
 ### "Login failed" or browser doesn't open
 
-- Try email-based login: `af login --email`
+- Try email-based login: `acc login --email`
 - Check your internet connection
 - Ensure you have an account at [app.alternatefutures.ai](https://app.alternatefutures.ai)
 

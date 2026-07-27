@@ -1,3 +1,7 @@
+---
+description: Generate and manage personal access tokens and API keys for programmatic access to the Alternate Futures platform.
+---
+
 # API Keys
 
 ::: warning Web App Coming Soon
@@ -48,7 +52,7 @@ Set as environment variables:
 ```bash
 export AF_TOKEN="pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AF_PROJECT_ID="prj_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-af sites list
+acc sites list
 ```
 
 ### SDK
