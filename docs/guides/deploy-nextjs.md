@@ -4,16 +4,16 @@ description: Step-by-step guide to deploying a Next.js application to decentrali
 
 # Deploy a Next.js App
 
-Deploy your Next.js application to decentralized infrastructure using Alternate Futures. This guide covers both static export and server-side rendering configurations.
+Deploy a Next.js app to Alternate Clouds, the decentralized cloud platform from Alternate Futures. Alternate Clouds serves static output, so this guide walks through configuring Next.js for static export and deploying the result.
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-- **An Alternate Futures account** - [Sign up here](https://app.alternatefutures.ai) (free, no credit card required)
-- **The AF CLI installed** - `npm install -g @alternatefutures/cli`
+- **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
+- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/cli`
 - **Node.js 18 or later** - [Download here](https://nodejs.org/en/download)
-- **A Next.js project** (or we will create one below)
+- **A Next.js project** (or create one below)
 
 ## Quick Deploy (Existing Next.js Project)
 
@@ -23,15 +23,19 @@ If you already have a Next.js project, deploy it in three commands:
 # Build the static export
 npm run build
 
-# Initialize AF configuration
-acc sites init
+# Authenticate (opens a browser)
+acc login
 
-# Deploy to IPFS
-acc sites deploy
+# Deploy the service
+acc services deploy
 ```
 
 ::: tip Output Directory
-Next.js static export outputs to `./out` by default. When running `acc sites init`, set the output directory to `out`.
+Next.js static export outputs to `./out` by default. Set `distDir` to `out` in your `acc.config` so the CLI uploads the right folder.
+:::
+
+::: info What this maps to in code
+These are the commands the CLI actually registers — see [the CLI's actual command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts) (`login`, `logout`, `projects`, `services`, `deployments`, `ssh`, `billing`). Deploy lives at `acc services deploy [id]`.
 :::
 
 ## Step 1: Create a New Next.js Project
@@ -41,8 +45,8 @@ If you do not have a project yet, start from our template or create one from scr
 ### Option A: Use the AF Template (Recommended)
 
 ```bash
-# Clone the AF-optimized Next.js template
-git clone https://github.com/alternatefutures/template-nextjs my-nextjs-app
+# Clone the Alternate Clouds Next.js template
+git clone https://github.com/alternatefutures/template-cloud-nextjs my-nextjs-app
 cd my-nextjs-app
 
 # Install dependencies
@@ -125,7 +129,7 @@ This generates your static site in the `./out` directory. You can preview it loc
 npx serve out
 ```
 
-## Step 4: Authenticate with AF
+## Step 4: Authenticate with Alternate Clouds
 
 If you have not already authenticated:
 
@@ -140,18 +144,26 @@ export AF_TOKEN=pat_your_token_here
 ## Step 5: Initialize and Deploy
 
 ```bash
-# Initialize AF site configuration
-acc sites init
+Set the build fields in your `acc.config`:
 
-# When prompted, configure:
-#   Site name: my-nextjs-app
-#   Build command: npm run build
-#   Output directory: out
-#   Storage network: ipfs (recommended for getting started)
-
-# Deploy to decentralized storage
-acc sites deploy
+```json
+{
+  "slug": "my-nextjs-app",
+  "buildCommand": "npm run build",
+  "distDir": "out"
+}
 ```
+
+Then deploy:
+
+```bash
+# Deploy to decentralized storage
+acc services deploy
+```
+
+::: info What this maps to in code
+`slug`, `buildCommand`, and `distDir` are real fields in the [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+:::
 
 You should see output like:
 
@@ -165,14 +177,7 @@ You should see output like:
 
 ## Step 6: Set Up a Custom Domain (Optional)
 
-Point your own domain to your deployment:
-
-```bash
-# Add a custom domain
-acc domains add my-nextjs-app.com --site my-nextjs-app
-```
-
-Then configure your DNS:
+Add your domain from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) under your project's Domains settings, then configure your DNS:
 
 | Record Type | Name | Value |
 |-------------|------|-------|
@@ -210,8 +215,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to AF
-        run: npx @alternatefutures/cli sites deploy ./out --network ipfs
+      - name: Deploy to Alternate Clouds
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
@@ -230,12 +235,19 @@ const af = new AlternateFuturesSdk({
     personalAccessToken: process.env.AF_TOKEN,
     projectId: process.env.AF_PROJECT_ID,
   }),
+  // Required — the SDK throws EnvNotSetError if these are unset
+  ipfsStorageApiUrl: process.env.SDK__IPFS__STORAGE_API_URL,
+  uploadProxyApiUrl: process.env.SDK__UPLOAD_PROXY_API_URL,
 });
 
-// Deploy the build output
-const result = await af.ipfs().add('./out');
-console.log('Deployed! CID:', result.pin.cid);
+// Upload the build directory. addFromPath() returns an array of results.
+const results = await af.ipfs().addFromPath('./out');
+console.log('Deployed! CID:', results[0].cid);
 ```
+
+::: info What this maps to in code
+Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
+:::
 
 ## Common Issues
 

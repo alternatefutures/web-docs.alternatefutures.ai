@@ -73,6 +73,9 @@ npm run build
 
 # Check your af.config.json for the correct output directory
 cat af.config.json
+
+# The CLI resolves af.config using the lookup order in
+# src/utils/configuration/getConfiguration.ts
 ```
 
 ### "Deployment timed out"
@@ -83,7 +86,7 @@ The upload took too long, usually due to a large deployment or slow connection.
 
 ```bash
 # Try deploying again (network issues are often temporary)
-acc sites deploy
+acc services deploy
 
 # For large deployments, check your file count and total size
 du -sh ./dist
@@ -253,10 +256,10 @@ The content is not pinned or the IPFS gateway cannot find it.
 
 ```bash
 # Verify the deployment status
-acc sites list
+acc deployments
 
-# Re-pin the content
-acc sites deploy ./dist --network ipfs
+# Re-deploy to re-pin the content
+acc services deploy
 ```
 
 Common causes:
@@ -299,10 +302,10 @@ You have reached the storage limit for your plan.
 
 **Fix:**
 
-- Remove old deployments that are no longer needed: `acc sites delete <site-slug>`
+- Remove services that are no longer needed: `acc services delete <id>`
 - Upgrade your plan for more storage
 - Use Filecoin for large files (cheaper per GB)
-- Check your current usage: `acc billing usage`
+- Check your current credit balance: `acc billing balance`
 
 ## SSL Certificate Problems
 

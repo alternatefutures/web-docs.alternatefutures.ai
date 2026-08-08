@@ -4,7 +4,7 @@ description: Step-by-step guide to migrate your sites, storage, and deployments 
 
 # Migrate from Spheron
 
-Spheron has pivoted away from Web3 hosting to focus on GPU compute and AI inference. If you have sites, storage, or deployments on Spheron, this guide walks you through migrating everything to Alternate Futures.
+Spheron has pivoted away from Web3 hosting to focus on GPU compute and AI inference. If you still run sites, storage, or deployments there, this guide moves all of it onto Alternate Clouds — decentralized hosting from Alternate Futures across IPFS, Filecoin, and Arweave.
 
 **Time to complete:** 15-30 minutes per site
 
@@ -39,11 +39,15 @@ If you used Spheron primarily for GPU compute, that functionality is separate fr
 
 2. **Create an Alternate Futures account** at [app.alternatefutures.ai](https://app.alternatefutures.ai)
 
-3. **Install the Alternate Futures CLI:**
+3. **Install the Alternate Clouds CLI:**
    ```bash
    npm install -g @alternatefutures/cli
    acc login
    ```
+
+   ::: warning CLI binary name
+   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+   :::
 
 ## Step 1: Migrate Your Site
 
@@ -59,14 +63,16 @@ cd my-project
 # Build your project (if not already built)
 npm run build
 
-# Initialize AF configuration
-acc sites init
+# Create a service (choose a starter template when prompted)
+acc services create
 
-# Deploy to IPFS (default), Filecoin, or Arweave
-acc sites deploy
+# Deploy it — pass the service id, or omit to pick interactively
+acc services deploy [id]
 ```
 
-The `acc sites init` command creates an `af.config.json` file. Here is how Spheron's configuration maps:
+These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+
+If you keep an `af.config.json` in your project, here is how Spheron's configuration maps onto it:
 
 **Spheron config (via dashboard):**
 - Framework: Auto-detected
@@ -86,6 +92,8 @@ The `acc sites init` command creates an `af.config.json` file. Here is how Spher
   ]
 }
 ```
+
+> **What this maps to in code:** these fields are the [`af.config` schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
 
 ### From Spheron SDK to AF SDK
 
@@ -115,32 +123,37 @@ const af = new AlternateFuturesSdk({
   }),
 });
 
-// Upload to IPFS
-const result = await af.ipfs().add('./dist');
-console.log('CID:', result.pin.cid);
-console.log('URL:', `https://ipfs.io/ipfs/${result.pin.cid}`);
+// Upload a directory to IPFS
+const [result] = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
+console.log('URL:', `https://ipfs.io/ipfs/${result.cid.toString()}`);
 ```
+
+> **What this maps to in code:** `addFromPath` returns a `UploadResult[]` of `{ cid, size, path }` — see the [IPFS client return shape (UploadResult)](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
 
 ### Storage Protocol Mapping
 
 If you were using specific storage protocols on Spheron, here is how they map:
 
-| Spheron Protocol | AF Equivalent | CLI Flag |
-|-----------------|---------------|----------|
-| `ProtocolEnum.IPFS` | IPFS (default) | `acc sites deploy` |
-| `ProtocolEnum.FILECOIN` | Filecoin | `acc sites deploy --filecoin` |
-| `ProtocolEnum.ARWEAVE` | Arweave | `acc sites deploy --arweave` |
+| Spheron Protocol | Alternate Clouds equivalent | How to target it |
+|-----------------|-----------------------------|------------------|
+| `ProtocolEnum.IPFS` | IPFS (default) | Deployed by default |
+| `ProtocolEnum.FILECOIN` | Filecoin | Dashboard / SDK (no CLI flag yet) |
+| `ProtocolEnum.ARWEAVE` | Arweave | Dashboard / SDK (no CLI flag yet) |
+
+::: info Storage targeting
+A per-deploy `--filecoin` / `--arweave` CLI flag is not available yet. Choose the storage network from the dashboard or via the SDK.
+:::
 
 ## Step 2: Migrate IPFS Content
 
 If you have content pinned on Spheron's IPFS infrastructure, re-pin it on Alternate Futures before Spheron's pinning service goes offline.
 
-```bash
-# If you have the original files, re-upload them
-acc storage add ./my-files
+There is no direct `acc` storage command today — re-pin through the SDK:
 
-# Upload a directory to IPFS
-acc ipfs add ./my-content
+```typescript
+const results = await af.ipfs().addFromPath('./my-content');
+console.log('CID:', results[0].cid.toString());
 ```
 
 Your CIDs will remain the same since IPFS content-addressing is deterministic -- the same files always produce the same CID.
@@ -154,8 +167,8 @@ Arweave content is permanently stored on-chain, so it does not need to be re-upl
 # Access via any Arweave gateway:
 # https://arweave.net/{TX_ID}
 
-# Deploy new content to Arweave via AF
-acc sites deploy --arweave
+# Target Arweave for new content from the dashboard or SDK
+# (no per-deploy CLI flag yet)
 ```
 
 ## Step 3: Migrate Custom Domains
@@ -179,13 +192,9 @@ dig yourdomain.com TXT
 
 ### Configure Domains on Alternate Futures
 
-```bash
-# Add your domain to your AF site
-acc domains create --siteSlug my-site --hostname yourdomain.com
-
-# Get the required DNS records
-acc domains detail --hostname yourdomain.com
-```
+::: info Where to configure domains
+Add custom domains from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) (a CLI `domains` command is not yet available). The dashboard shows the exact DNS records to set at your registrar.
+:::
 
 ### Update DNS Records
 
@@ -203,14 +212,11 @@ TTL: 3600
 ```
 Type: A
 Name: @
-Value: [Platform IP from acc domains detail]
+Value: [Platform IP shown in the dashboard]
 TTL: 3600
 ```
 
-```bash
-# Verify DNS configuration
-acc domains verify --hostname yourdomain.com
-```
+The dashboard reports verification status once your DNS records propagate.
 
 See the [Custom Domains guide](./custom-domains.md) for full details.
 
@@ -247,7 +253,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: npx @alternatefutures/cli sites deploy
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -256,7 +262,7 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with `acc pat create --name "CI/CD"`)
+2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
 3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 5: Migrate Environment Variables
@@ -287,11 +293,11 @@ If your Spheron project used environment variables:
 Beyond replacing Spheron's hosting functionality, Alternate Futures provides additional features:
 
 - **AI agent deployment** -- Deploy Eliza chatbots, ComfyUI image generators, and custom agents
-- **Cloud functions** -- Serverless edge functions with optional SGX encryption
+- **Cloud functions** -- Serverless functions (confidential-compute options where available)
 - **Observability** -- OpenTelemetry-based APM with distributed tracing, metrics, and logging
 - **ENS integration** -- Full ENS domain support with `.eth` names
 - **IPNS records** -- Mutable pointers for stable URLs to changing content
-- **Private gateways** -- Dedicated IPFS gateways with custom domains
+- **Private gateways** -- Dedicated IPFS gateways with custom domains (via the SDK)
 - **Decentralized container registry** -- Self-hosted Docker registry on Akash
 - **Multi-method auth** -- Email, social OAuth, Web3 wallets (SIWE)
 
@@ -301,11 +307,11 @@ Beyond replacing Spheron's hosting functionality, Alternate Futures provides add
 |-----------------|------------------------------|
 | Dashboard deployments | CLI + SDK (web dashboard coming soon) |
 | GitHub auto-deploy | [CI/CD Integration](./cicd.md) with GitHub Actions |
-| IPFS pinning | Built-in IPFS pinning with `acc storage add` |
-| Arweave uploads | `acc sites deploy --arweave` |
-| Filecoin storage | `acc sites deploy --filecoin` |
+| IPFS pinning | Built-in IPFS pinning (SDK `af.ipfs().addFromPath()`) |
+| Arweave uploads | Arweave storage (dashboard / SDK) |
+| Filecoin storage | Filecoin storage (dashboard / SDK) |
 | Custom domains | [Custom Domains](./custom-domains.md) with SSL |
-| Preview deployments | Every deployment gets a unique CID URL |
+| Preview deployments | Each deployment is content-addressed on IPFS |
 | Team collaboration | [Projects](./projects.md) with team management |
 
 ## Troubleshooting

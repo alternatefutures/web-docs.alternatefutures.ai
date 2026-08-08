@@ -6,6 +6,10 @@ description: Create mutable pointers to IPFS content with IPNS on Alternate Futu
 
 Use IPNS to create mutable pointers to your IPFS content, enabling dynamic updates without changing URLs.
 
+::: tip What this maps to in code
+IPNS is managed entirely through the SDK's [`ipns.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) (`createRecordForSite`, `listRecords`, `publishRecord`, `resolveName`, `deleteRecord`). The `acc` CLI does not register an `ipns` command ([cli.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts)), so all examples below use the SDK.
+:::
+
 ## What is IPNS?
 
 IPNS (InterPlanetary Name System) is a system for creating mutable pointers to IPFS content. While IPFS content is immutable (CID changes with each update), IPNS provides:
@@ -32,44 +36,28 @@ graph LR
 
 ## Creating an IPNS Record
 
-::: code-group
-
-```bash [CLI]
-# Create IPNS record for a site
-acc ipns create --site-id <site-id>
-
-# The IPNS record will automatically point to
-# the site's latest deployment
-```
-
-```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
-// Create IPNS record for a site
+// Create an IPNS record for a site
 const ipnsRecord = await af.ipns().createRecordForSite({
-  siteId: 'site-id'
+  siteId: 'site-id',
 });
 
 console.log('IPNS Name:', ipnsRecord.name);
 console.log('Current Hash:', ipnsRecord.hash);
 ```
 
-:::
-
 ## Listing IPNS Records
 
-::: code-group
-
-```bash [CLI]
-# List all IPNS records
-acc ipns list
-```
-
-```typescript [SDK]
+```typescript
 // List all IPNS records
 const records = await af.ipns().listRecords();
 
@@ -80,24 +68,11 @@ records.forEach(record => {
 });
 ```
 
-:::
-
 ## Publishing Updates
 
-When you deploy a new version of your site, the IPNS record automatically updates to point to the new content.
+To point an IPNS name at newly deployed content, publish the new hash to the record:
 
-You can also manually publish a new hash:
-
-::: code-group
-
-```bash [CLI]
-# Publish new content to IPNS record
-acc ipns publish \
-  --ipns-id <ipns-id> \
-  --hash <new-ipfs-cid>
-```
-
-```typescript [SDK]
+```typescript
 // Publish new content to IPNS
 await af.ipns().publishRecord({
   id: 'ipns-record-id',
@@ -105,20 +80,11 @@ await af.ipns().publishRecord({
 });
 ```
 
-:::
-
 ## Resolving IPNS Names
 
 Check what content an IPNS name currently points to:
 
-::: code-group
-
-```bash [CLI]
-# Resolve IPNS name to current CID
-acc ipns resolve --name <ipns-name>
-```
-
-```typescript [SDK]
+```typescript
 // Resolve IPNS name
 const resolved = await af.ipns().resolveName({
   name: '/ipns/k51qzi5uqu5di...'
@@ -127,25 +93,14 @@ const resolved = await af.ipns().resolveName({
 console.log('Current CID:', resolved);
 ```
 
-:::
-
 ## Deleting an IPNS Record
 
-::: code-group
-
-```bash [CLI]
-# Delete an IPNS record
-acc ipns delete --ipns-id <ipns-id>
-```
-
-```typescript [SDK]
+```typescript
 // Delete IPNS record
 await af.ipns().deleteRecord({
   id: 'ipns-record-id'
 });
 ```
-
-:::
 
 ## Accessing Content via IPNS
 
@@ -177,24 +132,24 @@ https://yoursite.eth.link
 https://yoursite.eth.limo
 ```
 
-## Automatic Updates
+## Publishing a New Version
 
-IPNS records automatically update when you deploy:
+Each deployment produces a new IPFS CID. To point an existing IPNS name at that CID, publish it explicitly with the SDK:
 
-```bash
-# Deploy new version of site
-acc sites deploy ./dist --site-id <site-id>
-
-# IPNS record automatically updates to new CID
-# Users accessing /ipns/<name> see new version
+```typescript
+// After deploying and obtaining the new CID
+await af.ipns().publishRecord({
+  id: 'ipns-record-id',
+  hash: 'QmNewContentHash...',
+});
 ```
 
 The flow:
-1. Deploy creates new IPFS CID
-2. Deployment completes successfully
-3. Site's IPNS record updated to new CID
-4. Propagation across IPFS network (1-2 minutes)
-5. Users see updated content
+1. Deploy your site, producing a new IPFS CID
+2. Publish the new CID to your existing IPNS record (SDK call above)
+3. The IPNS name resolves to the new CID
+4. Changes propagate across the IPFS network (typically 1-2 minutes)
+5. Users accessing `/ipns/<name>` see the updated content
 
 ## Use Cases
 
@@ -293,7 +248,7 @@ Improve IPNS performance:
 **Solutions:**
 - Wait 2-3 minutes for propagation
 - Try different gateway
-- Verify IPNS record exists: `acc ipns list`
+- Verify the IPNS record exists with the SDK: `af.ipns().listRecords()`
 - Check network connectivity to IPFS
 
 ### Old Content Still Showing
@@ -303,7 +258,7 @@ Improve IPNS performance:
 **Solutions:**
 - Clear browser cache
 - Wait for propagation (2-5 minutes)
-- Verify publish succeeded: `acc ipns resolve`
+- Verify the publish succeeded with the SDK: `af.ipns().resolveName({ name })`
 - Try different IPFS gateway
 
 ### Slow Resolution
@@ -321,14 +276,16 @@ Improve IPNS performance:
 For advanced users who want to manage their own IPNS keys:
 
 ```bash
-# Generate IPNS key locally
+# Generate an IPNS key locally with the IPFS CLI
 ipfs key gen my-site
 
-# Publish with custom key
+# Publish with your custom key
 ipfs name publish --key=my-site <CID>
-
-# Import key to Alternate Futures (contact support)
 ```
+
+::: warning
+Alternate Futures manages IPNS keys on your behalf; importing an externally generated key is not currently supported through the SDK. Use the SDK's `createRecordForSite` to have a key provisioned for you.
+:::
 
 ## Best Practices
 

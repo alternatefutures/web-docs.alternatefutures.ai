@@ -4,7 +4,7 @@ description: Monitor your deployments with distributed tracing, metrics, and log
 
 # Observability & APM
 
-Monitor your applications with distributed tracing, metrics, and logging. The Alternate Futures Observability platform provides full APM (Application Performance Monitoring) capabilities for your deployed services.
+Instrument your services once, then query traces, metrics, and logs from the Alternate Clouds observability platform — full APM (Application Performance Monitoring) built on OpenTelemetry.
 
 ## Overview
 
@@ -18,7 +18,7 @@ The observability platform enables you to:
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Your Applications                            │
 │  (AF Functions, Node.js, Python, Go, etc.)                      │
@@ -43,7 +43,7 @@ The observability platform enables you to:
            │
            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│              Query via SDK, CLI, or GraphQL API                  │
+│              Query via SDK or GraphQL API                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -97,6 +97,10 @@ That's it! Your application is now sending traces, metrics, and logs to the Alte
 ---
 
 ## Instrumentation Setup
+
+::: tip What this maps to in code
+`initInstrumentation` and `withSpan` are real exports of the [SDK instrumentation module](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/instrumentation/index.ts), available via the `@alternatefutures/sdk/instrumentation` subpath.
+:::
 
 ### Node.js Auto-Instrumentation
 
@@ -250,6 +254,10 @@ logger.emit({
 
 ### Using the SDK
 
+::: tip What this maps to in code
+Every method below (`queryTraces`, `getTrace`, `queryLogs`, `queryMetrics`, `getServices`, `getSettings`, `updateSettings`, `getUsage`) is defined in the [observability SDK client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/observability.ts).
+:::
+
 ::: code-group
 
 ```typescript [Query Traces]
@@ -264,7 +272,7 @@ const af = new AlternateFuturesSdk({
 
 // Query traces from the last hour
 const traces = await af.observability().queryTraces({
-  projectId: 'prj_abc123',
+  projectId: process.env.AF_PROJECT_ID, // cuid, e.g. 'clx1a2b3c4d5e6f7g8h9'
   startTime: new Date(Date.now() - 60 * 60 * 1000),
   endTime: new Date(),
   serviceName: 'api-gateway',  // optional filter
@@ -285,7 +293,7 @@ traces.forEach(trace => {
 ```typescript [Get Trace Details]
 // Get full trace with all spans
 const trace = await af.observability().getTrace(
-  'prj_abc123',
+  process.env.AF_PROJECT_ID, // cuid
   'abc123def456...'
 );
 
@@ -310,12 +318,11 @@ trace.spans.forEach(span => {
 ```typescript [Query Logs]
 // Query logs with filters
 const logs = await af.observability().queryLogs({
-  projectId: 'prj_abc123',
+  projectId: process.env.AF_PROJECT_ID, // cuid, e.g. 'clx1a2b3c4d5e6f7g8h9'
   startTime: new Date(Date.now() - 24 * 60 * 60 * 1000),
   endTime: new Date(),
-  severityText: 'ERROR',         // Filter by severity
-  bodyContains: 'payment',       // Search in log body
-  serviceName: 'checkout-service',
+  severityText: 'ERROR',   // Filter by severity
+  search: 'payment',       // Full-text search in log body
   limit: 100,
 });
 
@@ -330,12 +337,12 @@ logs.forEach(log => {
 ```typescript [Query Metrics]
 // Query metrics with aggregation
 const metrics = await af.observability().queryMetrics({
-  projectId: 'prj_abc123',
+  projectId: process.env.AF_PROJECT_ID, // cuid, e.g. 'clx1a2b3c4d5e6f7g8h9'
   startTime: new Date(Date.now() - 60 * 60 * 1000),
   endTime: new Date(),
   metricName: 'http.server.duration',
-  aggregation: 'avg',
-  groupBy: ['http.route', 'http.status_code'],
+  aggregation: 'AVG',
+  interval: '1m',
 });
 
 metrics.forEach(series => {
@@ -350,7 +357,7 @@ metrics.forEach(series => {
 ```typescript [Service Statistics]
 // Get service-level statistics
 const services = await af.observability().getServices(
-  'prj_abc123',
+  process.env.AF_PROJECT_ID, // cuid
   new Date(Date.now() - 24 * 60 * 60 * 1000),
   new Date()
 );
@@ -375,133 +382,13 @@ services.forEach(service => {
 
 :::
 
-### Using the CLI
+### Querying via GraphQL
 
-::: code-group
-
-```bash [List Traces]
-# List recent traces
-acc observability traces
-
-# Filter by service
-acc observability traces --service api-gateway
-
-# Filter by status (errors only)
-acc observability traces --status ERROR
-
-# Filter by duration (slow requests)
-acc observability traces --min-duration 500
-
-# Look back further in time
-acc observability traces --hours 24 --limit 100
-```
-
-```bash [Get Trace Details]
-# View specific trace
-acc observability trace abc123def456...
-
-# Output shows:
-# Trace Details:
-#   Trace ID:    abc123def456...
-#   Service:     api-gateway
-#   Duration:    234.56ms
-#   Span Count:  12
-#   Has Error:   No
-#   Start Time:  12/29/2025, 10:30:15 AM
-#
-# Spans:
-# ┌────────────────────────────┬────────┬────────────┬────────┬──────────────┐
-# │ Span Name                  │ Kind   │ Duration   │ Status │ Service      │
-# ├────────────────────────────┼────────┼────────────┼────────┼──────────────┤
-# │ HTTP GET /api/users        │ SERVER │ 234.56ms   │ OK     │ api-gateway  │
-# │ PostgreSQL SELECT          │ CLIENT │ 45.23ms    │ OK     │ api-gateway  │
-# │ Redis GET                  │ CLIENT │ 2.34ms     │ OK     │ api-gateway  │
-# └────────────────────────────┴────────┴────────────┴────────┴──────────────┘
-```
-
-```bash [Query Logs]
-# Recent logs
-acc observability logs
-
-# Filter by severity
-acc observability logs --severity ERROR
-acc observability logs --severity WARN
-
-# Search in log body
-acc observability logs --search "connection failed"
-
-# Filter by service
-acc observability logs --service database-worker
-
-# Combine filters
-acc observability logs \
-  --service checkout-service \
-  --severity ERROR \
-  --hours 4
-```
-
-```bash [Service Statistics]
-# Get service performance overview
-acc observability services
-
-# Look at last 7 days
-acc observability services --hours 168
-
-# Output shows:
-# Found 5 service(s) with telemetry data:
-#
-# ┌────────────────────┬─────────┬──────────┬────────┬────────────┬──────────┬──────────┬──────────┬──────────┐
-# │ Service            │ Traces  │ Spans    │ Errors │ Error Rate │ Avg (ms) │ P50 (ms) │ P95 (ms) │ P99 (ms) │
-# ├────────────────────┼─────────┼──────────┼────────┼────────────┼──────────┼──────────┼──────────┼──────────┤
-# │ api-gateway        │ 15,234  │ 45,702   │ 123    │ 0.3%       │ 45.23    │ 32.10    │ 156.78   │ 423.45   │
-# │ user-service       │ 8,456   │ 16,912   │ 45     │ 0.3%       │ 23.45    │ 18.90    │ 67.89    │ 145.67   │
-# │ checkout-service   │ 3,234   │ 12,936   │ 234    │ 1.8%       │ 156.78   │ 123.45   │ 456.78   │ 890.12   │
-# │ notification-svc   │ 12,345  │ 24,690   │ 12     │ 0.0%       │ 12.34    │ 10.00    │ 34.56    │ 67.89    │
-# │ analytics-worker   │ 1,234   │ 3,702    │ 0      │ 0.0%       │ 234.56   │ 200.00   │ 567.89   │ 890.12   │
-# └────────────────────┴─────────┴──────────┴────────┴────────────┴──────────┴──────────┴──────────┴──────────┘
-```
-
-```bash [Check Usage & Cost]
-# View telemetry usage for billing period
-acc observability usage
-
-# Look at specific period
-acc observability usage --days 7
-
-# Output shows:
-# Telemetry Usage Summary:
-#
-#   Period:         12/1/2025 - 12/29/2025
-#   Project ID:     prj_abc123
-#
-# ┌───────────────────────┬───────────────────┐
-# │ Metric                │ Value             │
-# ├───────────────────────┼───────────────────┤
-# │ Spans Ingested        │ 1,234,567         │
-# │ Metrics Ingested      │ 456,789           │
-# │ Logs Ingested         │ 789,012           │
-# │ Total Data Ingested   │ 2.34 GB           │
-# │ Estimated Cost        │ $0.82             │
-# └───────────────────────┴───────────────────┘
-#
-# Pricing: $0.35 per GB ingested
-```
-
-```bash [View/Update Settings]
-# View current settings
-acc observability settings
-
-# Enable/disable telemetry types
-acc observability settings:update --traces true --metrics false
-
-# Adjust sampling rate (0.0 to 1.0)
-acc observability settings:update --sample-rate 0.5
-
-# Change retention periods
-acc observability settings:update --trace-retention 14 --log-retention 30
-```
-
+::: info CLI support is on the roadmap
+There is no `acc observability` command yet. Query observability data through the SDK (`af.observability()`) or the GraphQL API. The relevant types (`ObservabilitySettings`, `TelemetryUsageSummary`) and operations (`observabilitySettings`, `telemetryUsage`, `updateObservabilitySettings`) are defined in the [observability GraphQL schema](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts).
 :::
+
+<!-- Fabricated `acc observability ...` CLI code-group removed: no such command exists. -->
 
 ---
 
@@ -513,7 +400,7 @@ Configure per-project observability settings:
 
 ```typescript [SDK]
 // Get current settings
-const settings = await af.observability().getSettings('prj_abc123');
+const settings = await af.observability().getSettings(process.env.AF_PROJECT_ID);
 
 console.log('Observability Settings:');
 console.log(`  Traces: ${settings.tracesEnabled ? 'Enabled' : 'Disabled'}`);
@@ -525,7 +412,7 @@ console.log(`  Metric Retention: ${settings.metricRetention} days`);
 console.log(`  Log Retention: ${settings.logRetention} days`);
 
 // Update settings
-await af.observability().updateSettings('prj_abc123', {
+await af.observability().updateSettings(process.env.AF_PROJECT_ID, {
   tracesEnabled: true,
   metricsEnabled: true,
   logsEnabled: true,
@@ -535,14 +422,15 @@ await af.observability().updateSettings('prj_abc123', {
 });
 ```
 
-```bash [CLI]
-# View settings
-acc observability settings
-
-# Update individual settings
-acc observability settings:update --sample-rate 0.5
-acc observability settings:update --trace-retention 14
-acc observability settings:update --logs false
+```graphql [GraphQL]
+# Read via observabilitySettings, write via updateObservabilitySettings
+mutation {
+  updateObservabilitySettings(input: { sampleRate: 0.5, traceRetention: 14, logsEnabled: false }) {
+    sampleRate
+    traceRetention
+    logsEnabled
+  }
+}
 ```
 
 :::
@@ -614,11 +502,15 @@ export default async function handler(request) {
 
 ## Pricing
 
+::: warning Illustrative pricing
+The rate below is an example for cost modeling, not a committed price. The API returns actual cost via `TelemetryUsageSummary` (`costCents` / `costFormatted`); confirm current rates with your plan.
+:::
+
 Observability is billed based on data ingested:
 
-| Metric | Price |
+| Metric | Example rate |
 |--------|-------|
-| Data Ingestion | **$0.35 per GB** |
+| Data Ingestion | ~$0.35 per GB |
 
 Includes:
 - Traces, metrics, and logs
@@ -628,10 +520,11 @@ Includes:
 
 ### Estimating Costs
 
-Use the CLI to check current usage:
+Check current usage via the SDK:
 
-```bash
-acc observability usage --days 30
+```typescript
+const usage = await af.observability().getUsage(process.env.AF_PROJECT_ID);
+console.log(usage.costFormatted);
 ```
 
 **Typical data sizes:**
@@ -652,7 +545,7 @@ acc observability usage --days 30
 ```typescript
 // Configure sampling
 await initInstrumentation({
-  projectId: 'prj_abc123',
+  projectId: process.env.AF_PROJECT_ID, // cuid, e.g. 'clx1a2b3c4d5e6f7g8h9'
   projectSlug: 'my-project',
   serviceName: 'high-volume-service',
   instrumentationConfig: {
@@ -664,7 +557,7 @@ await initInstrumentation({
 });
 
 // Or set sampling via settings
-await af.observability().updateSettings('prj_abc123', {
+await af.observability().updateSettings(process.env.AF_PROJECT_ID, {
   sampleRate: 0.1, // Only sample 10%
 });
 ```
@@ -762,9 +655,6 @@ const response = await fetch('https://other-service/api', {
 4. **Review settings** - Telemetry type might be disabled
 
 ```bash
-# Check settings
-acc observability settings
-
 # Verify connectivity
 curl -X POST https://otel.alternatefutures.ai/v1/traces \
   -H "Content-Type: application/json" \
@@ -808,4 +698,4 @@ span.setAttribute('user.tier', 'premium');
 - [Cloud Functions](./functions.md) - Deploy serverless functions with built-in observability
 - [Best Practices](./best-practices.md) - General platform best practices
 - [Billing](./billing.md) - Understand billing and manage costs
-- [CLI Commands](/cli/commands.md) - Full CLI reference
+- [SDK API](../sdk/api.md) - Query observability data programmatically

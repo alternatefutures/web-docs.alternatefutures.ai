@@ -4,11 +4,11 @@ description: Learn how to deploy sites, AI agents, and cloud functions to decent
 
 # Platform Guides
 
-Welcome to the Alternate Futures platform guides. These guides will help you get started and master the platform.
+Guides for deploying and operating sites, AI agents, and cloud functions on Alternate Futures.
 
 ## What is Alternate Futures?
 
-Alternate Futures is a platform that lets you deploy websites and AI agents to **decentralized infrastructure**—meaning your applications run on distributed networks instead of centralized cloud providers like AWS or Google Cloud.
+Alternate Futures is a platform that lets you deploy websites and AI agents to **decentralized infrastructure**—your applications run across many independent operators instead of a single centralized cloud provider like AWS or Google Cloud.
 
 ### Why Decentralized?
 
@@ -38,7 +38,7 @@ Alternate Futures is a platform that lets you deploy websites and AI agents to *
 **Privacy-Focused Use Cases:**
 - **Whistleblower Platforms** - Anonymous document sharing without server logs or centralized tracking
 - **Activist Websites** - Content that can't be censored or seized by authorities
-- **Privacy-First Apps** - Run functions with SGX encryption where not even the host can see your data
+- **Privacy-First Apps** - Run functions in a confidential compute environment (a hardware-backed TEE, via Phala) where not even the host can see your data
 - **Journalist Archives** - Permanent, tamper-proof storage for sensitive documents
 - **Alternative Social Networks** - Build platforms without corporate surveillance or data mining
 

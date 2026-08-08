@@ -22,64 +22,26 @@ View your billing information at [app.alternatefutures.ai/billing](https://app.a
 
 ## CLI Commands
 
-Manage billing directly from the command line:
-
-### View Customer Information
+The CLI currently exposes a single billing subcommand — your credit balance:
 
 ```bash
-acc billing customer
+acc billing balance
 ```
 
-View your customer details including email, Stripe ID, and account status.
+::: tip What this maps to in code
+`balance` is the only subcommand defined in the [billing CLI command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/index.ts). Customer, invoice, subscription, usage, and payment-method operations are available through the SDK's [billing client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/billing.ts) (`af.billing().getCustomer()`, `listInvoices()`, `listSubscriptions()`, `getCurrentUsage()`, `listPaymentMethods()`) — CLI coverage is on the roadmap.
+:::
 
-### List Invoices
+### Invoices, subscriptions, usage, and payment methods (SDK)
 
-```bash
-acc billing invoices
+```typescript
+const invoices = await af.billing().listInvoices();
+const subscriptions = await af.billing().listSubscriptions();
+const usage = await af.billing().getCurrentUsage();
+const methods = await af.billing().listPaymentMethods();
 ```
 
-View all invoices with their status, amounts, and payment details. Invoices include:
-- Invoice number and status
-- Amount due and paid
-- Period covered
-- PDF download link
-
-### View Subscriptions
-
-```bash
-acc billing subscriptions
-```
-
-See your active subscriptions including:
-- Plan type (FREE, STARTER, PRO, ENTERPRISE)
-- Number of seats
-- Pricing details
-- Current period dates
-- Cancellation status
-
-### Check Usage
-
-```bash
-acc billing usage
-```
-
-View current billing cycle usage:
-- **Storage** - GB stored and costs
-- **Bandwidth** - Data transfer and costs
-- **Compute** - Processing time and costs
-- **Requests** - API calls and costs
-- **Total** - Current period total
-
-### Manage Payment Methods
-
-```bash
-acc billing payment-methods
-```
-
-List all payment methods on file including:
-- Credit/debit cards (last 4 digits, expiration)
-- Cryptocurrency wallets
-- Default payment method
+Each returns the same data the dashboard shows: invoice status/amounts/PDF links, plan and seat details, current-cycle usage, and payment methods on file.
 
 ## Usage Tracking
 
@@ -119,32 +81,31 @@ Track agent and function execution:
 | Filecoin | Per GB/month | ~$0.03 |
 | Arweave | One-time per GB | ~$6.00 |
 
+::: warning Illustrative rates
+The bandwidth and compute figures below are examples for planning, not committed prices. Billing is plan- and Stripe-driven; confirm current rates for your account.
+:::
+
 ### Bandwidth Costs
 
 | Tier | Included | Overage |
 |------|----------|---------|
-| Free | 100 GB | $0.10/GB |
-| Pro | 1 TB | $0.08/GB |
+| Free | 100 GB | ~$0.10/GB |
+| Pro | 1 TB | ~$0.08/GB |
 | Enterprise | Custom | Custom |
 
 ### Compute Costs
 
-| Service | Price |
+| Service | Example rate |
 |---------|-------|
-| Agent Runtime | $0.05/hour |
-| Function Invocations | $0.20/million |
-| GPU Processing | $0.50/hour |
+| Agent Runtime | ~$0.05/hour |
+| Function Invocations | ~$0.20/million |
+| GPU Processing | ~$0.50/hour |
 
 ## Payment Methods
 
 ### Cryptocurrency
 
-Pay with crypto (preferred):
-
-- **AR** (Arweave) - Native token
-- **FIL** (Filecoin) - Storage token
-- **ETH** (Ethereum) - Universal payment
-- **SOL** (Solana) - Fast payments
+Pay with crypto. Payments settle to a deposit address by `chainId` and `tokenSymbol` (default **USDC**); additional tokens and chains are added over time. Confirm supported tokens at checkout.
 
 **Benefits:**
 - Lower fees (no credit card processing)

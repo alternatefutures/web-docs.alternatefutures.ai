@@ -4,17 +4,13 @@ description: Create dedicated IPFS gateways with custom domains for fast, reliab
 
 # Private Gateways
 
-Create dedicated IPFS gateways with custom domains for fast, reliable access to your decentralized content.
+A private gateway is a dedicated IPFS endpoint you own and map to a custom domain, giving your users fast, branded access to content you store on Alternate Clouds. Gateways are managed through the SDK today.
 
 ## What are Private Gateways?
 
-Private Gateways are dedicated IPFS gateway infrastructure that provides:
+Private Gateways are dedicated IPFS gateway endpoints you own and manage. Each gateway has a `name`, a `slug`, and an associated DNS `zone`, and can be mapped to a custom domain for branded access to your IPFS content.
 
-- **Custom Domains** - Access content via your own domain
-- **Enhanced Performance** - Dedicated resources for faster loading
-- **CDN Integration** - Global edge caching
-- **Access Control** - Restrict who can access your content
-- **Custom Configuration** - Configure caching, headers, and more
+> **What this maps to in code:** the gateway fields exposed by the API are defined on the [PrivateGateway GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) (`name`, `slug`, `zone`).
 
 ## Why Use Private Gateways?
 
@@ -35,48 +31,35 @@ Private Gateways are dedicated IPFS gateway infrastructure that provides:
 
 ## Creating a Private Gateway
 
-::: code-group
+Gateways are managed through the SDK (`af.privateGateways()`); there is no `acc gateways` CLI command.
 
-```bash [CLI]
-# Create a new private gateway
-acc gateways create
-
-# You'll be prompted for:
-# - Gateway name
-# - Zone/Domain to use
-```
-
-```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: '<your-project-id>',
+  }),
 });
 
 // Create a private gateway
-const gateway = await af.privateGateway().create({
+const gateway = await af.privateGateways().create({
   name: 'My Gateway',
-  zoneId: 'zone-id' // DNS zone for your domain
+  zoneId: 'zone-id', // DNS zone for your domain
 });
 
 console.log('Gateway created:', gateway.name);
 console.log('Gateway slug:', gateway.slug);
 ```
 
-:::
+> **What this maps to in code:** the [AlternateFuturesSdk constructor](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) requires `accessTokenService` and exposes the `privateGateways()` accessor; the [PrivateGatewayClient](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/privateGateway.ts) implements `create({ name, zoneId })`, `list()`, `get({ id })`, `getBySlug({ slug })`, `update({ id, name })`, and `delete({ id })`.
 
 ## Listing Gateways
 
-::: code-group
-
-```bash [CLI]
-# List all private gateways
-acc gateways list
-```
-
-```typescript [SDK]
+```typescript
 // List all gateways
-const gateways = await af.privateGateway().list();
+const gateways = await af.privateGateways().list();
 
 gateways.forEach(gw => {
   console.log(`${gw.name} (${gw.slug})`);
@@ -84,75 +67,38 @@ gateways.forEach(gw => {
 });
 ```
 
-:::
-
 ## Viewing Gateway Details
 
-::: code-group
-
-```bash [CLI]
-# Get details for a specific gateway
-acc gateways detail
-
-# You'll be prompted to select the gateway
-```
-
-```typescript [SDK]
+```typescript
 // Get gateway by ID
-const gateway = await af.privateGateway().get({ id: 'gateway-id' });
+const gateway = await af.privateGateways().get({ id: 'gateway-id' });
 
 console.log('Name:', gateway.name);
 console.log('Slug:', gateway.slug);
 console.log('Created:', gateway.createdAt);
 
 // Get gateway by slug
-const gatewayBySlug = await af.privateGateway().getBySlug({
+const gatewayBySlug = await af.privateGateways().getBySlug({
   slug: 'my-gateway'
 });
 ```
 
-:::
-
 ## Updating a Gateway
 
-::: code-group
-
-```bash [CLI]
-# Update gateway configuration
-acc gateways update
-
-# You'll be prompted to:
-# 1. Select the gateway
-# 2. Enter new name
-```
-
-```typescript [SDK]
+```typescript
 // Update gateway
-await af.privateGateway().update({
+await af.privateGateways().update({
   id: 'gateway-id',
   name: 'Updated Gateway Name'
 });
 ```
 
-:::
-
 ## Deleting a Gateway
 
-::: code-group
-
-```bash [CLI]
-# Delete a gateway
-acc gateways delete
-
-# You'll be prompted to select which gateway to delete
-```
-
-```typescript [SDK]
+```typescript
 // Delete a gateway
-await af.privateGateway().delete({ id: 'gateway-id' });
+await af.privateGateways().delete({ id: 'gateway-id' });
 ```
-
-:::
 
 ## Setting Up Custom Domain
 
@@ -165,23 +111,19 @@ Add a CNAME record pointing to your gateway:
 ```
 Type: CNAME
 Name: gateway (or @)
-Value: <gateway-slug>.af-gateway.app
+Value: <gateway-slug>.<gateway-domain>
 TTL: 3600
 ```
 
-### 2. Create Domain in Alternate Futures
+> The canonical gateway domain is not yet finalized in the published tooling, and this guide and storage.md currently disagree (`af-gateway.app` vs `af-gateways.app`). Confirm the correct host before configuring DNS.
 
-```bash
-acc domains create \
-  --hostname gateway.yourdomain.com \
-  --gateway-id <gateway-id>
-```
+### 2. Create the Domain in Alternate Clouds
 
-### 3. Verify Domain
+Domain management is available through the SDK (`af.domains()`); there is no `acc domains` CLI command. Create the domain against your gateway with the domains client.
 
-```bash
-acc domains verify --domain-id <domain-id>
-```
+### 3. Verify the Domain
+
+Verify the domain through the same `af.domains()` client. See the domains client for the exact method signatures.
 
 ## Accessing Content Through Gateway
 
@@ -202,11 +144,13 @@ https://gateway.yourdomain.com/ipns/<IPNS-NAME>
 https://gateway.yourdomain.com/ipfs/<CID>/path/to/file.html
 ```
 
-## Gateway Configuration
+## Roadmap
 
-### Caching Strategy
+::: warning Planned, not yet configurable
+The API today exposes only a gateway's `name`, `slug`, and `zone` (create/list/get/update/delete). The capabilities below — edge caching and invalidation, custom TTL and headers, access control (IP allowlist, token auth, geo-blocking, rate limiting), compression, image optimization, DDoS protection, analytics, and uptime SLAs — are on the roadmap and are not configurable through the CLI, SDK, or API yet. Do not rely on them in production.
+:::
 
-Private gateways automatically cache content with:
+### Caching Strategy (planned)
 
 - **Edge Caching** - Content cached at CDN edge nodes globally
 - **Smart Invalidation** - Automatic cache updates for new versions
@@ -284,14 +228,6 @@ Optimize images served through your gateway:
 - WebP conversion for supported browsers
 - Automatic resizing based on request
 - Lazy loading support
-
-### 3. Preloading
-
-Preload frequently accessed content:
-```bash
-# Pin content to your gateway
-acc storage pin <CID> --gateway-id <gateway-id>
-```
 
 ### 4. CDN Distribution
 

@@ -84,10 +84,7 @@ acc projects switch
 # You'll be prompted to select which project to use
 
 # Or specify directly
-acc projects switch --project-id <project-id>
-
-# Check current project
-acc projects current
+acc projects switch <project-id>
 ```
 
 ```typescript [SDK]
@@ -117,21 +114,15 @@ Configure project basics:
 
 ### Storage Settings
 
-Configure backup storage:
+::: info What this maps to in code
+- **CLI:** [projects command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/projects/index.ts) — `list`, `create`, `update` (rename only), `switch`, `delete`.
+- **SDK:** [projects client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/projects.ts) — backup toggles via `update({ where, data: { backupStorageOnArweave, backupStorageOnFilecoin } })`.
+- **API:** [Project data model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma).
+:::
+
+Backup storage is configured through the SDK. The CLI `acc projects update` only renames a project.
 
 ::: code-group
-
-```bash [CLI]
-# Enable Arweave backup
-acc projects update \
-  --project-id <project-id> \
-  --backup-arweave true
-
-# Enable Filecoin backup
-acc projects update \
-  --project-id <project-id> \
-  --backup-filecoin true
-```
 
 ```typescript [SDK]
 // Update project settings
@@ -211,13 +202,13 @@ deploy-staging:
   env:
     AF_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
   steps:
-    - run: acc sites deploy
+    - run: acc services deploy
 
 deploy-production:
   env:
     AF_PROJECT_ID: ${{ secrets.PROD_PROJECT_ID }}
   steps:
-    - run: acc sites deploy
+    - run: acc services deploy
 ```
 
 ## Team Collaboration
@@ -233,71 +224,42 @@ Projects support team collaboration (feature coming soon):
 
 View all resources in a project:
 
-### Sites
+### Services
 ```bash
-acc sites list --project-id <project-id>
+acc services list
 ```
 
-### Functions
+### Deployments
 ```bash
-acc functions list --project-id <project-id>
-```
-
-### Storage
-```bash
-acc storage list --project-id <project-id>
-```
-
-### Domains
-```bash
-acc domains list --project-id <project-id>
+acc deployments list --project <project-id>
 ```
 
 ## Project Limits
 
-Each project includes:
-
-| Resource | Free Tier | Pro Tier |
-|----------|-----------|----------|
-| **Sites** | 10 | Unlimited |
-| **Functions** | 5 | Unlimited |
-| **Storage** | 10 GB | 100 GB+ |
-| **Bandwidth** | 100 GB/mo | 1 TB/mo+ |
-| **Custom Domains** | 3 | Unlimited |
-| **Team Members** | 1 | 10+ |
+Resource limits depend on your plan. Check your current account with `acc billing balance`. Specific per-tier limits are intentionally not listed here to avoid publishing numbers that may be out of date.
 
 ## Billing
 
-Each project has independent billing:
-
-- Separate usage tracking
-- Individual payment methods
-- Per-project invoices
-- Custom limits and budgets
+Billing today uses a single credit balance for your account. Per-project invoices, separate payment methods, and per-project budgets are not yet available.
 
 Access billing:
 ```bash
-# View project billing (coming soon)
-acc billing status --project-id <project-id>
+# View your credit balance
+acc billing balance
 ```
 
 ## Migrating Between Projects
 
 Move resources between projects:
 
-### Export Configuration
+### Move a service to another project
 ```bash
-# Export site configuration
-acc sites export --site-id <site-id> > site-config.json
-```
+# Switch to the target project
+acc projects switch <target-project-id>
 
-### Import to New Project
-```bash
-# Switch to target project
-acc projects switch --project-id <target-project-id>
-
-# Create new site from config
-acc sites create --config site-config.json
+# Recreate the service from a template, then deploy
+acc services create
+acc services deploy
 ```
 
 ## Project API Access
@@ -305,14 +267,11 @@ acc sites create --config site-config.json
 Each project can have dedicated API keys:
 
 ```bash
-# Create project-scoped API key
-acc pat create \
-  --name "Project API Key" \
-  --project-id <project-id> \
-  --permissions read,write
+# Create a personal access token
+acc pat create --name "Project API Key"
 
-# Use in applications
-export AF_TOKEN=<project-api-key>
+# Use in applications (scope to a project via AF_PROJECT_ID)
+export AF_TOKEN=<personal-access-token>
 export AF_PROJECT_ID=<project-id>
 ```
 
@@ -421,9 +380,8 @@ Set project context via environment variables:
 export AF_PROJECT_ID=<project-id>
 
 # All CLI commands use this project
-acc sites list
-acc functions deploy
-acc storage upload
+acc services list
+acc deployments list
 ```
 
 In CI/CD:
@@ -441,13 +399,10 @@ env:
 
 **Solution:**
 ```bash
-# Check current project
-acc projects current
+# Switch to the correct project
+acc projects switch <correct-id>
 
-# Switch to correct project
-acc projects switch --project-id <correct-id>
-
-# Or set explicitly
+# Or set it explicitly for the session
 export AF_PROJECT_ID=<correct-id>
 ```
 

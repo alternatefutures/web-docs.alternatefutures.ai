@@ -1,19 +1,19 @@
 ---
-description: The Alternate Futures CLI (af) lets you deploy sites, manage storage, configure domains, and run AI agents from the command line.
+description: The Alternate Clouds CLI (acc) lets you manage projects, deploy services from templates, inspect deployments, open a shell into a running service, and check your billing balance.
 ---
 
 # CLI Documentation
 
-The Alternate Futures CLI (`acc`) provides a powerful command-line interface for managing your agents, sites, storage, and deployments on decentralized infrastructure.
+The Alternate Clouds CLI (`acc`) is the command-line interface for Alternate Clouds. Use it to authenticate, manage projects, create and deploy services from templates, inspect deployments, open a shell into a running service, and check your billing balance.
 
 ## Features
 
-- **Deploy Sites** - Push static sites to IPFS, Filecoin, or Arweave
-- **Manage Storage** - Upload and manage files on decentralized storage
-- **Configure Domains** - Add custom domains and ENS integration
-- **Serverless Functions** - Deploy and manage edge functions
-- **CI/CD Integration** - Generate workflow configs for GitHub Actions, GitLab CI, and more
-- **Billing & Usage** - Monitor costs and resource consumption
+- **Authenticate** - Log in via browser or email verification code
+- **Manage projects** - Create, list, switch, rename, and delete projects
+- **Deploy services** - Create services from templates and deploy them to decentralized compute (Akash/Phala)
+- **Inspect deployments** - List and filter deployments across projects and services
+- **Open a shell** - SSH into a running service
+- **Check billing** - View your current credit balance
 
 ## Installation
 
@@ -48,37 +48,30 @@ acc --version
 acc login
 
 # 2. Create a new project
-acc projects create --name "my-website"
+acc projects create --name "my-project"
 
-# 3. Initialize site configuration
-acc sites init
+# 3. Create a service from a template (interactive)
+acc services create
 
-# 4. Deploy your site
-acc sites deploy
+# 4. Deploy the service
+acc services deploy
 
 # 5. View your deployments
-acc sites list
+acc deployments list
 ```
 
 ## Command Groups
 
 | Command | Description |
 |---------|-------------|
-| `acc login` / `acc logout` | Authentication |
-| `acc projects` | Manage projects |
-| `acc sites` | Deploy and manage static sites |
-| `acc functions` | Serverless function management |
-| `acc storage` | Decentralized storage operations |
-| `acc ipfs` | Direct IPFS operations |
-| `acc ipns` | IPNS record management |
-| `acc domains` | Custom domain configuration |
-| `acc ens` | ENS domain integration |
-| `acc gateways` | Private IPFS gateways |
-| `acc agents` | AI agent deployment and management |
-| `acc observability` | APM observability (traces, logs, metrics) |
-| `acc applications` | SDK application management |
-| `acc pat` | Personal access tokens |
-| `acc billing` | Billing and usage information |
+| `acc login` / `acc logout` | Authenticate or end your CLI session |
+| `acc projects` | Create, list, switch, rename, and delete projects |
+| `acc services` | Create, deploy, inspect, and manage services |
+| `acc deployments` | List and filter deployments |
+| `acc ssh` | Open a shell into a running service |
+| `acc billing` | View your credit balance |
+
+> **What this maps to in code:** command registration lives in [command registration (cli.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). `templates` and `pat` are also registered but hidden from top-level help.
 
 ## Getting Help
 
@@ -89,10 +82,10 @@ The CLI has built-in help for every command:
 acc --help
 
 # Help for a command group
-acc sites --help
+acc services --help
 
 # Help for a specific command
-acc sites deploy --help
+acc services deploy --help
 ```
 
 ## Environment Variables
@@ -108,28 +101,29 @@ export AF_PROJECT_ID="your-project-id"
 |----------|-------------|
 | `AF_TOKEN` | Personal access token for authentication |
 | `AF_PROJECT_ID` | Default project ID for commands |
-| `AF_BASE_URL` | Override API endpoint (for testing) |
+| `AF_ORG_ID` | Default organization ID |
+
+> **What this maps to in code:** these are the only variables the CLI reads — see [CLI environment variables (secrets.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
 
 ## Configuration File
 
-The CLI uses `af.config.json` for site configuration:
+The CLI reads deployment configuration from an `af.config` file in your project root. It accepts `af.config.ts`, `af.config.js`, or `af.config.json`:
 
 ```json
 {
-  "name": "my-site",
-  "buildCommand": "npm run build",
-  "distDir": "./dist",
-  "storage": {
-    "type": "ipfs"
-  }
+  "sites": [
+    {
+      "slug": "my-site",
+      "distDir": "./dist",
+      "buildCommand": "npm run build"
+    }
+  ]
 }
 ```
 
-Create one with:
+Create the file manually in your project root.
 
-```bash
-acc sites init
-```
+> **What this maps to in code:** the schema (`AlternateFuturesRootConfig` with a `sites[]` array and an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
 
 ## Documentation
 
@@ -138,10 +132,77 @@ acc sites init
 
 ## Requirements
 
-- Node.js 18.0.0 or higher
+- Node.js 18.18.2 or higher
 - npm, pnpm, or yarn
 
 ## Examples
+
+### Deploy a Service
+
+```bash
+# Create a service from a template (interactive prompts)
+acc services create
+
+# Deploy it
+acc services deploy
+
+# Watch its logs
+acc services logs --tail 100
+```
+
+### Manage Multiple Projects
+
+```bash
+# List all projects
+acc projects list
+
+# Switch to a different project (positional project ID)
+acc projects switch prj_production
+
+# All subsequent commands use the selected project
+acc services list
+acc deployments list
+```
+
+### Browse Templates
+
+```bash
+# List templates, optionally filtered by category
+acc templates list --category AI_ML
+
+# Inspect a template
+acc templates info <templateId>
+```
+
+<!-- ROADMAP — not yet shipped. Uncomment when implemented.
+
+## Roadmap (not yet available)
+
+The following capabilities are documented for reference but are **not yet implemented** in the `acc` CLI. Uncomment each section when the corresponding feature ships.
+
+### Planned features
+
+- **Deploy Sites** - Push static sites to IPFS, Filecoin, or Arweave
+- **Manage Storage** - Upload and manage files on decentralized storage
+- **Configure Domains** - Add custom domains and ENS integration
+- **Serverless Functions** - Deploy and manage edge functions
+- **CI/CD Integration** - Generate workflow configs for GitHub Actions, GitLab CI, and more
+
+### Planned command groups
+
+| Command | Description |
+|---------|-------------|
+| `acc sites` | Deploy and manage static sites |
+| `acc functions` | Serverless function management |
+| `acc storage` | Decentralized storage operations |
+| `acc ipfs` | Direct IPFS operations |
+| `acc ipns` | IPNS record management |
+| `acc domains` | Custom domain configuration |
+| `acc ens` | ENS domain integration |
+| `acc gateways` | Private IPFS gateways |
+| `acc agents` | AI agent deployment and management |
+| `acc observability` | APM observability (traces, logs, metrics) |
+| `acc applications` | SDK application management |
 
 ### Deploy a React Site
 
@@ -165,20 +226,6 @@ acc sites ci --provider github
 ```
 
 This creates `.github/workflows/af-deploy.yml` for automatic deployments.
-
-### Manage Multiple Projects
-
-```bash
-# List all projects
-acc projects list
-
-# Switch to a different project
-acc projects switch --id prj_production
-
-# All subsequent commands use the selected project
-acc sites list
-acc domains list
-```
 
 ### Upload Files to IPFS
 
@@ -205,3 +252,6 @@ acc domains detail --hostname www.example.com
 # Verify DNS configuration
 acc domains verify --hostname www.example.com
 ```
+
+-->
+

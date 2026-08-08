@@ -14,20 +14,9 @@ Manage decentralized storage across IPFS, Filecoin, and Arweave.
 
 Upload a file to decentralized storage in seconds:
 
-::: code-group
+Storage is managed through the SDK. (There is no `acc storage` or `acc ipfs` CLI command yet — the CLI surface is login/logout/projects/services/deployments/ssh/billing.)
 
-```bash [CLI]
-# Upload a file to IPFS
-acc storage add ./my-file.pdf
-
-# Upload an entire directory
-acc storage add ./my-folder
-
-# Upload directly to IPFS (returns CID)
-acc ipfs add ./my-file.pdf
-```
-
-```typescript [SDK]
+```typescript
 import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
@@ -37,23 +26,16 @@ const af = new AlternateFuturesSdk({
   }),
 });
 
-// Upload a file
-const result = await af.storage().uploadFile({
-  file: './my-file.pdf',
-});
-
-console.log('CID:', result.pin.cid);
-console.log('Size:', result.pin.size);
-
-// Upload a directory
+// Upload a directory (accepts a filesystem path)
 const dirResult = await af.storage().uploadDirectory({
   path: './my-folder',
 });
 
 console.log('Directory CID:', dirResult.pin.cid);
+console.log('Size:', dirResult.pin.size);
 ```
 
-:::
+> **What this maps to in code:** upload/list/get/delete are implemented in [`StorageClient`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/storage.ts); authentication uses [`PersonalAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts). The [CLI command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts) does not include storage commands.
 
 ## Storage Networks
 
@@ -108,34 +90,27 @@ console.log('Directory CID:', dirResult.pin.cid);
 
 ## Uploading Files
 
-### Upload via CLI
-
-```bash
-# Upload a single file
-acc storage add ./report.pdf
-
-# Upload an entire directory
-acc storage add ./build-output
-
-# Upload directly to IPFS (lower level, returns raw CID)
-acc ipfs add ./my-image.png
-```
-
-When you upload, the file is pinned to IPFS and its CID (Content Identifier) is returned. The CID is a unique hash of the file content -- the same file always produces the same CID.
+When you upload, the content is pinned to IPFS and its CID (Content Identifier) is returned. The CID is a unique hash of the file content — the same content always produces the same CID. Uploads are performed through the SDK (see below); there is no `acc storage`/`acc ipfs` CLI command yet.
 
 ### Upload via SDK
 
+`uploadFile` takes a `FileLike` object (with a `name` and contents), not a path string. Construct one from your file contents; for a filesystem path, use `uploadDirectory({ path })`.
+
 ```typescript
-// Upload a single file
+import { readFile } from 'node:fs/promises';
+
+// Upload a single file (pass a File/FileLike, not a path)
+const bytes = await readFile('./report.pdf');
 const fileResult = await af.storage().uploadFile({
-  file: './report.pdf',
+  file: new File([bytes], 'report.pdf'),
 });
 
 console.log('File uploaded!');
 console.log('CID:', fileResult.pin.cid);
+console.log('Size:', fileResult.pin.size);
 console.log('URL:', `https://ipfs.io/ipfs/${fileResult.pin.cid}`);
 
-// Upload a directory (e.g., a built website)
+// Upload a directory (accepts a filesystem path)
 const dirResult = await af.storage().uploadDirectory({
   path: './dist',
 });
@@ -145,49 +120,33 @@ console.log('Directory CID:', dirResult.pin.cid);
 
 ## Listing Storage Items
 
-::: code-group
-
-```bash [CLI]
-# List all files in your project's storage
-acc storage list
-```
-
-```typescript [SDK]
+```typescript
 // List all storage items
 const items = await af.storage().list();
 
 items.forEach(item => {
-  console.log(`${item.name} (${item.cid})`);
-  console.log(`  Size: ${item.size}`);
-  console.log(`  Created: ${item.createdAt}`);
+  console.log(`${item.filename} (${item.cid})`);
+  console.log(`  Extension: ${item.extension}`);
+  if (item.arweaveId) console.log(`  Arweave: ${item.arweaveId}`);
 });
 ```
 
-:::
+> `list()` returns `StoragePin[]` with `cid`, `filename`, `extension`, `arweaveId`, and `filecoinDealIds`. File size and creation date are not returned by the SDK.
 
 ## Retrieving Files
 
-::: code-group
-
-```bash [CLI]
-# Retrieve a file by name
-acc storage get --name my-file.pdf
-
-# Retrieve a file by CID
-acc storage get --cid QmXxx...
-```
-
-```typescript [SDK]
-// Get file details by CID
+```typescript
+// Get storage-pin details by CID
 const file = await af.storage().get({ cid: 'QmXxx...' });
 
-console.log('Name:', file.name);
-console.log('Size:', file.size);
-console.log('Network:', file.network);
-console.log('URL:', file.url);
+console.log('Filename:', file.filename);
+console.log('Extension:', file.extension);
+console.log('Arweave ID:', file.arweaveId);
+// Build a gateway URL from the CID:
+console.log('URL:', `https://ipfs.io/ipfs/${file.cid}`);
 ```
 
-:::
+> `get({ cid })` returns a `StoragePin` (`cid`, `filename`, `extension`, `arweaveId`, `filecoinDealIds`). It does not include size, network, or a URL — construct the gateway URL yourself from `cid`.
 
 ### Accessing via IPFS Gateway
 
@@ -201,27 +160,17 @@ https://gateway.pinata.cloud/ipfs/<CID>
 For faster, branded access, use a [Private Gateway](/guides/gateways):
 
 ```
-https://your-gateway.af-gateways.app/ipfs/<CID>
+https://<gateway-slug>.<gateway-domain>/ipfs/<CID>
 ```
+
+> The exact gateway domain is not yet finalized in the published tooling; storage.md and gateways.md currently disagree (`af-gateways.app` vs `af-gateway.app`). Confirm the canonical host before relying on it.
 
 ## Deleting Files
 
-::: code-group
-
-```bash [CLI]
-# Delete a file by name
-acc storage delete --name my-file.pdf
-
-# Delete a file by CID
-acc storage delete --cid QmXxx...
-```
-
-```typescript [SDK]
-// Delete a storage item
+```typescript
+// Delete a storage item by CID
 await af.storage().delete({ cid: 'QmXxx...' });
 ```
-
-:::
 
 ::: warning
 Deleting a file unpins it from IPFS. The content may still be available on the network if other nodes have cached or pinned it, but it will no longer be guaranteed to be available.
@@ -237,33 +186,13 @@ Pinning keeps content available on IPFS by ensuring at least one node stores and
 
 ### Pin Providers
 
-We integrate with multiple pinning services for redundancy:
-
-- **Pinata** - Fast, reliable pinning
-- **Web3.Storage** - Free tier available
-- **Lighthouse** - Filecoin-backed pinning
-
-### Pin Status
-
-- **Pinned** - Content is actively pinned and available
-- **Unpinned** - Content may become unavailable
-- **Pinning** - Pin operation in progress
-- **Failed** - Pin operation failed (check logs)
+Pinning is handled by the platform's upload service. Provider selection and pin-status reporting are not exposed through the SDK today, so treat the specifics as an infrastructure detail rather than a configurable API.
 
 ## IPNS (Mutable Pointers)
 
 IPNS (InterPlanetary Name System) lets you create mutable pointers to IPFS content. This is useful when you want a stable URL that always points to the latest version of your content.
 
-```bash
-# Create an IPNS record
-acc ipns create --name my-website
-
-# Publish an IPFS hash to your IPNS name
-acc ipns publish --name my-website --hash QmNewHash...
-
-# Resolve an IPNS name to its current content
-acc ipns resolve k51qzi5uqu5...
-```
+IPNS is available through the SDK (`af.ipns()`); there is no `acc ipns` CLI command. See the [IPNS Guide](/guides/ipns) for the SDK method signatures.
 
 See the [IPNS Guide](/guides/ipns) for full details.
 
@@ -300,11 +229,11 @@ See [Billing](/guides/billing) for full pricing details.
 
 ### Upload Fails
 
-**Problem:** `acc storage add` returns an error
+**Problem:** `af.storage().uploadFile()` / `uploadDirectory()` returns an error
 
 **Solutions:**
-- Check that the file path is correct
-- Verify you are authenticated (`acc login`)
+- Confirm `uploadFile` is passed a `File`/`FileLike` (not a path string) and `uploadDirectory` a valid path
+- Verify your access token and project id are set correctly
 - Ensure you have sufficient storage quota
 - Check file size does not exceed limits
 
@@ -313,7 +242,7 @@ See [Billing](/guides/billing) for full pricing details.
 **Problem:** IPFS gateway returns 404 or timeout
 
 **Solutions:**
-- Verify the content is still pinned (`acc storage list`)
+- Verify the content is still pinned (`af.storage().list()`)
 - Try a different IPFS gateway
 - Wait a few minutes for propagation on new uploads
 - Check if the CID is correct (copy-paste errors are common)
@@ -323,8 +252,8 @@ See [Billing](/guides/billing) for full pricing details.
 **Problem:** Cannot upload new files
 
 **Solutions:**
-- Check current usage: `acc billing usage`
-- Delete unused files: `acc storage delete`
+- Check your credit balance: `acc billing balance`
+- Delete unused files via the SDK: `af.storage().delete({ cid })`
 - Upgrade your plan for more storage
 
 ## Next Steps
