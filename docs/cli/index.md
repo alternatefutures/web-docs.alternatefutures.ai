@@ -176,9 +176,9 @@ acc templates info <templateId>
 
 <!-- ROADMAP — not yet shipped. Uncomment when implemented.
 
-## Roadmap (not yet available)
+## Removed / re-architected commands (kept for reference)
 
-The following capabilities are documented for reference but are **not yet implemented** in the `acc` CLI. Uncomment each section when the corresponding feature ships.
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
 
 ### Planned features
 
@@ -206,6 +206,8 @@ The following capabilities are documented for reference but are **not yet implem
 
 ### Deploy a React Site
 
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 ```bash
 # Build your app
 npm run build
@@ -220,6 +222,8 @@ acc sites deploy
 
 ### Generate CI/CD Config
 
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 ```bash
 # Generate GitHub Actions workflow
 acc sites ci --provider github
@@ -228,6 +232,8 @@ acc sites ci --provider github
 This creates `.github/workflows/af-deploy.yml` for automatic deployments.
 
 ### Upload Files to IPFS
+
+STATUS: Removed. Object storage is now the rustfs S3 BUCKET service template (`acc services create`).
 
 ```bash
 # Upload a single file
@@ -241,6 +247,8 @@ acc storage list
 ```
 
 ### Work with Custom Domains
+
+STATUS: Removed. Custom domains are managed in the dashboard.
 
 ```bash
 # Add a domain to your site

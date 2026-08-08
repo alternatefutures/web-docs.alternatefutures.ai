@@ -122,7 +122,12 @@ Create a config file in your project root. The CLI accepts `af.config.ts`, `af.c
 
 > **What this maps to in code:** the schema (a top-level `sites[]` array, plus an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
 
-<!-- ROADMAP — not yet shipped. Uncomment when implemented.
+<!-- Removed / re-architected commands (kept for reference)
+
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 Initialize a site configuration file in your project:
 
 ```bash
@@ -221,7 +226,10 @@ jobs:
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
 ```
 
-<!-- ROADMAP — not yet shipped. Uncomment when implemented.
+<!-- Removed / re-architected commands (kept for reference)
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 Or generate it automatically:
 
 ```bash

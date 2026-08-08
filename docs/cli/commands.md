@@ -348,13 +348,14 @@ acc --version
 
 <!-- ROADMAP — not yet shipped. Uncomment each section as the feature ships.
 
-## Roadmap (not yet available)
+## Removed / re-architected commands (kept for reference)
 
-The commands below were previously documented but are **not yet implemented** in
-the `acc` CLI. They are preserved here (commented out) so they are ready to
-uncomment when the corresponding feature ships.
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
 
 ### `acc signup`
+
+STATUS: Handler exists but is not registered in cli.ts.
+
 Create a new Alternate Futures account using email verification.
 
 ```bash
@@ -362,6 +363,8 @@ acc signup
 ```
 
 ## Sites
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
 
 Deploy and manage static sites on decentralized infrastructure.
 
@@ -434,6 +437,8 @@ acc sites ci --provider gitlab    # GitLab CI
 
 ## Storage
 
+STATUS: Removed. Object storage is now the rustfs S3 BUCKET service template (`acc services create`).
+
 Manage files on decentralized storage (IPFS + Filecoin/Arweave backup).
 
 ### `acc storage add`
@@ -490,6 +495,8 @@ acc storage delete --cid QmXxx...
 
 ## IPFS
 
+STATUS: Removed as a standalone command. IPFS pinning is internal to the deploy pipeline / dashboard.
+
 Direct IPFS operations for decentralized content storage.
 
 ### `acc ipfs add`
@@ -507,6 +514,8 @@ Returns the content identifier (CID) for the uploaded content.
 
 
 ## IPNS
+
+STATUS: Removed from the CLI. Handled via the DNS / custom-domain flow (backend WIP).
 
 InterPlanetary Naming System for mutable content addressing.
 
@@ -573,6 +582,8 @@ acc ipns delete --name my-website
 
 
 ## Functions
+
+STATUS: No longer a standalone group. Now a 'Function' kind inside `acc services create` (coming soon there).
 
 Deploy serverless functions to decentralized infrastructure.
 
@@ -659,6 +670,8 @@ acc functions deployments --name my-function
 
 ## Domains
 
+STATUS: Removed. Custom domains are managed in the dashboard.
+
 Manage custom domains for your sites and gateways.
 
 ### `acc domains list`
@@ -730,6 +743,8 @@ acc domains delete --hostname www.example.com
 
 
 ## ENS
+
+STATUS: Removed from the CLI. ENS backend is planned (service-cloud-api#64).
 
 Ethereum Name Service integration for .eth domains.
 
@@ -803,6 +818,8 @@ acc ens delete --domain myapp.eth
 
 ## Gateways
 
+STATUS: Removed from the CLI. Private-gateway backend is not yet built.
+
 Manage private IPFS gateways for your content.
 
 ### `acc gateways list`
@@ -859,6 +876,8 @@ acc gateways delete --id gw_abc123
 
 
 ## Applications
+
+STATUS: Removed (Fleek-legacy). Product intent under review.
 
 Manage SDK application Client IDs.
 
@@ -917,6 +936,8 @@ acc applications delete --id app_abc123
 
 
 ## Observability
+
+STATUS: No longer a separate group. Use `acc services logs`, plus SDK/API observability.
 
 Query and manage APM observability data (traces, logs, metrics). Use `acc observability` or the short alias `acc obs`.
 
@@ -1111,6 +1132,8 @@ acc obs settings:update --sample-rate 0.1 --trace-retention 7 --log-retention 7
 
 ## Agents
 
+STATUS: Not a deployable-runtime CLI group. Deployable agents are templates via `acc services`/templates; `acc chat` provides chat orchestration.
+
 Deploy and manage AI agents on decentralized infrastructure. Supported agent types include Eliza (conversational AI), ComfyUI (image generation), and custom agents.
 
 ### `acc agents create`
@@ -1207,6 +1230,8 @@ acc agents delete <agent-id>
 
 
 ## Billing
+
+STATUS: Only `acc billing balance` ships; the other billing subcommands are not implemented.
 
 View billing information and usage metrics.
 
