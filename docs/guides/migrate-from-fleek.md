@@ -15,7 +15,7 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have s
 | **CLI command** | `fleek` | `acc` |
 | **Package name** | `@fleekxyz/cli` | `@alternatefutures/cli` |
 | **SDK package** | `@fleekxyz/sdk` | `@alternatefutures/sdk` |
-| **Config file** | `fleek.json` | `acc.config.json` |
+| **Config file** | `fleek.json` | `af.config.json` |
 | **Token env var** | `FLEEK_TOKEN` | `AF_TOKEN` |
 | **Project env var** | `FLEEK_PROJECT_ID` | `AF_PROJECT_ID` |
 | **IPFS support** | Yes | Yes |
@@ -58,7 +58,7 @@ acc sites init
 acc sites deploy
 ```
 
-The `acc sites init` command creates an `acc.config.json` file. If you had a `fleek.json`, here is how the configuration maps:
+The `acc sites init` command creates an `af.config.json` file. If you had a `fleek.json`, here is how the configuration maps:
 
 **Fleek config (`fleek.json`):**
 ```json
@@ -70,7 +70,7 @@ The `acc sites init` command creates an `acc.config.json` file. If you had a `fl
 }
 ```
 
-**Alternate Futures config (`acc.config.json`):**
+**Alternate Futures config (`af.config.json`):**
 ```json
 {
   "sites": [

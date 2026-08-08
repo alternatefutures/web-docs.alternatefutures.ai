@@ -117,7 +117,7 @@ cd my-project
 acc sites init
 ```
 
-This creates `acc.config.json`:
+This creates `af.config.json`:
 
 ```json
 {

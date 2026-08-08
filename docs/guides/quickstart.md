@@ -376,7 +376,7 @@ Now let's deploy your site to a decentralized storage network. You have three op
 ::: code-group
 
 ```bash [CLI]
-# Initialize site configuration (creates acc.config.json)
+# Initialize site configuration (creates af.config.json)
 acc sites init
 
 # Follow the prompts to configure:

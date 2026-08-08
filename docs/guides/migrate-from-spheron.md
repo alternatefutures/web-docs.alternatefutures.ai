@@ -15,7 +15,7 @@ Spheron has pivoted away from Web3 hosting to focus on GPU compute and AI infere
 | **CLI command** | `spheron` | `acc` |
 | **Package name** | `@spheron/cli` | `@alternatefutures/cli` |
 | **SDK package** | `@spheron/storage` | `@alternatefutures/sdk` |
-| **Config file** | `spheron.json` | `acc.config.json` |
+| **Config file** | `spheron.json` | `af.config.json` |
 | **Token env var** | `SPHERON_TOKEN` | `AF_TOKEN` |
 | **IPFS support** | Yes | Yes |
 | **Arweave support** | Yes | Yes (full) |
@@ -66,7 +66,7 @@ acc sites init
 acc sites deploy
 ```
 
-The `acc sites init` command creates an `acc.config.json` file. Here is how Spheron's configuration maps:
+The `acc sites init` command creates an `af.config.json` file. Here is how Spheron's configuration maps:
 
 **Spheron config (via dashboard):**
 - Framework: Auto-detected
@@ -74,7 +74,7 @@ The `acc sites init` command creates an `acc.config.json` file. Here is how Sphe
 - Output directory: `./dist`
 - Protocol: IPFS / Arweave / Filecoin
 
-**Alternate Futures config (`acc.config.json`):**
+**Alternate Futures config (`af.config.json`):**
 ```json
 {
   "sites": [
@@ -327,7 +327,7 @@ If your CIDs differ after re-uploading the same content, check that:
 ### Build fails during deployment
 
 If your build fails, verify:
-1. Your `buildCommand` in `acc.config.json` matches what you used on Spheron
+1. Your `buildCommand` in `af.config.json` matches what you used on Spheron
 2. Your `distDir` points to the correct output directory
 3. All required environment variables are set
 

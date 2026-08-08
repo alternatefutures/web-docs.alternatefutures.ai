@@ -112,7 +112,7 @@ export AF_PROJECT_ID="your-project-id"
 
 ## Configuration File
 
-The CLI uses `acc.config.json` for site configuration:
+The CLI uses `af.config.json` for site configuration:
 
 ```json
 {

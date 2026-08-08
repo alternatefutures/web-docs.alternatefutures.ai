@@ -331,7 +331,7 @@ my-project/
 ├── dist/              # Built static files
 ├── .env              # API keys (not in git!)
 ├── .gitignore        # Include .env
-├── acc.config.json    # Alternate Futures config
+├── af.config.json    # Alternate Futures config
 └── deploy.sh         # Deployment script
 ```
 

@@ -71,8 +71,8 @@ ls -la ./dist
 # Make sure you ran the build command first
 npm run build
 
-# Check your acc.config.json for the correct output directory
-cat acc.config.json
+# Check your af.config.json for the correct output directory
+cat af.config.json
 ```
 
 ### "Deployment timed out"

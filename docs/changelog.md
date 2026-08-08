@@ -76,7 +76,7 @@ Starter templates for popular frameworks, pre-configured for Alternate Futures d
 - [template-hugo](https://github.com/alternatefutures/template-hugo) - Hugo static site starter
 - [template-vitepress](https://github.com/alternatefutures/template-vitepress) - VitePress documentation starter
 
-Each template includes an `acc.config.json` with the correct build command and output directory pre-configured.
+Each template includes an `af.config.json` with the correct build command and output directory pre-configured.
 
 ### Documentation Site
 

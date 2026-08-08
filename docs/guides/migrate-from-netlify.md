@@ -45,7 +45,7 @@ acc login
 
 ### Remove Netlify Config
 
-Netlify uses `netlify.toml` for configuration. You will replace this with `acc.config.json`.
+Netlify uses `netlify.toml` for configuration. You will replace this with `af.config.json`.
 
 **Old (`netlify.toml`):**
 ```toml
@@ -59,7 +59,7 @@ Netlify uses `netlify.toml` for configuration. You will replace this with `acc.c
   status = 200
 ```
 
-**New (`acc.config.json` -- created by `acc sites init`):**
+**New (`af.config.json` -- created by `acc sites init`):**
 ```json
 {
   "sites": [
@@ -270,7 +270,7 @@ On IPFS, there is no server to handle redirects. Ensure your SPA framework gener
 ### Build fails during deployment
 
 Verify that:
-1. Your `buildCommand` in `acc.config.json` matches what Netlify used
+1. Your `buildCommand` in `af.config.json` matches what Netlify used
 2. Your `distDir` points to the correct output directory
 3. All required environment variables are set in your CI/CD workflow
 4. You are not relying on Netlify-specific build plugins

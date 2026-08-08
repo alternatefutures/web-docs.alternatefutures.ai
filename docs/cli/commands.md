@@ -96,7 +96,7 @@ Deploy and manage static sites on decentralized infrastructure.
 
 ### `acc sites init`
 
-Initialize a new Alternate Futures site in the current directory. Creates an `acc.config.json` file.
+Initialize a new Alternate Futures site in the current directory. Creates an `af.config.json` file.
 
 ```bash
 acc sites init
