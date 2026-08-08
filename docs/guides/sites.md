@@ -1,3 +1,7 @@
+---
+description: Deploy static sites to IPFS, Filecoin, or Arweave using the Alternate Futures CLI or SDK. Supports React, Next.js, Vue, Astro, and more.
+---
+
 # Deploying Sites
 
 Deploy static sites to decentralized storage networks (IPFS, Filecoin, Arweave).
@@ -46,13 +50,13 @@ Deploy via command line:
 
 ```bash
 # Deploy to IPFS
-af sites deploy ./dist --network ipfs
+acc sites deploy ./dist --network ipfs
 
 # Deploy to Arweave
-af sites deploy ./dist --network arweave
+acc sites deploy ./dist --network arweave
 
 # Deploy to Filecoin
-af sites deploy ./dist --network filecoin
+acc sites deploy ./dist --network filecoin
 ```
 
 ## Storage Networks
@@ -364,7 +368,7 @@ See [Custom Domains](./custom-domains.md) for detailed instructions.
 ## Deployment History
 
 ::: warning Coming Soon
-Deployment history viewing via the web interface is in development. Use the CLI to view deployment history: `af sites list --history`
+Deployment history viewing via the web interface is in development. Use the CLI to view deployment history: `acc sites list --history`
 :::
 
 View all deployments for a site:

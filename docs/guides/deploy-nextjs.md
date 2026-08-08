@@ -24,14 +24,14 @@ If you already have a Next.js project, deploy it in three commands:
 npm run build
 
 # Initialize AF configuration
-af sites init
+acc sites init
 
 # Deploy to IPFS
-af sites deploy
+acc sites deploy
 ```
 
 ::: tip Output Directory
-Next.js static export outputs to `./out` by default. When running `af sites init`, set the output directory to `out`.
+Next.js static export outputs to `./out` by default. When running `acc sites init`, set the output directory to `out`.
 :::
 
 ## Step 1: Create a New Next.js Project
@@ -131,7 +131,7 @@ If you have not already authenticated:
 
 ```bash
 # Interactive login (opens browser)
-af login
+acc login
 
 # Or use a Personal Access Token
 export AF_TOKEN=pat_your_token_here
@@ -141,7 +141,7 @@ export AF_TOKEN=pat_your_token_here
 
 ```bash
 # Initialize AF site configuration
-af sites init
+acc sites init
 
 # When prompted, configure:
 #   Site name: my-nextjs-app
@@ -150,7 +150,7 @@ af sites init
 #   Storage network: ipfs (recommended for getting started)
 
 # Deploy to decentralized storage
-af sites deploy
+acc sites deploy
 ```
 
 You should see output like:
@@ -169,7 +169,7 @@ Point your own domain to your deployment:
 
 ```bash
 # Add a custom domain
-af domains add my-nextjs-app.com --site my-nextjs-app
+acc domains add my-nextjs-app.com --site my-nextjs-app
 ```
 
 Then configure your DNS:

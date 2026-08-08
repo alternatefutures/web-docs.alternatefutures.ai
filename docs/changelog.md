@@ -26,15 +26,15 @@ The Alternate Futures platform enters public beta, providing decentralized cloud
 
 **Released: February 2026**
 
-The `@alternatefutures/cli` package is now available on npm. The CLI binary is `af`.
+The `@alternatefutures/cli` package is now available on npm. The CLI binary is `acc`.
 
-- `af login` - Interactive browser-based authentication
-- `af sites init` - Initialize site configuration with framework detection
-- `af sites deploy` - Deploy to IPFS, Filecoin, or Arweave
-- `af sites list` - View all sites and deployments
-- `af storage add` - Upload files to decentralized storage
-- `af pat create` - Generate Personal Access Tokens for automation
-- `af projects list` - Manage projects and organizations
+- `acc login` - Interactive browser-based authentication
+- `acc sites init` - Initialize site configuration with framework detection
+- `acc sites deploy` - Deploy to IPFS, Filecoin, or Arweave
+- `acc sites list` - View all sites and deployments
+- `acc storage add` - Upload files to decentralized storage
+- `acc pat create` - Generate Personal Access Tokens for automation
+- `acc projects list` - Manage projects and organizations
 - Automatic framework detection for React, Next.js, Vue, Astro, SvelteKit, Hugo, and more
 - JSON output mode for scripting and CI/CD integration
 - Environment variable support (`AF_TOKEN`, `AF_PROJECT_ID`)

@@ -1,3 +1,7 @@
+---
+description: Technical deep dive into the decentralized container registry architecture built on Akash Network, OpenRegistry, and IPFS.
+---
+
 # Registry Architecture
 
 Deep dive into the technical architecture of the decentralized container registry.
@@ -599,4 +603,4 @@ Use GeoDNS to route clients to nearest instance.
 
 - [Deploy Your Registry](/guides/registry-deployment)
 - [Use the Registry](/guides/decentralized-registry)
-- [Monitor & Maintain](/guides/monitoring)
+- [Monitor & Maintain](/guides/observability)

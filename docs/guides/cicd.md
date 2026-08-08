@@ -1,3 +1,7 @@
+---
+description: Automate Alternate Futures deployments with GitHub Actions, GitLab CI, and other CI/CD pipelines.
+---
+
 # CI/CD Integration
 
 Automate deployments with continuous integration and delivery pipelines.
@@ -35,14 +39,14 @@ jobs:
       - name: Deploy to Alternate Futures
         run: npx @alternatefutures/cli sites deploy ./dist --network ipfs
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
 
 ### Add API Key Secret
 
 1. Go to repository **Settings** → **Secrets and variables** → **Actions**
 2. Click **New repository secret**
-3. Name: `AF_API_KEY`
+3. Name: `AF_TOKEN`
 4. Value: Your API key from [app.alternatefutures.ai/api-keys](https://app.alternatefutures.ai/api-keys)
 5. Click **Add secret**
 
@@ -77,13 +81,13 @@ jobs:
         if: github.ref == 'refs/heads/staging'
         run: npx @alternatefutures/cli sites deploy ./dist --network ipfs --name staging
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY_STAGING }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN_STAGING }}
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
         run: npx @alternatefutures/cli sites deploy ./dist --network arweave --name production
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY_PROD }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN_PROD }}
 ```
 
 ## GitLab CI/CD
@@ -117,12 +121,12 @@ deploy:
     - main
   script:
     - npm install -g @alternatefutures/cli
-    - af sites deploy ./dist --network ipfs
+    - acc sites deploy ./dist --network ipfs
   variables:
-    AF_API_KEY: $AF_API_KEY
+    AF_TOKEN: $AF_TOKEN
 ```
 
-Add `AF_API_KEY` in GitLab project settings:
+Add `AF_TOKEN` in GitLab project settings:
 - **Settings** → **CI/CD** → **Variables**
 
 ## CircleCI
@@ -160,7 +164,7 @@ jobs:
           name: Deploy
           command: |
             npm install -g @alternatefutures/cli
-            af sites deploy ./dist --network ipfs
+            acc sites deploy ./dist --network ipfs
 
 workflows:
   deploy:
@@ -171,7 +175,7 @@ workflows:
               only: main
 ```
 
-Add `AF_API_KEY` in CircleCI project settings.
+Add `AF_TOKEN` in CircleCI project settings.
 
 ## Vercel Integration
 
@@ -192,13 +196,13 @@ Then add deployment hook:
 ```json
 {
   "scripts": {
-    "vercel-build": "npm run build && npm run deploy:af"
+    "vercel-build": "npm run build && npm run deploy:af",
     "deploy:af": "npx @alternatefutures/cli sites deploy ./dist --network ipfs"
   }
 }
 ```
 
-Set `AF_API_KEY` in Vercel environment variables.
+Set `AF_TOKEN` in Vercel environment variables.
 
 ## Jenkins
 
@@ -209,7 +213,7 @@ pipeline {
     agent any
 
     environment {
-        AF_API_KEY = credentials('af-api-key')
+        AF_TOKEN = credentials('af-token')
     }
 
     stages {
@@ -231,14 +235,14 @@ pipeline {
             }
             steps {
                 sh 'npm install -g @alternatefutures/cli'
-                sh 'af sites deploy ./dist --network ipfs'
+                sh 'acc sites deploy ./dist --network ipfs'
             }
         }
     }
 }
 ```
 
-Add `af-api-key` credential in Jenkins credentials manager.
+Add `af-token` credential in Jenkins credentials manager.
 
 ## CLI Options
 
@@ -246,26 +250,26 @@ Common deployment options:
 
 ```bash
 # Deploy with custom name
-af sites deploy ./dist --name "My Site" --network ipfs
+acc sites deploy ./dist --name "My Site" --network ipfs
 
 # Deploy with metadata
-af sites deploy ./dist --description "Production v1.2.0"
+acc sites deploy ./dist --description "Production v1.2.0"
 
 # Deploy to specific network
-af sites deploy ./dist --network arweave  # or ipfs, filecoin
+acc sites deploy ./dist --network arweave  # or ipfs, filecoin
 
 # Wait for deployment completion
-af sites deploy ./dist --wait
+acc sites deploy ./dist --wait
 
 # Get deployment URL in JSON
-af sites deploy ./dist --json | jq -r '.url'
+acc sites deploy ./dist --json | jq -r '.url'
 ```
 
 ## Environment Variables
 
 CLI reads these environment variables:
 
-- `AF_API_KEY` - API key for authentication
+- `AF_TOKEN` - API key for authentication
 - `AF_SITE_ID` - Default site ID (optional)
 - `AF_NETWORK` - Default network (optional)
 

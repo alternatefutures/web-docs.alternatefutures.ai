@@ -1,3 +1,7 @@
+---
+description: Deploy your first site to decentralized infrastructure in 5 minutes with the Alternate Futures CLI.
+---
+
 # Quick Start Guide
 
 Get started with Alternate Futures in minutes. This guide will walk you through your first deployment to decentralized infrastructure.
@@ -57,7 +61,7 @@ There are two ways to authenticate with Alternate Futures:
 
 ```bash [CLI]
 # Login interactively
-af login
+acc login
 ```
 
 :::
@@ -74,10 +78,10 @@ After signing in, the CLI automatically saves your credentials. You're ready to 
 
 If you prefer tokens or need to automate deployments:
 
-1. Log in via the CLI first: `af login`
-2. Create a Personal Access Token: `af pat create --name "My Development Token"`
+1. Log in via the CLI first: `acc login`
+2. Create a Personal Access Token: `acc pat create --name "My Development Token"`
 3. Copy the token (it starts with `pat_...`)
-4. Note your project ID from `af projects list`
+4. Note your project ID from `acc projects list`
 5. Set them as environment variables:
 
 ::: code-group
@@ -114,7 +118,7 @@ Environment variables store sensitive information (like tokens) outside your cod
 
 **How to use them:**
 1. Store your token in a `.env` file:
-   ```env
+   ```bash
    AF_TOKEN=pat_your_token_here
    AF_PROJECT_ID=prj_your_project_id
    ```
@@ -135,7 +139,7 @@ Environment variables store sensitive information (like tokens) outside your cod
 
 ### Troubleshooting Authentication
 
-**"Command not found: af"**
+**"Command not found: acc"**
 - Make sure you installed the CLI: `npm install -g @alternatefutures/cli`
 - Try restarting your terminal
 - Check installation with `npm list -g @alternatefutures/cli`
@@ -148,7 +152,7 @@ Environment variables store sensitive information (like tokens) outside your cod
 **"Invalid token"**
 - Double-check you copied the entire token (starts with `pat_`)
 - Make sure there are no extra spaces
-- Generate a new token if needed: `af pat create --name "New Token"`
+- Generate a new token if needed: `acc pat create --name "New Token"`
 
 ## Step 3: Deploy Your First Site
 
@@ -184,8 +188,8 @@ npm install
 npm run build
 
 # Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-react) | [React Docs](https://react.dev/) | [Vite Docs](https://vitejs.dev/)
@@ -204,8 +208,8 @@ npm install
 npm run build
 
 # Initialize and deploy (build output is in ./out)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-nextjs) | [Next.js Docs](https://nextjs.org/docs)
@@ -224,8 +228,8 @@ npm install
 npm run build
 
 # Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-vue) | [Vue.js Docs](https://vuejs.org/guide/) | [Vite Docs](https://vitejs.dev/)
@@ -244,8 +248,8 @@ npm install
 npm run build
 
 # Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-astro) | [Astro Docs](https://docs.astro.build/)
@@ -264,8 +268,8 @@ npm install
 npm run build
 
 # Initialize and deploy (build output is in ./build)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-sveltekit) | [SvelteKit Docs](https://kit.svelte.dev/docs)
@@ -281,8 +285,8 @@ cd my-site
 hugo
 
 # Initialize and deploy (build output is in ./public)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-hugo) | [Hugo Docs](https://gohugo.io/documentation/)
@@ -301,8 +305,8 @@ npm install
 npm run docs:build
 
 # Initialize and deploy (build output is in ./docs/.vitepress/dist)
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
 [Template Repository](https://github.com/alternatefutures/template-vitepress) | [VitePress Docs](https://vitepress.dev/)
@@ -373,7 +377,7 @@ Now let's deploy your site to a decentralized storage network. You have three op
 
 ```bash [CLI]
 # Initialize site configuration (creates af.config.json)
-af sites init
+acc sites init
 
 # Follow the prompts to configure:
 # - Site name
@@ -382,7 +386,7 @@ af sites init
 # - Storage network (IPFS, Filecoin, Arweave)
 
 # Deploy the site
-af sites deploy
+acc sites deploy
 
 # You should see output like:
 # ✓ Building site...
@@ -432,10 +436,10 @@ When you deployed, Alternate Futures:
 
 ```bash [CLI]
 # List all your sites
-af sites list
+acc sites list
 
 # View deployments for a specific site
-af sites deployments --slug my-site
+acc sites deployments --slug my-site
 
 # Output shows:
 # - Site name and slug
@@ -469,11 +473,11 @@ sites.forEach(site => {
 **"No such file or directory: ./dist"**
 - Make sure the directory exists
 - Use the correct path to your build output
-- Try an absolute path: `af sites deploy /full/path/to/dist --network ipfs`
+- Try an absolute path: `acc sites deploy /full/path/to/dist --network ipfs`
 
 **"Deployment failed" or timeout errors**
 - Check your internet connection
-- Verify you're authenticated: `af login`
+- Verify you're authenticated: `acc login`
 - Try again—network issues can be temporary
 - Try a smaller deployment first to test
 

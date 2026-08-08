@@ -54,10 +54,11 @@ features:
     linkText: Learn more
   - icon:
       src: /icons/chart.svg
-      alt: Analytics
-    title: Analytics
-    details: Track usage and performance metrics across all your deployments
-    status: in-progress
+      alt: Observability
+    title: Observability & APM
+    details: Distributed tracing, metrics, and logging for all your deployments
+    link: /guides/observability
+    linkText: Learn more
   - icon:
       src: /icons/credit-card.svg
       alt: Billing
@@ -94,8 +95,10 @@ features:
 - [CLI Commands](/cli/commands) - Complete CLI reference
 - [SDK API Reference](/sdk/api) - TypeScript SDK documentation
 - [Authentication](/guides/authentication) - Multi-method authentication guide
-- [Decentralized Registry](/guides/decentralized-registry) - Self-hosted container registry with IPFS
-- [Deploy Your Registry](/guides/registry-deployment) - Step-by-step Akash deployment guide
+- [Migrate from Fleek](/guides/migrate-from-fleek) - Moving from Fleek? Start here
+- [Migrate from Netlify](/guides/migrate-from-netlify) - Moving from Netlify? Start here
+- [Migrate from Spheron](/guides/migrate-from-spheron) - Moving from Spheron? Start here
+- [Migrate from Vercel](/guides/migrate-from-vercel) - Moving from Vercel? Start here
 
 ## Installation
 
@@ -103,7 +106,7 @@ features:
 
 ```bash [CLI]
 npm install -g @alternatefutures/cli
-af login
+acc login
 ```
 
 ```bash [SDK]
@@ -118,14 +121,14 @@ npm install @alternatefutures/sdk
 
 ```bash [CLI]
 # Initialize and deploy a site
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 
 # List your sites
-af sites list
+acc sites list
 
 # Upload files to IPFS
-af storage add ./my-files
+acc storage add ./my-files
 ```
 
 ```typescript [SDK]

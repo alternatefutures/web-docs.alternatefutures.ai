@@ -26,10 +26,10 @@ If you already have a React project, deploy it in three commands:
 npm run build
 
 # Initialize AF configuration
-af sites init
+acc sites init
 
 # Deploy to IPFS
-af sites deploy
+acc sites deploy
 ```
 
 ```bash [Create React App]
@@ -37,10 +37,10 @@ af sites deploy
 npm run build
 
 # Initialize AF configuration (set output directory to 'build')
-af sites init
+acc sites init
 
 # Deploy to IPFS
-af sites deploy
+acc sites deploy
 ```
 
 :::
@@ -49,7 +49,7 @@ af sites deploy
 - **Vite projects** output to `./dist` by default
 - **Create React App projects** output to `./build` by default
 
-Set the correct directory when running `af sites init`.
+Set the correct directory when running `acc sites init`.
 :::
 
 ## Step 1: Create a New React Project
@@ -162,7 +162,7 @@ If you have not already authenticated:
 
 ```bash
 # Interactive login (opens browser)
-af login
+acc login
 
 # Or use a Personal Access Token
 export AF_TOKEN=pat_your_token_here
@@ -174,7 +174,7 @@ export AF_TOKEN=pat_your_token_here
 
 ```bash [Vite]
 # Initialize AF site configuration
-af sites init
+acc sites init
 
 # When prompted, configure:
 #   Site name: my-react-app
@@ -183,12 +183,12 @@ af sites init
 #   Storage network: ipfs
 
 # Deploy to decentralized storage
-af sites deploy
+acc sites deploy
 ```
 
 ```bash [Create React App]
 # Initialize AF site configuration
-af sites init
+acc sites init
 
 # When prompted, configure:
 #   Site name: my-react-app
@@ -197,7 +197,7 @@ af sites init
 #   Storage network: ipfs
 
 # Deploy to decentralized storage
-af sites deploy
+acc sites deploy
 ```
 
 :::

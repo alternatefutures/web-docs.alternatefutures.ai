@@ -1,3 +1,7 @@
+---
+description: Track usage, manage costs, credits, and payment methods for your Alternate Futures deployments. Supports crypto and fiat payments.
+---
+
 # Billing & Usage
 
 ::: warning Web App Coming Soon
@@ -23,7 +27,7 @@ Manage billing directly from the command line:
 ### View Customer Information
 
 ```bash
-af billing customer
+acc billing customer
 ```
 
 View your customer details including email, Stripe ID, and account status.
@@ -31,7 +35,7 @@ View your customer details including email, Stripe ID, and account status.
 ### List Invoices
 
 ```bash
-af billing invoices
+acc billing invoices
 ```
 
 View all invoices with their status, amounts, and payment details. Invoices include:
@@ -43,7 +47,7 @@ View all invoices with their status, amounts, and payment details. Invoices incl
 ### View Subscriptions
 
 ```bash
-af billing subscriptions
+acc billing subscriptions
 ```
 
 See your active subscriptions including:
@@ -56,7 +60,7 @@ See your active subscriptions including:
 ### Check Usage
 
 ```bash
-af billing usage
+acc billing usage
 ```
 
 View current billing cycle usage:
@@ -69,7 +73,7 @@ View current billing cycle usage:
 ### Manage Payment Methods
 
 ```bash
-af billing payment-methods
+acc billing payment-methods
 ```
 
 List all payment methods on file including:
@@ -107,11 +111,13 @@ Track agent and function execution:
 
 ### Storage Costs
 
+<!-- TODO: Confirm IPFS pricing with product/finance. Sites guide, quickstart, and glossary all list ~$0.15/GB/month. Update whichever is incorrect. -->
+
 | Network | Type | Price |
 |---------|------|-------|
-| IPFS | Per GB/month | $0.06 |
-| Filecoin | Per GB/month | $0.03 |
-| Arweave | One-time per GB | $6.00 |
+| IPFS | Per GB/month | ~$0.15 |
+| Filecoin | Per GB/month | ~$0.03 |
+| Arweave | One-time per GB | ~$6.00 |
 
 ### Bandwidth Costs
 

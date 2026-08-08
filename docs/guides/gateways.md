@@ -1,3 +1,7 @@
+---
+description: Create dedicated IPFS gateways with custom domains for fast, reliable access to your decentralized content on Alternate Futures.
+---
+
 # Private Gateways
 
 Create dedicated IPFS gateways with custom domains for fast, reliable access to your decentralized content.
@@ -35,7 +39,7 @@ Private Gateways are dedicated IPFS gateway infrastructure that provides:
 
 ```bash [CLI]
 # Create a new private gateway
-af gateways create
+acc gateways create
 
 # You'll be prompted for:
 # - Gateway name
@@ -67,7 +71,7 @@ console.log('Gateway slug:', gateway.slug);
 
 ```bash [CLI]
 # List all private gateways
-af gateways list
+acc gateways list
 ```
 
 ```typescript [SDK]
@@ -88,7 +92,7 @@ gateways.forEach(gw => {
 
 ```bash [CLI]
 # Get details for a specific gateway
-af gateways detail
+acc gateways detail
 
 # You'll be prompted to select the gateway
 ```
@@ -115,7 +119,7 @@ const gatewayBySlug = await af.privateGateway().getBySlug({
 
 ```bash [CLI]
 # Update gateway configuration
-af gateways update
+acc gateways update
 
 # You'll be prompted to:
 # 1. Select the gateway
@@ -138,7 +142,7 @@ await af.privateGateway().update({
 
 ```bash [CLI]
 # Delete a gateway
-af gateways delete
+acc gateways delete
 
 # You'll be prompted to select which gateway to delete
 ```
@@ -168,7 +172,7 @@ TTL: 3600
 ### 2. Create Domain in Alternate Futures
 
 ```bash
-af domains create \
+acc domains create \
   --hostname gateway.yourdomain.com \
   --gateway-id <gateway-id>
 ```
@@ -176,7 +180,7 @@ af domains create \
 ### 3. Verify Domain
 
 ```bash
-af domains verify --domain-id <domain-id>
+acc domains verify --domain-id <domain-id>
 ```
 
 ## Accessing Content Through Gateway
@@ -286,7 +290,7 @@ Optimize images served through your gateway:
 Preload frequently accessed content:
 ```bash
 # Pin content to your gateway
-af storage pin <CID> --gateway-id <gateway-id>
+acc storage pin <CID> --gateway-id <gateway-id>
 ```
 
 ### 4. CDN Distribution

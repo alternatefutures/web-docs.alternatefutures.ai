@@ -1,3 +1,7 @@
+---
+description: Install and configure the Alternate Futures SDK for Node.js and browser environments with npm, pnpm, or yarn.
+---
+
 # SDK Installation
 
 Complete guide to installing and configuring the Alternate Futures SDK.

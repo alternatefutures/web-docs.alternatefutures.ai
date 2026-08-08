@@ -1,3 +1,7 @@
+---
+description: Deploy and manage Eliza, ComfyUI, and custom AI agents on decentralized infrastructure with Alternate Futures.
+---
+
 # Managing AI Agents
 
 ::: warning Web App Under Development
@@ -74,22 +78,27 @@ For Eliza agents:
 
 ```bash [CLI]
 # Create an Eliza agent
-af agents create --name "My Agent" --type eliza --character ./character.json
+acc agents create --name "My Agent" --type eliza --character ./character.json
 
 # List agents
-af agents list
+acc agents list
 
 # Get agent status
-af agents status <agent-id>
+acc agents status <agent-id>
 ```
 
 ```typescript [SDK]
-import { AlternateFutures } from '@alternatefutures/sdk';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
-const af = new AlternateFutures({ apiKey: process.env.AF_API_KEY });
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: '<your-token>',
+    projectId: '<your-project-id>',
+  }),
+});
 
 // Create an agent
-const agent = await af.agents.create({
+const agent = await af.agents().create({
   name: 'My Agent',
   type: 'eliza',
   config: {
@@ -125,30 +134,30 @@ Each agent will have a dashboard showing:
 
 ```bash [CLI]
 # Start an agent
-af agents start <agent-id>
+acc agents start <agent-id>
 
 # Stop an agent
-af agents stop <agent-id>
+acc agents stop <agent-id>
 
 # View logs
-af agents logs <agent-id>
+acc agents logs <agent-id>
 
 # Delete an agent
-af agents delete <agent-id>
+acc agents delete <agent-id>
 ```
 
 ```typescript [SDK]
 // Start an agent
-await af.agents.start(agentId);
+await af.agents().start(agentId);
 
 // Stop an agent
-await af.agents.stop(agentId);
+await af.agents().stop(agentId);
 
 // Get logs
-const logs = await af.agents.logs(agentId);
+const logs = await af.agents().logs(agentId);
 
 // Delete an agent
-await af.agents.delete(agentId);
+await af.agents().delete(agentId);
 ```
 
 :::
@@ -186,20 +195,20 @@ Pass environment variables directly when creating or updating agents:
 
 ```bash [CLI]
 # Set variables during agent creation
-af agents create \
+acc agents create \
   --name "My Agent" \
   --type eliza \
   --env OPENAI_API_KEY=sk-... \
   --env MODEL=gpt-4
 
 # Update existing agent variables
-af agents update <agent-id> \
+acc agents update <agent-id> \
   --env TEMPERATURE=0.8
 ```
 
 ```typescript [SDK]
 // Set variables during agent creation
-const agent = await af.agents.create({
+const agent = await af.agents().create({
   name: 'My Agent',
   type: 'eliza',
   env: {
@@ -210,7 +219,7 @@ const agent = await af.agents.create({
 });
 
 // Update existing agent variables
-await af.agents.update(agentId, {
+await af.agents().update(agentId, {
   env: {
     TEMPERATURE: '0.8'
   }

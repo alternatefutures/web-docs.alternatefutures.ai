@@ -1,3 +1,7 @@
+---
+description: Complete API reference for the @alternatefutures/sdk package including all types, interfaces, classes, and methods.
+---
+
 # SDK API Reference
 
 Complete API reference for the `@alternatefutures/sdk` package. This page documents all public types, interfaces, and classes available in the SDK.

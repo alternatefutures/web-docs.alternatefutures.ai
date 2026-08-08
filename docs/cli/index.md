@@ -1,6 +1,10 @@
+---
+description: The Alternate Futures CLI (af) lets you deploy sites, manage storage, configure domains, and run AI agents from the command line.
+---
+
 # CLI Documentation
 
-The Alternate Futures CLI (`af`) provides a powerful command-line interface for managing your agents, sites, storage, and deployments on decentralized infrastructure.
+The Alternate Futures CLI (`acc`) provides a powerful command-line interface for managing your agents, sites, storage, and deployments on decentralized infrastructure.
 
 ## Features
 
@@ -34,45 +38,47 @@ yarn global add @alternatefutures/cli
 Verify installation:
 
 ```bash
-af --version
+acc --version
 ```
 
 ## Quick Start
 
 ```bash
 # 1. Authenticate with your account
-af login
+acc login
 
 # 2. Create a new project
-af projects create --name "my-website"
+acc projects create --name "my-website"
 
 # 3. Initialize site configuration
-af sites init
+acc sites init
 
 # 4. Deploy your site
-af sites deploy
+acc sites deploy
 
 # 5. View your deployments
-af sites list
+acc sites list
 ```
 
 ## Command Groups
 
 | Command | Description |
 |---------|-------------|
-| `af login` / `af logout` | Authentication |
-| `af projects` | Manage projects |
-| `af sites` | Deploy and manage static sites |
-| `af functions` | Serverless function management |
-| `af storage` | Decentralized storage operations |
-| `af ipfs` | Direct IPFS operations |
-| `af ipns` | IPNS record management |
-| `af domains` | Custom domain configuration |
-| `af ens` | ENS domain integration |
-| `af gateways` | Private IPFS gateways |
-| `af applications` | SDK application management |
-| `af pat` | Personal access tokens |
-| `af billing` | Billing and usage information |
+| `acc login` / `acc logout` | Authentication |
+| `acc projects` | Manage projects |
+| `acc sites` | Deploy and manage static sites |
+| `acc functions` | Serverless function management |
+| `acc storage` | Decentralized storage operations |
+| `acc ipfs` | Direct IPFS operations |
+| `acc ipns` | IPNS record management |
+| `acc domains` | Custom domain configuration |
+| `acc ens` | ENS domain integration |
+| `acc gateways` | Private IPFS gateways |
+| `acc agents` | AI agent deployment and management |
+| `acc observability` | APM observability (traces, logs, metrics) |
+| `acc applications` | SDK application management |
+| `acc pat` | Personal access tokens |
+| `acc billing` | Billing and usage information |
 
 ## Getting Help
 
@@ -80,13 +86,13 @@ The CLI has built-in help for every command:
 
 ```bash
 # General help
-af --help
+acc --help
 
 # Help for a command group
-af sites --help
+acc sites --help
 
 # Help for a specific command
-af sites deploy --help
+acc sites deploy --help
 ```
 
 ## Environment Variables
@@ -122,7 +128,7 @@ The CLI uses `af.config.json` for site configuration:
 Create one with:
 
 ```bash
-af sites init
+acc sites init
 ```
 
 ## Documentation
@@ -144,18 +150,18 @@ af sites init
 npm run build
 
 # Initialize AF config
-af sites init
+acc sites init
 # Follow prompts: name, dist folder (./dist), network (ipfs)
 
 # Deploy
-af sites deploy
+acc sites deploy
 ```
 
 ### Generate CI/CD Config
 
 ```bash
 # Generate GitHub Actions workflow
-af sites ci --provider github
+acc sites ci --provider github
 ```
 
 This creates `.github/workflows/af-deploy.yml` for automatic deployments.
@@ -164,38 +170,38 @@ This creates `.github/workflows/af-deploy.yml` for automatic deployments.
 
 ```bash
 # List all projects
-af projects list
+acc projects list
 
 # Switch to a different project
-af projects switch --id prj_production
+acc projects switch --id prj_production
 
 # All subsequent commands use the selected project
-af sites list
-af domains list
+acc sites list
+acc domains list
 ```
 
 ### Upload Files to IPFS
 
 ```bash
 # Upload a single file
-af storage add ./my-file.pdf
+acc storage add ./my-file.pdf
 
 # Upload a directory
-af storage add ./my-folder
+acc storage add ./my-folder
 
 # List stored files
-af storage list
+acc storage list
 ```
 
 ### Work with Custom Domains
 
 ```bash
 # Add a domain to your site
-af domains create --siteSlug my-site --hostname www.example.com
+acc domains create --siteSlug my-site --hostname www.example.com
 
 # Check verification status
-af domains detail --hostname www.example.com
+acc domains detail --hostname www.example.com
 
 # Verify DNS configuration
-af domains verify --hostname www.example.com
+acc domains verify --hostname www.example.com
 ```

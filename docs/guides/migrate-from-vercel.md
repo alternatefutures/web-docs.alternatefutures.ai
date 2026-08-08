@@ -38,7 +38,7 @@ Migrating from Vercel works best for **static sites** and **static exports** (Ne
 npm install -g @alternatefutures/cli
 
 # Authenticate
-af login
+acc login
 ```
 
 ## Step 2: Configure Your Build
@@ -64,16 +64,16 @@ Build and deploy:
 
 ```bash
 npm run build
-af sites init          # Set output directory to ./out
-af sites deploy
+acc sites init          # Set output directory to ./out
+acc sites deploy
 ```
 
 ### React (Vite or Create React App)
 
 ```bash
 npm run build
-af sites init          # Set output directory to ./dist (Vite) or ./build (CRA)
-af sites deploy
+acc sites init          # Set output directory to ./dist (Vite) or ./build (CRA)
+acc sites deploy
 ```
 
 ### Other Frameworks
@@ -102,10 +102,10 @@ Any framework that produces static output works. Set the correct output director
 
 ```bash
 # Add the domain to your site
-af domains create --siteSlug my-site --hostname example.com
+acc domains create --siteSlug my-site --hostname example.com
 
 # Get the required DNS records
-af domains detail --hostname example.com
+acc domains detail --hostname example.com
 ```
 
 ### Update DNS Records
@@ -123,12 +123,12 @@ Value: cname.alternatefutures.ai
 ```
 Type: A
 Name: @
-Value: [IP from af domains detail]
+Value: [IP from acc domains detail]
 ```
 
 ```bash
 # Verify DNS configuration
-af domains verify --hostname example.com
+acc domains verify --hostname example.com
 ```
 
 ## Step 4: Migrate CI/CD
@@ -173,8 +173,8 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with `af pat create --name "CI/CD"`)
-3. Add `AF_PROJECT_ID` -- your project ID (find it with `af projects list`)
+2. Add `AF_TOKEN` -- your personal access token (create one with `acc pat create --name "CI/CD"`)
+3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 5: Migrate Environment Variables
 

@@ -1,3 +1,7 @@
+---
+description: Optimize your Alternate Futures deployments for performance, cost, and reliability with storage, caching, and security best practices.
+---
+
 # Best Practices
 
 Optimize your Alternate Futures deployments for performance, cost, and reliability.
@@ -146,16 +150,16 @@ module.exports = {
 **Unpin Unused Content (IPFS):**
 ```bash
 # List all pinned content
-af storage list --network ipfs --pinned
+acc storage list --network ipfs --pinned
 
 # Unpin old deployments
-af storage unpin QmOldCID
+acc storage unpin QmOldCID
 ```
 
 **Use Filecoin for Archives:**
 ```bash
 # Move old content from IPFS to Filecoin
-af storage migrate QmXxx --from ipfs --to filecoin
+acc storage migrate QmXxx --from ipfs --to filecoin
 ```
 
 **Compress Before Upload:**
@@ -164,7 +168,7 @@ af storage migrate QmXxx --from ipfs --to filecoin
 tar -czf site.tar.gz dist/
 
 # Deploy compressed (auto-extracted)
-af sites deploy site.tar.gz
+acc sites deploy site.tar.gz
 ```
 
 ### Bandwidth Costs
@@ -188,10 +192,10 @@ af sites deploy site.tar.gz
 **Agent Optimization:**
 ```javascript
 // Stop agents when not needed
-af agents stop agent-id
+acc agents stop agent-id
 
 // Start on-demand
-af agents start agent-id
+acc agents start agent-id
 
 // Use smaller models
 {
@@ -205,17 +209,17 @@ af agents start agent-id
 
 ```bash
 # Use environment variables
-export AF_API_KEY="af_xxx"
+export AF_TOKEN="af_pat_xxx"
 
 # Never commit to git
-echo "AF_API_KEY=*" >> .gitignore
+echo "AF_TOKEN=*" >> .gitignore
 
 # Rotate regularly
-af api-keys create --expires 90d
-af api-keys revoke old-key-id
+acc api-keys create --expires 90d
+acc api-keys revoke old-key-id
 
 # Use minimal permissions
-af api-keys create --permissions agents:read,sites:write
+acc api-keys create --permissions agents:read,sites:write
 ```
 
 ### Content Security
@@ -230,7 +234,7 @@ ipfs add --only-hash file.txt
 **Sign Deployments:**
 ```bash
 # Sign with private key for verification
-af sites deploy ./dist --sign
+acc sites deploy ./dist --sign
 ```
 
 ## Reliability Best Practices
@@ -240,17 +244,17 @@ af sites deploy ./dist --sign
 **Pin on Multiple Services:**
 ```bash
 # Primary pinning service
-af storage pin QmXxx --provider pinata
+acc storage pin QmXxx --provider pinata
 
 # Backup pinning
-af storage pin QmXxx --provider web3storage
+acc storage pin QmXxx --provider web3storage
 ```
 
 **Use Multiple Networks:**
 ```bash
 # Deploy to both IPFS and Arweave
-af sites deploy ./dist --network ipfs
-af sites deploy ./dist --network arweave
+acc sites deploy ./dist --network ipfs
+acc sites deploy ./dist --network arweave
 ```
 
 ### Monitoring
@@ -258,10 +262,10 @@ af sites deploy ./dist --network arweave
 **Set Up Alerts:**
 ```bash
 # Monitor agent uptime
-af agents monitor agent-id --alert-email you@example.com
+acc agents monitor agent-id --alert-email you@example.com
 
 # Monitor bandwidth usage
-af billing alert --type bandwidth --threshold 1TB
+acc billing alert --type bandwidth --threshold 1TB
 ```
 
 **Check Deployment Health:**
@@ -270,7 +274,7 @@ af billing alert --type bandwidth --threshold 1TB
 curl -I https://gateway.ipfs.io/ipfs/QmXxx
 
 # Check all gateways
-af sites check site-id --all-gateways
+acc sites check site-id --all-gateways
 ```
 
 ## Development Workflow
@@ -282,13 +286,13 @@ af sites check site-id --all-gateways
 ipfs daemon
 
 # Test locally before deploying
-af sites preview ./dist --local
+acc sites preview ./dist --local
 
 # Deploy to staging first
-af sites deploy ./dist --name staging
+acc sites deploy ./dist --name staging
 
 # Test thoroughly, then deploy to production
-af sites deploy ./dist --name production
+acc sites deploy ./dist --name production
 ```
 
 ### CI/CD
@@ -297,11 +301,11 @@ af sites deploy ./dist --name production
 # .github/workflows/deploy.yml
 - name: Deploy to staging
   if: github.ref == 'refs/heads/staging'
-  run: af sites deploy ./dist --network ipfs
+  run: acc sites deploy ./dist --network ipfs
 
 - name: Deploy to production
   if: github.ref == 'refs/heads/main'
-  run: af sites deploy ./dist --network arweave
+  run: acc sites deploy ./dist --network arweave
 ```
 
 ## Content Organization
@@ -310,14 +314,14 @@ af sites deploy ./dist --name production
 
 ```bash
 # Use descriptive names
-af sites deploy ./dist --name "marketing-website-prod"
-af agents create --name "discord-bot-support"
+acc sites deploy ./dist --name "marketing-website-prod"
+acc agents create --name "discord-bot-support"
 
 # Include version numbers
-af sites deploy ./dist --name "app-v1.2.0"
+acc sites deploy ./dist --name "app-v1.2.0"
 
 # Use tags for organization
-af sites deploy ./dist --tags production,public
+acc sites deploy ./dist --tags production,public
 ```
 
 ### Project Structure
@@ -327,7 +331,7 @@ my-project/
 ├── dist/              # Built static files
 ├── .env              # API keys (not in git!)
 ├── .gitignore        # Include .env
-├── af-config.json    # Alternate Futures config
+├── af.config.json    # Alternate Futures config
 └── deploy.sh         # Deployment script
 ```
 

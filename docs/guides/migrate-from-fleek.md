@@ -12,7 +12,7 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have s
 
 | Feature | Fleek | Alternate Futures |
 |---------|-------|-------------------|
-| **CLI command** | `fleek` | `af` |
+| **CLI command** | `fleek` | `acc` |
 | **Package name** | `@fleekxyz/cli` | `@alternatefutures/cli` |
 | **SDK package** | `@fleekxyz/sdk` | `@alternatefutures/sdk` |
 | **Config file** | `fleek.json` | `af.config.json` |
@@ -37,7 +37,7 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have s
 3. **Install the Alternate Futures CLI:**
    ```bash
    npm install -g @alternatefutures/cli
-   af login
+   acc login
    ```
 
 ## Step 1: Migrate Your Site
@@ -54,11 +54,11 @@ fleek sites deploy
 
 **New (Alternate Futures):**
 ```bash
-af sites init
-af sites deploy
+acc sites init
+acc sites deploy
 ```
 
-The `af sites init` command creates an `af.config.json` file. If you had a `fleek.json`, here is how the configuration maps:
+The `acc sites init` command creates an `af.config.json` file. If you had a `fleek.json`, here is how the configuration maps:
 
 **Fleek config (`fleek.json`):**
 ```json
@@ -121,10 +121,10 @@ If you have content pinned on Fleek's IPFS infrastructure, you should re-pin it 
 
 ```bash
 # If you have the original files, re-upload them
-af storage add ./my-files
+acc storage add ./my-files
 
 # Or upload from a directory
-af ipfs add ./my-content
+acc ipfs add ./my-content
 ```
 
 Your CIDs will remain the same since IPFS content-addressing is deterministic -- the same files always produce the same CID.
@@ -146,10 +146,10 @@ dig yourdomain.com TXT
 
 ```bash
 # Add your domain to your AF site
-af domains create --siteSlug my-site --hostname yourdomain.com
+acc domains create --siteSlug my-site --hostname yourdomain.com
 
 # Verify DNS configuration
-af domains verify --hostname yourdomain.com
+acc domains verify --hostname yourdomain.com
 ```
 
 ### Update DNS Records
@@ -168,7 +168,7 @@ TTL: 3600
 ```
 Type: A
 Name: @
-Value: [Platform IP from af domains detail]
+Value: [Platform IP from acc domains detail]
 TTL: 3600
 ```
 
@@ -208,10 +208,10 @@ If you had ENS domains linked through Fleek:
 
 ```bash
 # Link your ENS domain to your AF site
-af ens create --domain mysite.eth --siteSlug my-site
+acc ens create --domain mysite.eth --siteSlug my-site
 
 # Verify the configuration
-af ens verify --domain mysite.eth
+acc ens verify --domain mysite.eth
 ```
 
 ## Step 6: Clean Up

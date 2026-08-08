@@ -38,7 +38,7 @@ Migrating from Netlify works best for **static sites** and **JAMstack apps** (Ne
 npm install -g @alternatefutures/cli
 
 # Authenticate
-af login
+acc login
 ```
 
 ## Step 2: Update Your Configuration
@@ -59,7 +59,7 @@ Netlify uses `netlify.toml` for configuration. You will replace this with `af.co
   status = 200
 ```
 
-**New (`af.config.json` -- created by `af sites init`):**
+**New (`af.config.json` -- created by `acc sites init`):**
 ```json
 {
   "sites": [
@@ -82,8 +82,8 @@ Build and deploy your site:
 
 ```bash
 npm run build
-af sites init          # Select your output directory
-af sites deploy
+acc sites init          # Select your output directory
+acc sites deploy
 ```
 
 ### Framework Output Directories
@@ -127,8 +127,8 @@ export const main = (params) => {
 
 Deploy the function:
 ```bash
-af functions create --name hello --path ./functions/hello.js
-af functions deploy --name hello
+acc functions create --name hello --path ./functions/hello.js
+acc functions deploy --name hello
 ```
 
 See the [Cloud Functions guide](./functions.md) for full details on function deployment, environment variables, and SGX encryption.
@@ -145,10 +145,10 @@ See the [Cloud Functions guide](./functions.md) for full details on function dep
 
 ```bash
 # Add the domain to your site
-af domains create --siteSlug my-site --hostname example.com
+acc domains create --siteSlug my-site --hostname example.com
 
 # Get the required DNS records
-af domains detail --hostname example.com
+acc domains detail --hostname example.com
 ```
 
 ### Update DNS Records
@@ -166,12 +166,12 @@ Value: cname.alternatefutures.ai
 ```
 Type: A
 Name: @
-Value: [IP from af domains detail]
+Value: [IP from acc domains detail]
 ```
 
 ```bash
 # Verify DNS configuration
-af domains verify --hostname example.com
+acc domains verify --hostname example.com
 ```
 
 ::: warning Netlify DNS Users
@@ -220,8 +220,8 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with `af pat create --name "CI/CD"`)
-3. Add `AF_PROJECT_ID` -- your project ID (find it with `af projects list`)
+2. Add `AF_TOKEN` -- your personal access token (create one with `acc pat create --name "CI/CD"`)
+3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 6: Migrate Environment Variables
 
