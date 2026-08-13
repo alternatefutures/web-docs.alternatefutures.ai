@@ -783,7 +783,7 @@ The developer typeface. Every code block, inline code reference, terminal output
 <div class="type-specimen">
   <div class="font-label">JetBrains Mono -- Regular 400 / Medium 500 / SemiBold 600 / Bold 700</div>
   <div class="sample-display" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 1.8rem;">
-    af deploy --network ipfs
+    acc services deploy
   </div>
   <div class="sample-code" style="font-family: 'JetBrains Mono', ui-monospace, monospace;">
     const af = new AlternateFuturesSdk({<br/>
@@ -1169,7 +1169,7 @@ The same voice can shift tone depending on context:
 
 | Context | Tone | Example |
 |---------|------|---------|
-| **Documentation** | Instructional, precise, neutral | "Run `af deploy` to push your site to IPFS. The CLI will return a CID and preview URL." |
+| **Documentation** | Instructional, precise, neutral | "Run `acc services deploy` to push your site to IPFS. The CLI will return a CID and preview URL." |
 | **Blog posts** | Conversational, informative | "We shipped a big update this week -- here is what changed and why it matters for your workflow." |
 | **Error messages** | Helpful, never blaming | "Deployment failed: the build command exited with code 1. Check your package.json scripts." |
 | **Social media** | Energetic, concise | "60% cheaper than Vercel. Same features. Decentralized infrastructure. Your margins intact." |
@@ -1185,7 +1185,7 @@ Always use these standard terms:
 | **Alternate Futures** | Full company name (first mention in any document) | "Alt Futures", "AltFut", "A.F." |
 | **AF** | Acceptable abbreviation after first mention | Any other abbreviation |
 | **deploy** | Lowercase verb for the deployment action | "push", "ship", "launch" (in technical docs) |
-| **site** | A static website deployment | "app" (when referring to static hosting) |
+| **site** | A static website deployment (deployed via the `acc services` command) | "app" (when referring to static hosting) |
 | **function** | A serverless cloud function | "lambda", "endpoint" |
 | **agent** | An AI agent deployment | "bot", "model" (when referring to hosted agents) |
 | **decentralized** | Preferred. Describes the infrastructure model | "distributed" (unless technically accurate) |

@@ -1,15 +1,19 @@
+---
+description: The Alternate Clouds CLI (acc) lets you manage projects, deploy services from templates, inspect deployments, open a shell into a running service, and check your billing balance.
+---
+
 # CLI Documentation
 
-The Alternate Futures CLI (`af`) provides a powerful command-line interface for managing your agents, sites, storage, and deployments on decentralized infrastructure.
+The Alternate Clouds CLI (`acc`) is the command-line interface for Alternate Clouds. Use it to authenticate, manage projects, create and deploy services from templates, inspect deployments, open a shell into a running service, and check your billing balance.
 
 ## Features
 
-- **Deploy Sites** - Push static sites to IPFS, Filecoin, or Arweave
-- **Manage Storage** - Upload and manage files on decentralized storage
-- **Configure Domains** - Add custom domains and ENS integration
-- **Serverless Functions** - Deploy and manage edge functions
-- **CI/CD Integration** - Generate workflow configs for GitHub Actions, GitLab CI, and more
-- **Billing & Usage** - Monitor costs and resource consumption
+- **Authenticate** - Log in via browser or email verification code
+- **Manage projects** - Create, list, switch, rename, and delete projects
+- **Deploy services** - Create services from templates and deploy them to decentralized compute (Akash/Phala)
+- **Inspect deployments** - List and filter deployments across projects and services
+- **Open a shell** - SSH into a running service
+- **Check billing** - View your current credit balance
 
 ## Installation
 
@@ -34,45 +38,40 @@ yarn global add @alternatefutures/cli
 Verify installation:
 
 ```bash
-af --version
+acc --version
 ```
 
 ## Quick Start
 
 ```bash
 # 1. Authenticate with your account
-af login
+acc login
 
 # 2. Create a new project
-af projects create --name "my-website"
+acc projects create --name "my-project"
 
-# 3. Initialize site configuration
-af sites init
+# 3. Create a service from a template (interactive)
+acc services create
 
-# 4. Deploy your site
-af sites deploy
+# 4. Deploy the service
+acc services deploy
 
 # 5. View your deployments
-af sites list
+acc deployments list
 ```
 
 ## Command Groups
 
 | Command | Description |
 |---------|-------------|
-| `af login` / `af logout` | Authentication |
-| `af projects` | Manage projects |
-| `af sites` | Deploy and manage static sites |
-| `af functions` | Serverless function management |
-| `af storage` | Decentralized storage operations |
-| `af ipfs` | Direct IPFS operations |
-| `af ipns` | IPNS record management |
-| `af domains` | Custom domain configuration |
-| `af ens` | ENS domain integration |
-| `af gateways` | Private IPFS gateways |
-| `af applications` | SDK application management |
-| `af pat` | Personal access tokens |
-| `af billing` | Billing and usage information |
+| `acc login` / `acc logout` | Authenticate or end your CLI session |
+| `acc projects` | Create, list, switch, rename, and delete projects |
+| `acc services` | Create, deploy, inspect, and manage services |
+| `acc deployments` | List and filter deployments |
+| `acc ssh` | Open a shell into a running service |
+| `acc billing` | View your credit balance |
+
+> **What this maps to in code:** command registration lives in [command registration (cli.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). `templates` and `pat` are also registered but hidden from top-level help.
 
 ## Getting Help
 
@@ -80,13 +79,13 @@ The CLI has built-in help for every command:
 
 ```bash
 # General help
-af --help
+acc --help
 
 # Help for a command group
-af sites --help
+acc services --help
 
 # Help for a specific command
-af sites deploy --help
+acc services deploy --help
 ```
 
 ## Environment Variables
@@ -102,28 +101,29 @@ export AF_PROJECT_ID="your-project-id"
 |----------|-------------|
 | `AF_TOKEN` | Personal access token for authentication |
 | `AF_PROJECT_ID` | Default project ID for commands |
-| `AF_BASE_URL` | Override API endpoint (for testing) |
+| `AF_ORG_ID` | Default organization ID |
+
+> **What this maps to in code:** these are the only variables the CLI reads — see [CLI environment variables (secrets.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
 
 ## Configuration File
 
-The CLI uses `af.config.json` for site configuration:
+The CLI reads deployment configuration from an `af.config` file in your project root. It accepts `af.config.ts`, `af.config.js`, or `af.config.json`:
 
 ```json
 {
-  "name": "my-site",
-  "buildCommand": "npm run build",
-  "distDir": "./dist",
-  "storage": {
-    "type": "ipfs"
-  }
+  "sites": [
+    {
+      "slug": "my-site",
+      "distDir": "./dist",
+      "buildCommand": "npm run build"
+    }
+  ]
 }
 ```
 
-Create one with:
+Create the file manually in your project root.
 
-```bash
-af sites init
-```
+> **What this maps to in code:** the schema (`AlternateFuturesRootConfig` with a `sites[]` array and an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
 
 ## Documentation
 
@@ -132,70 +132,134 @@ af sites init
 
 ## Requirements
 
-- Node.js 18.0.0 or higher
+- Node.js 18.18.2 or higher
 - npm, pnpm, or yarn
 
 ## Examples
 
+### Deploy a Service
+
+```bash
+# Create a service from a template (interactive prompts)
+acc services create
+
+# Deploy it
+acc services deploy
+
+# Watch its logs
+acc services logs --tail 100
+```
+
+### Manage Multiple Projects
+
+```bash
+# List all projects
+acc projects list
+
+# Switch to a different project (positional project ID)
+acc projects switch prj_production
+
+# All subsequent commands use the selected project
+acc services list
+acc deployments list
+```
+
+### Browse Templates
+
+```bash
+# List templates, optionally filtered by category
+acc templates list --category AI_ML
+
+# Inspect a template
+acc templates info <templateId>
+```
+
+<!-- ROADMAP — not yet shipped. Uncomment when implemented.
+
+## Removed / re-architected commands (kept for reference)
+
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
+
+### Planned features
+
+- **Deploy Sites** - Push static sites to IPFS, Filecoin, or Arweave
+- **Manage Storage** - Upload and manage files on decentralized storage
+- **Configure Domains** - Add custom domains and ENS integration
+- **Serverless Functions** - Deploy and manage edge functions
+- **CI/CD Integration** - Generate workflow configs for GitHub Actions, GitLab CI, and more
+
+### Planned command groups
+
+| Command | Description |
+|---------|-------------|
+| `acc sites` | Deploy and manage static sites |
+| `acc functions` | Serverless function management |
+| `acc storage` | Decentralized storage operations |
+| `acc ipfs` | Direct IPFS operations |
+| `acc ipns` | IPNS record management |
+| `acc domains` | Custom domain configuration |
+| `acc ens` | ENS domain integration |
+| `acc gateways` | Private IPFS gateways |
+| `acc agents` | AI agent deployment and management |
+| `acc observability` | APM observability (traces, logs, metrics) |
+| `acc applications` | SDK application management |
+
 ### Deploy a React Site
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
 
 ```bash
 # Build your app
 npm run build
 
 # Initialize AF config
-af sites init
+acc sites init
 # Follow prompts: name, dist folder (./dist), network (ipfs)
 
 # Deploy
-af sites deploy
+acc sites deploy
 ```
 
 ### Generate CI/CD Config
 
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 ```bash
 # Generate GitHub Actions workflow
-af sites ci --provider github
+acc sites ci --provider github
 ```
 
 This creates `.github/workflows/af-deploy.yml` for automatic deployments.
 
-### Manage Multiple Projects
-
-```bash
-# List all projects
-af projects list
-
-# Switch to a different project
-af projects switch --id prj_production
-
-# All subsequent commands use the selected project
-af sites list
-af domains list
-```
-
 ### Upload Files to IPFS
+
+STATUS: Removed. Object storage is now the rustfs S3 BUCKET service template (`acc services create`).
 
 ```bash
 # Upload a single file
-af storage add ./my-file.pdf
+acc storage add ./my-file.pdf
 
 # Upload a directory
-af storage add ./my-folder
+acc storage add ./my-folder
 
 # List stored files
-af storage list
+acc storage list
 ```
 
 ### Work with Custom Domains
 
+STATUS: Removed. Custom domains are managed in the dashboard.
+
 ```bash
 # Add a domain to your site
-af domains create --siteSlug my-site --hostname www.example.com
+acc domains create --siteSlug my-site --hostname www.example.com
 
 # Check verification status
-af domains detail --hostname www.example.com
+acc domains detail --hostname www.example.com
 
 # Verify DNS configuration
-af domains verify --hostname www.example.com
+acc domains verify --hostname www.example.com
 ```
+
+-->
+

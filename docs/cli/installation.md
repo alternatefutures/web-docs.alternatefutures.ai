@@ -1,17 +1,23 @@
+---
+description: Install and configure the Alternate Futures CLI on macOS, Linux, or Windows with npm, pnpm, or yarn.
+---
+
 # CLI Installation
 
 Complete guide to installing and configuring the Alternate Futures CLI.
 
 ## Requirements
 
-- **Node.js 18.0.0 or higher** - [Download here](https://nodejs.org/)
+- **Node.js 18.18.2 or higher** - [Download here](https://nodejs.org/)
 - **npm, pnpm, or yarn** - Package manager
 
 Check your Node.js version:
 
 ```bash
-node --version  # Should be v18.0.0 or higher
+node --version  # Should be v18.18.2 or higher
 ```
+
+> **What this maps to in code:** the engine range and package name are declared in [package.json engines / bin](https://github.com/alternatefutures/cloud-cli/blob/main/package.json).
 
 ## Installation
 
@@ -38,7 +44,7 @@ yarn global add @alternatefutures/cli
 After installation, verify the CLI is working:
 
 ```bash
-af --version
+acc --version
 ```
 
 You should see the version number displayed. If you see "command not found", try:
@@ -54,23 +60,17 @@ Before using the CLI, you need to authenticate with your Alternate Futures accou
 ### Interactive Login (Recommended)
 
 ```bash
-af login
+acc login
 ```
 
-This opens your browser where you can sign in with:
-- Email (magic link)
-- Google account
-- GitHub account
-- Web3 wallet (MetaMask, Coinbase Wallet, etc.)
-
-After signing in, the CLI automatically saves your credentials.
+This opens the Alternate Clouds web app in your browser to sign in. The available sign-in methods (email magic link, Google, GitHub, and Web3 wallets) are provided by the web app. After signing in, the CLI automatically saves your credentials.
 
 ### Email Login (No Browser)
 
 For environments without a browser (SSH, containers):
 
 ```bash
-af login --email
+acc login --email
 ```
 
 This sends a verification code to your email.
@@ -88,7 +88,7 @@ export AF_PROJECT_ID="your-project-id"
 1. Log in to [app.alternatefutures.ai](https://app.alternatefutures.ai)
 2. Go to Settings > API Keys
 3. Create a new Personal Access Token
-4. Copy the token (starts with `pat_`)
+4. Copy the token and store it somewhere secure
 
 ## Configuration
 
@@ -98,19 +98,41 @@ If you have multiple projects, select one:
 
 ```bash
 # List available projects
-af projects list
+acc projects list
 
-# Switch to a project
-af projects switch --id prj_abc123
+# Switch to a project (positional project ID)
+acc projects switch prj_abc123
 ```
 
 ### Site Configuration
+
+Create a config file in your project root. The CLI accepts `af.config.ts`, `af.config.js`, or `af.config.json`:
+
+```json
+{
+  "sites": [
+    {
+      "slug": "my-site",
+      "distDir": "./dist",
+      "buildCommand": "npm run build"
+    }
+  ]
+}
+```
+
+> **What this maps to in code:** the schema (a top-level `sites[]` array, plus an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+
+<!-- Removed / re-architected commands (kept for reference)
+
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
 
 Initialize a site configuration file in your project:
 
 ```bash
 cd my-project
-af sites init
+acc sites init
 ```
 
 This creates `af.config.json`:
@@ -125,39 +147,43 @@ This creates `af.config.json`:
   }
 }
 ```
+-->
+
 
 ## Environment Variables Reference
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `AF_TOKEN` | Personal access token | `pat_abc123...` |
-| `AF_PROJECT_ID` | Default project ID | `prj_def456...` |
-| `AF_BASE_URL` | Override API endpoint | `https://api.custom.com` |
+| `AF_TOKEN` | Personal access token | `<your-token>` |
+| `AF_PROJECT_ID` | Default project ID | `prj_abc123` |
+| `AF_ORG_ID` | Default organization ID | `org_abc123` |
+
+> **What this maps to in code:** these are the only variables the CLI reads — see [env vars read by the CLI](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
 
 ### Setting Environment Variables
 
 **Linux/macOS:**
 ```bash
 # Temporary (current session)
-export AF_TOKEN="pat_abc123..."
+export AF_TOKEN="your-token"
 
 # Permanent (add to ~/.bashrc or ~/.zshrc)
-echo 'export AF_TOKEN="pat_abc123..."' >> ~/.bashrc
+echo 'export AF_TOKEN="your-token"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
 **Windows (PowerShell):**
 ```powershell
 # Temporary
-$env:AF_TOKEN = "pat_abc123..."
+$env:AF_TOKEN = "your-token"
 
 # Permanent
-[Environment]::SetEnvironmentVariable("AF_TOKEN", "pat_abc123...", "User")
+[Environment]::SetEnvironmentVariable("AF_TOKEN", "your-token", "User")
 ```
 
 **Windows (Command Prompt):**
 ```cmd
-set AF_TOKEN=pat_abc123...
+set AF_TOKEN=your-token
 ```
 
 ## CI/CD Setup
@@ -194,17 +220,22 @@ jobs:
         run: npm install -g @alternatefutures/cli
 
       - name: Deploy
-        run: af sites deploy
+        run: acc services deploy <service-id>
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
 ```
 
+<!-- Removed / re-architected commands (kept for reference)
+
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 Or generate it automatically:
 
 ```bash
-af sites ci --provider github
+acc sites ci --provider github
 ```
+-->
 
 ### GitLab CI
 
@@ -218,7 +249,7 @@ deploy:
     - npm ci
     - npm run build
     - npm install -g @alternatefutures/cli
-    - af sites deploy
+    - acc services deploy <service-id>
   variables:
     AF_TOKEN: $AF_TOKEN
     AF_PROJECT_ID: $AF_PROJECT_ID
@@ -248,7 +279,7 @@ yarn global upgrade @alternatefutures/cli
 
 ## Troubleshooting
 
-### "Command not found: af"
+### "Command not found: acc"
 
 - Ensure the global npm directory is in your PATH
 - Try restarting your terminal
@@ -257,7 +288,7 @@ yarn global upgrade @alternatefutures/cli
 
 ### "Login failed" or browser doesn't open
 
-- Try email-based login: `af login --email`
+- Try email-based login: `acc login --email`
 - Check your internet connection
 - Ensure you have an account at [app.alternatefutures.ai](https://app.alternatefutures.ai)
 

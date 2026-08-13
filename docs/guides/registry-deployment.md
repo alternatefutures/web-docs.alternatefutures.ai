@@ -1,4 +1,12 @@
+---
+description: Deploy your own OpenRegistry and IPFS container registry stack on Akash Network with this step-by-step guide.
+---
+
 # Deploying the Decentralized Registry
+
+::: warning Self-hosting third-party components
+This guide deploys open-source components (OpenRegistry + Kubo/IPFS + PostgreSQL) on Akash. Alternate Futures does not publish a prebuilt registry SDL — you supply your own `deploy-registry.yaml` describing these services. Treat the commands and values below as a template to adapt, not a turnkey Alternate Futures deployment.
+:::
 
 This guide walks you through deploying your own OpenRegistry + IPFS stack on Akash Network.
 
@@ -108,12 +116,13 @@ akash query bank balances $AKASH_ACCOUNT_ADDRESS --node $AKASH_NODE
 
 ## Step 3: Configure Deployment
 
-### Download SDL File
+### Author Your SDL File
 
-Download the deployment configuration:
+There is no published `deploy-registry.yaml` to download. Create one locally that defines the three services (PostgreSQL, IPFS/Kubo, OpenRegistry) using the resource profiles and environment variables from the [Registry Architecture](/guides/registry-architecture) reference. Save it as `deploy-registry.yaml` in your working directory before continuing.
 
 ```bash
-curl -O https://raw.githubusercontent.com/alternatefutures/backend/main/deploy-registry.yaml
+# Create the file, then validate it before deploying:
+akash deployment validate deploy-registry.yaml
 ```
 
 ### Edit Configuration
@@ -555,8 +564,8 @@ akash provider lease-logs \
 ## Next Steps
 
 - [Use Your Registry](/guides/decentralized-registry) - Push and pull images
-- [CLI Integration](/cli/commands) - Add registry commands to CLI
-- [Monitoring](/guides/monitoring) - Set up alerts and dashboards
+- **CLI support** - The `acc` CLI does not currently include registry commands; interact with your registry using the standard `docker` client and the OCI HTTP API.
+- **Monitoring** - Set up alerts and dashboards (guide coming soon)
 
 ## Support
 
@@ -564,4 +573,4 @@ Need help deploying?
 
 - [Discord Community](https://discord.gg/alternatefutures)
 - [Akash Discord](https://discord.gg/akash)
-- [GitHub Issues](https://github.com/alternatefutures/backend/issues)
+- [GitHub Issues](https://github.com/alternatefutures/service-cloud-api/issues)

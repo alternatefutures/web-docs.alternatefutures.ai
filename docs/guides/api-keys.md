@@ -1,3 +1,7 @@
+---
+description: Generate and manage personal access tokens and API keys for programmatic access to the Alternate Futures platform.
+---
+
 # API Keys
 
 ::: warning Web App Coming Soon
@@ -19,7 +23,11 @@ Generate and manage API keys for programmatic access to Alternate Futures.
 
 ## Permissions
 
-API keys support granular permissions:
+::: info Roadmap
+Scoped permissions are not yet implemented. Token creation currently accepts only a name, organization, and optional expiration — a token has the same access as its owner. The scopes below describe the planned model.
+:::
+
+Planned granular permissions:
 
 ### Read Permissions
 
@@ -46,9 +54,9 @@ API keys support granular permissions:
 Set as environment variables:
 
 ```bash
-export AF_TOKEN="pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export AF_PROJECT_ID="prj_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-af sites list
+export AF_TOKEN="af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AF_PROJECT_ID="clx1a2b3c4d5e6f7g8h9"
+acc projects list
 ```
 
 ### SDK
@@ -77,10 +85,24 @@ Include in Authorization header:
 
 ```bash
 curl https://api.alternatefutures.ai/graphql \
-  -H "Authorization: Bearer pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: Bearer af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ sites { id name } }"}'
 ```
+
+## Managing keys via CLI
+
+Personal access tokens can be managed with the (currently hidden) `pat` command:
+
+```bash
+acc pat list
+acc pat create --name "Production CI"
+acc pat delete <token-id>
+```
+
+::: tip What this maps to in code
+See the [pat CLI command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts). `create` takes only `--name`; there are no `--expires` or `--permissions` flags yet.
+:::
 
 ## Managing API Keys
 
@@ -137,33 +159,27 @@ Deleted keys are removed from all logs and cannot be recovered.
 
 ## Key Formats
 
-Personal Access Tokens follow this format:
+Personal access tokens follow this format:
 
 ```
-pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   # production
+af_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   # test
 ```
 
-- Prefix: `pat_` (Personal Access Token)
-- Length: 36 characters total (4 char prefix + 32 char random string)
-- Characters: Base62 encoded (a-z, A-Z, 0-9)
+- Prefix: `af_live_` or `af_test_` (the `af` prefix plus an environment segment)
+- Random segment: 32 characters, Base62 (a-z, A-Z, 0-9)
 
-Project IDs follow this format:
+::: tip What this maps to in code
+The format is defined by the [token service](https://github.com/alternatefutures/service-auth/blob/main/src/services/token.service.ts) — `af_${environment}_${base62}`.
+:::
 
-```
-prj_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+Project IDs are [cuid](https://github.com/paralleldrive/cuid) values (for example `clx1a2b3c4d5e6f7g8h9`); there is no `prj_` prefix.
 
 ## Rate Limits
 
 ### API Request Limits
 
-API keys are subject to rate limits based on your plan:
-
-- **Free tier**: 100 requests/minute
-- **Pro tier**: 1,000 requests/minute
-- **Enterprise**: Custom limits
-
-Exceeded rate limits return HTTP 429 (Too Many Requests).
+API requests are rate limited, and limits scale with your plan (Free < Pro < Enterprise). Exceeded limits return HTTP 429 (Too Many Requests). Specific per-plan request rates are set by your plan — check your account for current values.
 
 ### API Key Creation Limits
 
@@ -200,7 +216,7 @@ If you have 500 active keys:
 **Tips to manage your keys:**
 - Delete unused or expired keys to stay organized
 - Use expiration dates for temporary access
-- Monitor your limits via the GraphQL API:
+- Monitor your limits via the [`apiKeyRateLimit` query](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts):
   ```graphql
   query {
     apiKeyRateLimit {

@@ -1,3 +1,7 @@
+---
+description: Organize your sites, functions, storage, and team members with Alternate Futures projects.
+---
+
 # Projects
 
 Projects are the top-level organizational unit in Alternate Futures, containing all your sites, functions, storage, and other resources.
@@ -19,17 +23,20 @@ A project is a workspace that groups related resources:
 
 ```bash [CLI]
 # Create a new project
-af projects create
+acc projects create
 
 # You'll be prompted for:
 # - Project name
 ```
 
 ```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Create a project
@@ -49,7 +56,7 @@ console.log('Project ID:', project.id);
 
 ```bash [CLI]
 # List all projects
-af projects list
+acc projects list
 ```
 
 ```typescript [SDK]
@@ -72,24 +79,24 @@ When working with multiple projects, switch between them:
 
 ```bash [CLI]
 # Switch active project
-af projects switch
+acc projects switch
 
 # You'll be prompted to select which project to use
 
 # Or specify directly
-af projects switch --project-id <project-id>
-
-# Check current project
-af projects current
+acc projects switch <project-id>
 ```
 
 ```typescript [SDK]
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
 // The SDK works with project context from your token
 // To work with a specific project, use the project ID
-
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN,
-  projectId: 'specific-project-id'
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: 'specific-project-id',
+  }),
 });
 ```
 
@@ -107,21 +114,15 @@ Configure project basics:
 
 ### Storage Settings
 
-Configure backup storage:
+::: info What this maps to in code
+- **CLI:** [projects command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/projects/index.ts) — `list`, `create`, `update` (rename only), `switch`, `delete`.
+- **SDK:** [projects client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/projects.ts) — backup toggles via `update({ where, data: { backupStorageOnArweave, backupStorageOnFilecoin } })`.
+- **API:** [Project data model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma).
+:::
+
+Backup storage is configured through the SDK. The CLI `acc projects update` only renames a project.
 
 ::: code-group
-
-```bash [CLI]
-# Enable Arweave backup
-af projects update \
-  --project-id <project-id> \
-  --backup-arweave true
-
-# Enable Filecoin backup
-af projects update \
-  --project-id <project-id> \
-  --backup-filecoin true
-```
 
 ```typescript [SDK]
 // Update project settings
@@ -182,15 +183,15 @@ Create separate projects for different environments:
 
 ```bash
 # Production project
-af projects create --name "MyApp Production"
+acc projects create --name "MyApp Production"
 export PROD_PROJECT_ID=<project-id>
 
 # Staging project
-af projects create --name "MyApp Staging"
+acc projects create --name "MyApp Staging"
 export STAGING_PROJECT_ID=<project-id>
 
 # Development project
-af projects create --name "MyApp Development"
+acc projects create --name "MyApp Development"
 export DEV_PROJECT_ID=<project-id>
 ```
 
@@ -201,13 +202,13 @@ deploy-staging:
   env:
     AF_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
   steps:
-    - run: af sites deploy
+    - run: acc services deploy
 
 deploy-production:
   env:
     AF_PROJECT_ID: ${{ secrets.PROD_PROJECT_ID }}
   steps:
-    - run: af sites deploy
+    - run: acc services deploy
 ```
 
 ## Team Collaboration
@@ -223,71 +224,42 @@ Projects support team collaboration (feature coming soon):
 
 View all resources in a project:
 
-### Sites
+### Services
 ```bash
-af sites list --project-id <project-id>
+acc services list
 ```
 
-### Functions
+### Deployments
 ```bash
-af functions list --project-id <project-id>
-```
-
-### Storage
-```bash
-af storage list --project-id <project-id>
-```
-
-### Domains
-```bash
-af domains list --project-id <project-id>
+acc deployments list --project <project-id>
 ```
 
 ## Project Limits
 
-Each project includes:
-
-| Resource | Free Tier | Pro Tier |
-|----------|-----------|----------|
-| **Sites** | 10 | Unlimited |
-| **Functions** | 5 | Unlimited |
-| **Storage** | 10 GB | 100 GB+ |
-| **Bandwidth** | 100 GB/mo | 1 TB/mo+ |
-| **Custom Domains** | 3 | Unlimited |
-| **Team Members** | 1 | 10+ |
+Resource limits depend on your plan. Check your current account with `acc billing balance`. Specific per-tier limits are intentionally not listed here to avoid publishing numbers that may be out of date.
 
 ## Billing
 
-Each project has independent billing:
-
-- Separate usage tracking
-- Individual payment methods
-- Per-project invoices
-- Custom limits and budgets
+Billing today uses a single credit balance for your account. Per-project invoices, separate payment methods, and per-project budgets are not yet available.
 
 Access billing:
 ```bash
-# View project billing (coming soon)
-af billing status --project-id <project-id>
+# View your credit balance
+acc billing balance
 ```
 
 ## Migrating Between Projects
 
 Move resources between projects:
 
-### Export Configuration
+### Move a service to another project
 ```bash
-# Export site configuration
-af sites export --site-id <site-id> > site-config.json
-```
+# Switch to the target project
+acc projects switch <target-project-id>
 
-### Import to New Project
-```bash
-# Switch to target project
-af projects switch --project-id <target-project-id>
-
-# Create new site from config
-af sites create --config site-config.json
+# Recreate the service from a template, then deploy
+acc services create
+acc services deploy
 ```
 
 ## Project API Access
@@ -295,14 +267,11 @@ af sites create --config site-config.json
 Each project can have dedicated API keys:
 
 ```bash
-# Create project-scoped API key
-af pat create \
-  --name "Project API Key" \
-  --project-id <project-id> \
-  --permissions read,write
+# Create a personal access token
+acc pat create --name "Project API Key"
 
-# Use in applications
-export AF_TOKEN=<project-api-key>
+# Use in applications (scope to a project via AF_PROJECT_ID)
+export AF_TOKEN=<personal-access-token>
 export AF_PROJECT_ID=<project-id>
 ```
 
@@ -333,7 +302,7 @@ This action cannot be undone.
 
 ```bash
 # Delete project (requires confirmation)
-af projects delete --project-id <project-id>
+acc projects delete --project-id <project-id>
 ```
 
 Before deleting:
@@ -411,9 +380,8 @@ Set project context via environment variables:
 export AF_PROJECT_ID=<project-id>
 
 # All CLI commands use this project
-af sites list
-af functions deploy
-af storage upload
+acc services list
+acc deployments list
 ```
 
 In CI/CD:
@@ -431,13 +399,10 @@ env:
 
 **Solution:**
 ```bash
-# Check current project
-af projects current
+# Switch to the correct project
+acc projects switch <correct-id>
 
-# Switch to correct project
-af projects switch --project-id <correct-id>
-
-# Or set explicitly
+# Or set it explicitly for the session
 export AF_PROJECT_ID=<correct-id>
 ```
 
@@ -449,7 +414,7 @@ export AF_PROJECT_ID=<correct-id>
 - Verify you're a member of the project
 - Check your API token has project access
 - Contact project owner for invitation
-- Ensure you're logged in: `af login`
+- Ensure you're logged in: `acc login`
 
 ### Project Not Found
 
@@ -458,7 +423,7 @@ export AF_PROJECT_ID=<correct-id>
 **Solution:**
 ```bash
 # List all accessible projects
-af projects list
+acc projects list
 
 # Verify project ID is correct
 # Check you have permissions
@@ -470,4 +435,4 @@ af projects list
 - [Functions](./functions.md) - Create edge functions
 - [Storage](./storage.md) - Manage project storage
 - [API Keys](./api-keys.md) - Create project API keys
-- [Team Management](./team.md) - Add team members (coming soon)
+- **Team Management** - Add team members and manage permissions (coming soon)

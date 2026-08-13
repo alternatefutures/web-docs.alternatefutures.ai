@@ -1,3 +1,7 @@
+---
+description: Install and configure the Alternate Futures SDK for Node.js and browser environments with npm, pnpm, or yarn.
+---
+
 # SDK Installation
 
 Complete guide to installing and configuring the Alternate Futures SDK.
@@ -72,6 +76,8 @@ The SDK supports multiple authentication approaches. Choose the one that fits yo
 
 Best for: Server-side applications, scripts, CI/CD pipelines.
 
+> **What this maps to in code:** [`PersonalAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts) — `personalAccessToken` is required; `projectId` is optional.
+
 ```typescript
 import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
@@ -89,7 +95,7 @@ const af = new AlternateFuturesSdk({
 1. Log in to [app.alternatefutures.ai](https://app.alternatefutures.ai)
 2. Go to Settings > API Keys
 3. Create a new Personal Access Token
-4. Copy the token (starts with `pat_`)
+4. Copy the generated token and store it securely
 
 ### 2. Static Access Token (Browser Apps)
 
@@ -99,8 +105,7 @@ Best for: Client-side applications where the token is already available.
 import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new StaticAccessTokenService({
-  token: 'your-jwt-token',
-  projectId: 'your-project-id',
+  accessToken: 'your-jwt-token',
 });
 
 const af = new AlternateFuturesSdk({
@@ -112,19 +117,23 @@ const af = new AlternateFuturesSdk({
 
 Best for: Building applications that authenticate users via Alternate Futures.
 
+> **What this maps to in code:** [`ApplicationAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/ApplicationAccessTokenService.ts). Browser only — it reads `window.location.origin` and requires an auth-apps URL (via `authAppsServiceUrl` or the `SDK__AUTH_APPS_URL` env var), or the constructor throws.
+
 ```typescript
 import { AlternateFuturesSdk, ApplicationAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new ApplicationAccessTokenService({
   clientId: 'your-client-id',
+  authAppsServiceUrl: 'https://auth-apps.alternatefutures.ai',
+  // Or set the SDK__AUTH_APPS_URL env var instead of passing this option.
 });
 
 const af = new AlternateFuturesSdk({
   accessTokenService,
 });
 
-// User login flow
-await accessTokenService.login();
+// No explicit login call — the token is fetched lazily on first use:
+const token = await accessTokenService.getAccessToken();
 ```
 
 ## Environment Configuration
@@ -135,8 +144,8 @@ Store your credentials securely using environment variables:
 
 ```bash
 # .env
-AF_TOKEN=pat_your_personal_access_token_here
-AF_PROJECT_ID=prj_your_project_id_here
+AF_TOKEN=your_personal_access_token_here
+AF_PROJECT_ID=your_project_id_here
 ```
 
 **Important:** Add `.env` to your `.gitignore` to avoid committing secrets.
@@ -248,9 +257,9 @@ async function main() {
   const sites: Site[] = await af.sites().list();
   console.log('Sites:', sites.map(s => s.name));
 
-  // Upload a file to IPFS
-  const uploadResult = await af.ipfs().add('./dist');
-  console.log('Uploaded CID:', uploadResult.pin.cid);
+  // Upload a directory to IPFS
+  const uploadResult = await af.ipfs().addFromPath('./dist');
+  console.log('Uploaded CID:', uploadResult.cid.toString());
 
   // List storage
   const pins: StoragePin[] = await af.storage().list();
@@ -266,6 +275,8 @@ main().catch(console.error);
 
 ## Custom Configuration
 
+> **What this maps to in code:** the full option list lives in [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) as `AlternateFuturesSdkOptions`.
+
 ### Custom API Endpoints
 
 For self-hosted or development environments:
@@ -276,6 +287,8 @@ const af = new AlternateFuturesSdk({
   graphqlServiceApiUrl: 'https://custom-api.example.com/graphql',
   ipfsStorageApiUrl: 'https://custom-ipfs.example.com',
   uploadProxyApiUrl: 'https://custom-uploads.example.com',
+  // Required to use af.billing() — otherwise billing() throws EnvNotSetError.
+  authServiceUrl: 'https://custom-auth.example.com',
 });
 ```
 

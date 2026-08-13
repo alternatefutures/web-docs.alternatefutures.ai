@@ -1,3 +1,7 @@
+---
+description: Complete API reference for the @alternatefutures/sdk package including all types, interfaces, classes, and methods.
+---
+
 # SDK API Reference
 
 Complete API reference for the `@alternatefutures/sdk` package. This page documents all public types, interfaces, and classes available in the SDK.
@@ -47,7 +51,7 @@ const sites = await af.sites().list();
 const storage = await af.storage().list();
 ```
 
-**Methods:**
+**Methods:** (source: [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts))
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -67,6 +71,10 @@ const storage = await af.storage().list();
 ### Client
 
 Low-level GraphQL client interface for advanced use cases.
+
+::: warning Experimental
+`createClient` is re-exported from the underlying genql client and is not yet a committed part of the SDK's public surface. The `query`/`mutation` shape may change; prefer the typed clients above.
+:::
 
 ```typescript
 import { createClient } from '@alternatefutures/sdk';
@@ -115,7 +123,7 @@ const accessTokenService = new PersonalAccessTokenService({
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `personalAccessToken` | `string` | Yes | Your personal access token |
-| `projectId` | `string` | Yes | Target project ID |
+| `projectId` | `string` | No | Target project ID |
 
 ### StaticAccessTokenService
 
@@ -125,8 +133,7 @@ Browser-side authentication when you already have a JWT token.
 import { StaticAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new StaticAccessTokenService({
-  token: 'jwt-token',
-  projectId: 'project-id',
+  accessToken: 'jwt-token',
 });
 ```
 
@@ -134,8 +141,7 @@ const accessTokenService = new StaticAccessTokenService({
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `token` | `string` | Yes | JWT access token |
-| `projectId` | `string` | Yes | Target project ID |
+| `accessToken` | `string` | Yes | JWT / access token |
 
 ### ApplicationAccessTokenService
 
@@ -146,10 +152,11 @@ import { ApplicationAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new ApplicationAccessTokenService({
   clientId: 'your-client-id',
+  authAppsServiceUrl: 'https://auth-apps.alternatefutures.ai',
 });
 
-// Trigger user login flow
-await accessTokenService.login();
+// The token is fetched lazily on first use:
+const token = await accessTokenService.getAccessToken();
 ```
 
 **Constructor Options:**
@@ -157,10 +164,13 @@ await accessTokenService.login();
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `clientId` | `string` | Yes | Your application's Client ID |
+| `authAppsServiceUrl` | `string` | Yes* | Auth-apps service URL. *Required unless the `SDK__AUTH_APPS_URL` env var is set; otherwise the constructor throws. Browser only. |
 
 ---
 
 ## Sites & Deployments
+
+> **What this maps to in code:** [`Site` type and the sites client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/sites.ts) — `get({ id })`, `getBySlug({ slug })`, `list`, `create`, `delete`, `createCustomIpfsDeployment`, `getDeployment`.
 
 ### Site
 
@@ -169,7 +179,7 @@ Represents a deployed static site.
 ```typescript
 import type { Site } from '@alternatefutures/sdk';
 
-const site: Site = await af.sites().get({ slug: 'my-site' });
+const site: Site = await af.sites().getBySlug({ slug: 'my-site' });
 console.log(site.name, site.slug);
 ```
 
@@ -193,9 +203,12 @@ Represents a single deployment of a site.
 ```typescript
 import type { Deployment } from '@alternatefutures/sdk';
 
-const deployments: Deployment[] = await af.sites().listDeployments({
-  siteId: 'site_abc123',
-});
+// Site deployments are exposed on the fetched Site object:
+const site = await af.sites().get({ id: 'site_abc123' });
+const deployments: Deployment[] = site.deployments;
+
+// Fetch a single deployment directly:
+// const deployment = await af.sites().getDeployment({ ... });
 ```
 
 **Properties:**
@@ -236,7 +249,7 @@ Custom domain configuration.
 ```typescript
 import type { Domain } from '@alternatefutures/sdk';
 
-const domain: Domain = await af.domains().create({
+const domain: Domain = await af.domains().createCustomDomain({
   siteId: 'site_abc123',
   hostname: 'www.example.com',
 });
@@ -360,13 +373,13 @@ InterPlanetary Naming System record for mutable content addressing.
 ```typescript
 import type { IpnsRecord } from '@alternatefutures/sdk';
 
-const record: IpnsRecord = await af.ipns().create({
+const record: IpnsRecord = await af.ipns().createRecordForSite({
   siteId: 'site_abc123',
 });
 
-// Update the record to point to new content
-await af.ipns().publish({
-  name: record.name,
+// Update the record to point to new content (keyed by record id)
+await af.ipns().publishRecord({
+  id: record.id,
   hash: 'bafybei...',
 });
 ```
@@ -424,6 +437,8 @@ type AFFunctionStatus = "ACTIVE" | "INACTIVE";
 
 ## Billing
 
+> **What this maps to in code:** [`BillingClient`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/billing.ts) — `getCustomer`, `getActiveSubscription`, `listSubscriptions`, `getCurrentUsage`, `listInvoices`.
+
 ### Customer
 
 Billing customer information.
@@ -450,7 +465,7 @@ Active subscription details.
 ```typescript
 import type { Subscription } from '@alternatefutures/sdk';
 
-const subscription: Subscription = await af.billing().getSubscription();
+const subscription: Subscription | null = await af.billing().getActiveSubscription();
 ```
 
 **Properties:**
@@ -656,13 +671,13 @@ Additional properties are inherited from the platform's gateway schema.
 
 ## Error Handling
 
-All SDK methods throw errors that can be caught and handled:
+All SDK methods throw on failure. **Note:** the exact discriminator on thrown errors (`error.code` vs `error.name`) is not yet finalized in the SDK; the example below is illustrative — inspect the caught error in your environment before branching on a specific field.
 
 ```typescript
 import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
 
 try {
-  const site = await af.sites().get({ slug: 'nonexistent' });
+  const site = await af.sites().getBySlug({ slug: 'nonexistent' });
 } catch (error) {
   if (error.code === 'NOT_FOUND') {
     console.error('Site not found');
@@ -678,7 +693,7 @@ try {
 
 ## TypeScript Support
 
-Import types directly from the SDK:
+All of these are re-exported from the SDK's [public entry point](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/index.ts). Import types directly from the SDK:
 
 ```typescript
 import {
@@ -717,8 +732,7 @@ let afInstance: AlternateFuturesSdk | null = null;
 export function getAFClient(token: string, projectId: string): AlternateFuturesSdk {
   if (!afInstance) {
     const accessTokenService = new StaticAccessTokenService({
-      token,
-      projectId,
+      accessToken: token,
     });
     afInstance = new AlternateFuturesSdk({ accessTokenService });
   }
@@ -752,8 +766,7 @@ let afInstance: AlternateFuturesSdk | null = null;
 
 function createClient(token: string, projectId: string): AlternateFuturesSdk {
   const accessTokenService = new StaticAccessTokenService({
-    token,
-    projectId,
+    accessToken: token,
   });
   return new AlternateFuturesSdk({ accessTokenService });
 }
@@ -1211,9 +1224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      await accessTokenService.login();
-
-      // After successful login, the token is available
+      // The token is fetched lazily; there is no separate login() call.
       const token = await accessTokenService.getAccessToken();
 
       if (token) {
@@ -1346,7 +1357,7 @@ function createAuthStore() {
       update(state => ({ ...state, isLoading: true, error: null }));
 
       try {
-        await accessTokenService.login();
+        // The token is fetched lazily; there is no separate login() call.
         const token = await accessTokenService.getAccessToken();
 
         if (token && browser) {

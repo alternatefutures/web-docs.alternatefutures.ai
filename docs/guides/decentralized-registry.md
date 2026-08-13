@@ -1,8 +1,16 @@
+---
+description: Store and distribute Docker images on a fully decentralized container registry running on Akash Network with IPFS storage.
+---
+
 # Decentralized Container Registry
+
+::: warning Reference architecture — not a hosted service (yet)
+This guide describes a self-hostable reference architecture for running a decentralized container registry (OpenRegistry + IPFS on Akash). It is not currently offered as a managed Alternate Futures service, and the `registry.alternatefutures.ai` / `ipfs.alternatefutures.ai` endpoints, storage limits, and ports shown below are illustrative of a self-hosted deployment rather than a live shared registry. Substitute your own domain and infrastructure values. To stand up the stack yourself, follow [Deploying the Decentralized Registry](/guides/registry-deployment).
+:::
 
 ## Overview
 
-Alternate Futures provides a **fully decentralized container registry** for storing and distributing Docker images. Unlike centralized services like Docker Hub, your container images are stored on your own infrastructure running on Akash Network with IPFS storage.
+The decentralized container registry is a **self-hostable** way to store and distribute Docker images. Unlike centralized services like Docker Hub, your container images are stored on infrastructure you run on Akash Network with IPFS storage.
 
 ## Architecture
 
@@ -36,9 +44,7 @@ registry.alternatefutures.ai  ipfs.alternatefutures.ai
 - **Censorship Resistant**: Images stored on IPFS cannot be taken down
 
 ### Cost Savings
-- **Traditional Stack**: $77-307/month (Docker Hub + IPFS service + cloud hosting)
-- **Decentralized Stack**: $40-70/month (Akash only)
-- **Savings**: 40-85% cost reduction
+Costs depend on your image volume, traffic, and the Akash provider you choose. A self-hosted stack on Akash can be meaningfully cheaper than combining a managed registry, a hosted IPFS service, and cloud compute, but exact figures vary — benchmark against your own workload rather than relying on a fixed estimate.
 
 ### Performance
 - **Global Distribution**: IPFS enables P2P delivery
@@ -142,9 +148,11 @@ All container layers are stored on IPFS with these benefits:
 
 ### IPFS Node Details
 
-- **Storage**: 100GB persistent volume on Akash
-- **API**: Port 5001 (internal only)
-- **Gateway**: Port 8080 (public at `ipfs.alternatefutures.ai`)
+The following are example values for a self-hosted deployment — adjust them to your own SDL and domain:
+
+- **Storage**: e.g. a 100GB persistent volume on Akash
+- **API**: Port 5001 (keep internal only)
+- **Gateway**: Port 8080 (exposed at your own `ipfs.` subdomain)
 - **Swarm**: Port 4001 (P2P connections)
 
 ### Viewing IPFS Content
@@ -161,49 +169,32 @@ https://ipfs.alternatefutures.ai/ipfs/<CID>
 - **Total Storage**: 100GB initially (expandable)
 - **Garbage Collection**: Automatic cleanup of unused layers
 
-## CLI Commands
+## Working with the Registry
 
-### List Images
+There is no dedicated `acc registry` command — the registry is OCI-compliant, so you interact with it using the standard `docker` client.
 
-```bash
-af registry list
-```
-
-Shows all your container images with:
-- Repository name
-- Tags
-- Size
-- IPFS CIDs
-- Created date
-
-### Image Details
+### List repositories and tags
 
 ```bash
-af registry info myapp:latest
+# List repositories
+curl https://registry.yourdomain.com/v2/_catalog
+
+# List tags for a repository
+curl https://registry.yourdomain.com/v2/myapp/tags/list
 ```
 
-Displays:
-- Manifest
-- Layer CIDs
-- Total size
-- Build date
-- Digest
-
-### Push Image
+### Push an image
 
 ```bash
-af registry push myapp:latest
+docker tag myapp:latest registry.yourdomain.com/myapp:latest
+docker push registry.yourdomain.com/myapp:latest
 ```
 
-Tags and pushes to `registry.alternatefutures.ai/myapp:latest`
-
-### Pull Image
+### Pull an image
 
 ```bash
-af registry pull myapp:latest
+docker pull registry.yourdomain.com/myapp:latest
 ```
-
-Pulls from decentralized registry
 
 ## CI/CD Integration
 
@@ -396,9 +387,9 @@ docker login registry.alternatefutures.ai
 
 **Symptom**: `manifest unknown`
 
-**Solution**: Verify image name and tag
+**Solution**: Verify the image name and tag
 ```bash
-af registry list  # Check available images
+curl https://registry.yourdomain.com/v2/_catalog  # List available repositories
 ```
 
 ## Next Steps

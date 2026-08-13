@@ -4,16 +4,16 @@ description: Step-by-step guide to deploying an Astro site to decentralized infr
 
 # Deploy an Astro Site
 
-Deploy your Astro site to decentralized infrastructure using Alternate Futures. Astro's static-first architecture makes it an excellent fit for decentralized hosting.
+Deploy an Astro site to Alternate Clouds, the decentralized cloud platform from Alternate Futures. Astro ships static HTML by default, so its output maps directly onto IPFS-backed hosting with no server runtime required.
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-- **An Alternate Futures account** - [Sign up here](https://app.alternatefutures.ai) (free, no credit card required)
-- **The AF CLI installed** - `npm install -g @alternatefutures/cli`
+- **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
+- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/cli`
 - **Node.js 18 or later** - [Download here](https://nodejs.org/en/download)
-- **An Astro project** (or we will create one below)
+- **An Astro project** (or create one below)
 
 ## Quick Deploy (Existing Astro Project)
 
@@ -23,15 +23,19 @@ If you already have an Astro project, deploy it in three commands:
 # Build the production output
 npm run build
 
-# Initialize AF configuration
-af sites init
+# Authenticate (opens a browser)
+acc login
 
-# Deploy to IPFS
-af sites deploy
+# Deploy the service
+acc services deploy
 ```
 
 ::: tip Output Directory
-Astro outputs to `./dist` by default. When running `af sites init`, set the output directory to `dist`.
+Astro outputs to `./dist` by default. Set `distDir` to `dist` in your `acc.config` so the CLI uploads the right folder.
+:::
+
+::: info What this maps to in code
+The commands above are the ones the CLI actually registers — see [the CLI's actual command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts) (`login`, `logout`, `projects`, `services`, `deployments`, `ssh`, `billing`). The deploy subcommand lives at `acc services deploy [id]`.
 :::
 
 ## Step 1: Create a New Astro Project
@@ -41,8 +45,8 @@ If you do not have a project yet, start from our template or create one from scr
 ### Option A: Use the AF Template (Recommended)
 
 ```bash
-# Clone the AF-optimized Astro template
-git clone https://github.com/alternatefutures/template-astro my-astro-site
+# Clone the Alternate Clouds Astro template
+git clone https://github.com/alternatefutures/template-cloud-astro my-astro-site
 cd my-astro-site
 
 # Install dependencies
@@ -117,13 +121,13 @@ npm run preview
 
 The build output will be in the `./dist` directory.
 
-## Step 4: Authenticate with AF
+## Step 4: Authenticate with Alternate Clouds
 
 If you have not already authenticated:
 
 ```bash
 # Interactive login (opens browser)
-af login
+acc login
 
 # Or use a Personal Access Token
 export AF_TOKEN=pat_your_token_here
@@ -132,18 +136,26 @@ export AF_TOKEN=pat_your_token_here
 ## Step 5: Initialize and Deploy
 
 ```bash
-# Initialize AF site configuration
-af sites init
+Set the build fields in your `acc.config`:
 
-# When prompted, configure:
-#   Site name: my-astro-site
-#   Build command: npm run build
-#   Output directory: dist
-#   Storage network: ipfs (recommended for getting started)
-
-# Deploy to decentralized storage
-af sites deploy
+```json
+{
+  "slug": "my-astro-site",
+  "buildCommand": "npm run build",
+  "distDir": "dist"
+}
 ```
+
+Then deploy:
+
+```bash
+# Deploy to decentralized storage
+acc services deploy
+```
+
+::: info What this maps to in code
+`slug`, `buildCommand`, and `distDir` are real fields in the [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+:::
 
 You should see output like:
 
@@ -157,14 +169,7 @@ You should see output like:
 
 ## Step 6: Set Up a Custom Domain (Optional)
 
-Point your own domain to your deployment:
-
-```bash
-# Add a custom domain
-af domains add my-astro-site.com --site my-astro-site
-```
-
-Then configure your DNS:
+Add your domain from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) under your project's Domains settings, then configure your DNS:
 
 | Record Type | Name | Value |
 |-------------|------|-------|
@@ -257,8 +262,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to AF
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs
+      - name: Deploy to Alternate Clouds
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
@@ -277,12 +282,19 @@ const af = new AlternateFuturesSdk({
     personalAccessToken: process.env.AF_TOKEN,
     projectId: process.env.AF_PROJECT_ID,
   }),
+  // Required — the SDK throws EnvNotSetError if these are unset
+  ipfsStorageApiUrl: process.env.SDK__IPFS__STORAGE_API_URL,
+  uploadProxyApiUrl: process.env.SDK__UPLOAD_PROXY_API_URL,
 });
 
-// Deploy the build output
-const result = await af.ipfs().add('./dist');
-console.log('Deployed! CID:', result.pin.cid);
+// Upload the build directory. addFromPath() returns an array of results.
+const results = await af.ipfs().addFromPath('./dist');
+console.log('Deployed! CID:', results[0].cid);
 ```
+
+::: info What this maps to in code
+Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
+:::
 
 ## Common Issues
 

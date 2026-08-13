@@ -1,6 +1,14 @@
+---
+description: Connect your Alternate Futures sites to ENS domains for decentralized, human-readable .eth URLs pointing to IPFS content.
+---
+
 # ENS (Ethereum Name Service)
 
 Connect your Alternate Futures sites to Ethereum Name Service (ENS) domains for decentralized, human-readable URLs.
+
+::: tip What this maps to in code
+ENS records are managed through the SDK's [`ens.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ens.ts) (`create`, `list`, `getByName`, `verify`, `delete`). The `acc` CLI does not register an `ens` command ([cli.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts)), so ENS management is SDK-only.
+:::
 
 ## What is ENS?
 
@@ -18,23 +26,14 @@ ENS (Ethereum Name Service) is a distributed, open naming system based on the Et
 
 ## Creating an ENS Record
 
-::: code-group
-
-```bash [CLI]
-# Create an ENS record for your site
-af ens create
-
-# You'll be prompted for:
-# - ENS name (e.g., mysite.eth)
-# - Site to link
-# - IPNS record to use
-```
-
-```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Create an ENS record
@@ -48,18 +47,9 @@ console.log('ENS Record created:', ensRecord.name);
 console.log('Content hash:', ensRecord.ipnsRecord.hash);
 ```
 
-:::
-
 ## Listing ENS Records
 
-::: code-group
-
-```bash [CLI]
-# List all ENS records
-af ens list
-```
-
-```typescript [SDK]
+```typescript
 // List all ENS records
 const records = await af.ens().list();
 
@@ -69,20 +59,9 @@ records.forEach(record => {
 });
 ```
 
-:::
-
 ## Viewing ENS Record Details
 
-::: code-group
-
-```bash [CLI]
-# Get details for a specific ENS record
-af ens detail
-
-# You'll be prompted to select the ENS record
-```
-
-```typescript [SDK]
+```typescript
 // Get ENS record by name
 const record = await af.ens().getByName({ name: 'mysite.eth' });
 
@@ -92,39 +71,29 @@ console.log('Content Hash:', record.ipnsRecord.hash);
 console.log('Status:', record.status);
 ```
 
-:::
-
 ## Verifying ENS Setup
 
 After creating an ENS record, you need to manually update your ENS domain's content hash:
 
-::: code-group
-
-```bash [CLI]
-# Verify your ENS setup
-af ens verify
-
-# This checks if your ENS domain's content hash
-# matches the IPNS record from Alternate Futures
-```
-
-```typescript [SDK]
-// Get the content hash you need to set
+```typescript
+// Look up the content hash you need to set on-chain
 const record = await af.ens().getByName({ name: 'mysite.eth' });
 console.log('Set your ENS content hash to:', record.ipnsRecord.hash);
 
-// The SDK doesn't automatically update ENS
-// You must do this manually via ENS interface
-```
+// After you update the content hash in the ENS Manager,
+// confirm the link is recognized:
+await af.ens().verify({ id: record.id });
 
-:::
+// Note: the SDK does not update ENS on-chain for you.
+// Set the content hash manually via the ENS Manager.
+```
 
 ## Setting Up ENS Content Hash
 
-1. **Get your IPNS hash** from Alternate Futures:
-   ```bash
-   af ens detail
-   # Note the IPNS hash (starts with /ipns/...)
+1. **Get your IPNS hash** from Alternate Futures via the SDK:
+   ```typescript
+   const record = await af.ens().getByName({ name: 'mysite.eth' });
+   console.log(record.ipnsRecord.hash); // starts with /ipns/...
    ```
 
 2. **Go to ENS Manager** at [app.ens.domains](https://app.ens.domains)
@@ -135,28 +104,17 @@ console.log('Set your ENS content hash to:', record.ipnsRecord.hash);
 
 5. **Confirm the transaction** on Ethereum
 
-6. **Verify** the setup:
-   ```bash
-   af ens verify
+6. **Verify** the setup with the SDK:
+   ```typescript
+   await af.ens().verify({ id: record.id });
    ```
 
 ## Deleting an ENS Record
 
-::: code-group
-
-```bash [CLI]
-# Delete an ENS record
-af ens delete
-
-# You'll be prompted to select which ENS record to delete
-```
-
-```typescript [SDK]
+```typescript
 // Delete an ENS record
 await af.ens().delete({ id: 'ens-record-id' });
 ```
-
-:::
 
 ## How ENS Integration Works
 
@@ -220,7 +178,7 @@ No manual ENS updates needed after initial setup!
 
 ### ENS Verification Fails
 
-**Problem:** `af ens verify` shows mismatch
+**Problem:** `af.ens().verify(...)` reports a mismatch
 
 **Solutions:**
 - Wait 5-10 minutes for Ethereum blockchain confirmation
@@ -235,7 +193,7 @@ No manual ENS updates needed after initial setup!
 **Solutions:**
 - Confirm browser has ENS support (try Brave)
 - Use `.eth.link` gateway: `mysite.eth.link`
-- Check IPNS record is published: `af ipns list`
+- Check the IPNS record is published: `af.ipns().listRecords()`
 - Verify content hash in ENS manager
 
 ### Content Not Updating
@@ -243,7 +201,7 @@ No manual ENS updates needed after initial setup!
 **Problem:** ENS shows old version of site
 
 **Solutions:**
-- Check IPNS record updated: `af ipns list`
+- Check the IPNS record updated: `af.ipns().listRecords()`
 - IPNS propagation can take 5-10 minutes
 - Clear browser cache
 - Try different ENS gateway

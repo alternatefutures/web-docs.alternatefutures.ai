@@ -22,28 +22,29 @@ The Alternate Futures platform enters public beta, providing decentralized cloud
 - **Observability** - Distributed tracing, metrics, and logging for all deployments
 - **Billing** - Usage-based pricing with Stripe integration and credit system
 
-### CLI v1.0
+### CLI v0.2 ([`@alternatefutures/cli` package.json](https://github.com/alternatefutures/cloud-cli/blob/main/package.json))
 
 **Released: February 2026**
 
-The `@alternatefutures/cli` package is now available on npm. The CLI binary is `af`.
+The `@alternatefutures/cli` package is now available on npm. The CLI binary is `acc`.
 
-- `af login` - Interactive browser-based authentication
-- `af sites init` - Initialize site configuration with framework detection
-- `af sites deploy` - Deploy to IPFS, Filecoin, or Arweave
-- `af sites list` - View all sites and deployments
-- `af storage add` - Upload files to decentralized storage
-- `af pat create` - Generate Personal Access Tokens for automation
-- `af projects list` - Manage projects and organizations
-- Automatic framework detection for React, Next.js, Vue, Astro, SvelteKit, Hugo, and more
+- `acc login` / `acc logout` - Interactive browser-based authentication
+- `acc projects` - Manage projects and organizations
+- `acc services` - Create, list, deploy, tail logs for, close, and delete services
+- `acc deployments` - View deployment history
+- `acc billing balance` - Check your credit balance
+- `acc ssh` - Manage SSH access
+- `acc pat create` - Generate Personal Access Tokens for automation
 - JSON output mode for scripting and CI/CD integration
 - Environment variable support (`AF_TOKEN`, `AF_PROJECT_ID`)
+
+See the full [command registration in `src/cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
 
 ```bash
 npm install -g @alternatefutures/cli
 ```
 
-### SDK v1.0
+### SDK v0.2 ([`@alternatefutures/sdk` package.json](https://github.com/alternatefutures/package-cloud-sdk/blob/main/package.json))
 
 **Released: February 2026**
 
@@ -68,15 +69,13 @@ npm install @alternatefutures/sdk
 
 Starter templates for popular frameworks, pre-configured for Alternate Futures deployment:
 
-- [template-react](https://github.com/alternatefutures/template-react) - React + Vite starter
-- [template-nextjs](https://github.com/alternatefutures/template-nextjs) - Next.js static export starter
-- [template-vue](https://github.com/alternatefutures/template-vue) - Vue.js + Vite starter
-- [template-astro](https://github.com/alternatefutures/template-astro) - Astro starter
-- [template-sveltekit](https://github.com/alternatefutures/template-sveltekit) - SvelteKit static adapter starter
-- [template-hugo](https://github.com/alternatefutures/template-hugo) - Hugo static site starter
-- [template-vitepress](https://github.com/alternatefutures/template-vitepress) - VitePress documentation starter
+- [template-cloud-react](https://github.com/alternatefutures/template-cloud-react) - React + Vite starter
+- [template-cloud-nextjs](https://github.com/alternatefutures/template-cloud-nextjs) - Next.js static export starter
+- [template-cloud-vue](https://github.com/alternatefutures/template-cloud-vue) - Vue.js + Vite starter
+- [template-cloud-astro](https://github.com/alternatefutures/template-cloud-astro) - Astro starter
+- [template-cloud-hugo](https://github.com/alternatefutures/template-cloud-hugo) - Hugo static site starter
 
-Each template includes an `af.config.json` with the correct build command and output directory pre-configured.
+Each template ships with its framework config (e.g. `vite.config.ts`, `next.config.js`, `astro.config.mjs`) and a ready-to-build `package.json`.
 
 ### Documentation Site
 
@@ -87,7 +86,7 @@ Comprehensive documentation at [docs.alternatefutures.ai](https://docs.alternate
 - Getting started guides and quickstart tutorial
 - Framework-specific deployment guides (Next.js, React, Astro)
 - CLI command reference
-- SDK API reference (auto-generated from TypeDoc)
+- SDK API reference
 - Migration guides from Fleek, Netlify, Spheron, and Vercel
 - CI/CD integration for GitHub Actions, GitLab CI, CircleCI, and Jenkins
 - Infrastructure guides for the decentralized container registry

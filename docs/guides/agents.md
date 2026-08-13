@@ -1,39 +1,31 @@
-# Managing AI Agents
+---
+description: Create and interact with chat agents on Alternate Clouds using the GraphQL API.
+---
 
-::: warning Web App Under Development
-The web interface for managing agents is currently under development. Use the [CLI](../cli/) or [SDK](../sdk/) to deploy and manage AI agents.
+# AI Agents
+
+::: info What ships today
+Alternate Clouds agents are **chat agents**: a named agent with a system prompt, a model, and an optional linked function. You create an agent, start chats, and send messages via the GraphQL API. Deployable runtimes (Eliza, ComfyUI, custom LangChain/LangGraph) and a start/stop/logs lifecycle are on the roadmap and are not yet available.
 :::
 
-Deploy and manage AI agents on decentralized infrastructure using the CLI or SDK.
+::: tip What this maps to in code
+The [Agent GraphQL type and mutations](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) define the real surface: `Agent { id name slug description avatar systemPrompt model status }`, `CreateAgentInput { name, slug, description, systemPrompt, model, functionId }`, and the mutations `createAgent`, `createChat`, `sendMessage`, `deleteChat`.
+:::
 
-## Agent Types
+## What a chat agent is
 
-### Eliza
+An agent is defined by:
 
-Autonomous AI agents with personality and memory:
+- **name / slug** - identity within your project
+- **systemPrompt** - the instructions that shape the agent's behavior
+- **model** - the model that backs the agent
+- **functionId** (optional) - an Alternate Clouds function the agent can call
 
-- Conversational AI with persistent memory
-- Multi-platform support (Discord, Twitter, Telegram)
-- Custom personality configuration via characterfile
-- Plugin ecosystem for extended capabilities
+You then open a chat against the agent and exchange messages.
 
-### ComfyUI
-
-AI image and video generation workflows:
-
-- Stable Diffusion image generation
-- Custom workflow support
-- GPU-accelerated processing
-- API access for programmatic generation
-
-### Custom
-
-Build your own AI agents:
-
-- Deploy custom LangChain/LangGraph agents
-- Full control over agent logic
-- Connect to external APIs and services
-- Custom runtime environments
+::: info Roadmap
+Deployable agent runtimes — Eliza (Discord/Twitter/Telegram, characterfiles, plugins), ComfyUI (Stable Diffusion / GPU workflows), and custom LangChain/LangGraph agents — are planned but not yet part of the API.
+:::
 
 ## Creating an Agent
 
@@ -70,35 +62,23 @@ For Eliza agents:
 5. Click **Deploy**
 -->
 
-::: code-group
-
-```bash [CLI]
-# Create an Eliza agent
-af agents create --name "My Agent" --type eliza --character ./character.json
-
-# List agents
-af agents list
-
-# Get agent status
-af agents status <agent-id>
-```
-
-```typescript [SDK]
-import { AlternateFutures } from '@alternatefutures/sdk';
-
-const af = new AlternateFutures({ apiKey: process.env.AF_API_KEY });
-
-// Create an agent
-const agent = await af.agents.create({
-  name: 'My Agent',
-  type: 'eliza',
-  config: {
-    // Agent configuration
+```graphql
+mutation {
+  createAgent(input: {
+    name: "Support Assistant"
+    slug: "support-assistant"
+    description: "Answers product questions"
+    systemPrompt: "You are a helpful support agent for Alternate Clouds."
+    model: "claude-sonnet"
+    # functionId: "<optional-function-id>"
+  }) {
+    id
+    name
+    slug
+    status
   }
-});
+}
 ```
-
-:::
 
 ## Managing Agents
 
@@ -121,36 +101,24 @@ Each agent will have a dashboard showing:
 - **Delete** - Remove agent permanently
 -->
 
-::: code-group
+Start a chat and send a message, then delete the chat when you're done:
 
-```bash [CLI]
-# Start an agent
-af agents start <agent-id>
+```graphql
+mutation {
+  createChat(agentId: "<agent-id>") { id }
+}
 
-# Stop an agent
-af agents stop <agent-id>
+mutation {
+  sendMessage(chatId: "<chat-id>", content: "Hello!") { id role content }
+}
 
-# View logs
-af agents logs <agent-id>
-
-# Delete an agent
-af agents delete <agent-id>
+mutation {
+  deleteChat(chatId: "<chat-id>") { id }
+}
 ```
 
-```typescript [SDK]
-// Start an agent
-await af.agents.start(agentId);
-
-// Stop an agent
-await af.agents.stop(agentId);
-
-// Get logs
-const logs = await af.agents.logs(agentId);
-
-// Delete an agent
-await af.agents.delete(agentId);
-```
-
+::: info Roadmap
+There is no start/stop/logs lifecycle for agents today — an agent is available as soon as it is created.
 :::
 
 ## Agent Configuration
@@ -178,46 +146,7 @@ DISCORD_BOT_TOKEN=...
 TWITTER_API_KEY=...
 ```
 
-#### Using CLI Flags
-
-Pass environment variables directly when creating or updating agents:
-
-::: code-group
-
-```bash [CLI]
-# Set variables during agent creation
-af agents create \
-  --name "My Agent" \
-  --type eliza \
-  --env OPENAI_API_KEY=sk-... \
-  --env MODEL=gpt-4
-
-# Update existing agent variables
-af agents update <agent-id> \
-  --env TEMPERATURE=0.8
-```
-
-```typescript [SDK]
-// Set variables during agent creation
-const agent = await af.agents.create({
-  name: 'My Agent',
-  type: 'eliza',
-  env: {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    MODEL: 'gpt-4',
-    TEMPERATURE: '0.7'
-  }
-});
-
-// Update existing agent variables
-await af.agents.update(agentId, {
-  env: {
-    TEMPERATURE: '0.8'
-  }
-});
-```
-
-:::
+<!-- Removed: `acc agents ... --env` and `af.agents().create({ env })` — the agents CLI command, the agents() SDK client, and env/type/character fields on the agent model do not exist. -->
 
 #### Using Character Files
 
@@ -249,22 +178,9 @@ For Eliza agents, include environment variables in your `character.json`:
 Environment variables are stored securely and encrypted at rest. However, they will be accessible to your running agent, so only use trusted code.
 :::
 
-### Platform Integrations
-
-Connect agents to:
-
-- **Discord** - Bot token and permissions
-- **Twitter** - OAuth credentials
-- **Telegram** - Bot token
-- **Slack** - Webhook URL
-
-### Memory Settings
-
-Configure agent memory:
-
-- **Short-term** - Conversation context
-- **Long-term** - Persistent knowledge
-- **Vector DB** - Embeddings storage
+::: info Roadmap
+Platform integrations (Discord, Twitter, Telegram, Slack) and configurable memory (short-term, long-term, vector DB) are planned but not represented in the current agent schema.
+:::
 
 ## Next Steps
 

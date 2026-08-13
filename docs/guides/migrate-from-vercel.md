@@ -4,7 +4,7 @@ description: Move your static sites and serverless functions from Vercel to Alte
 
 # Migrate from Vercel
 
-Move your static sites from Vercel to Alternate Futures for decentralized hosting with IPFS, Filecoin, and Arweave storage options.
+Move your static sites from Vercel onto Alternate Clouds — decentralized hosting from Alternate Futures with IPFS, Filecoin, and Arweave storage.
 
 **Time to complete:** 15-30 minutes per site
 
@@ -15,7 +15,7 @@ Move your static sites from Vercel to Alternate Futures for decentralized hostin
 | **Hosting model** | Centralized (AWS) | Decentralized (IPFS/Arweave/Filecoin) |
 | **Censorship resistance** | No | Yes |
 | **Permanent storage** | No | Yes (Arweave) |
-| **Free tier** | Limited (Hobby) | Generous free tier |
+| **Free tier** | Limited (Hobby) | Free tier available (see pricing) |
 | **Vendor lock-in** | Yes (Vercel-specific features) | No (standard IPFS/web protocols) |
 | **Crypto payments** | No | Yes (ETH, AR, FIL, SOL) |
 | **AI agents** | No | Yes |
@@ -34,12 +34,16 @@ Migrating from Vercel works best for **static sites** and **static exports** (Ne
 ## Step 1: Install and Authenticate
 
 ```bash
-# Install the Alternate Futures CLI
+# Install the Alternate Clouds CLI
 npm install -g @alternatefutures/cli
 
 # Authenticate
-af login
+acc login
 ```
+
+::: warning CLI binary name
+Commands here use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+:::
 
 ## Step 2: Configure Your Build
 
@@ -64,16 +68,24 @@ Build and deploy:
 
 ```bash
 npm run build
-af sites init          # Set output directory to ./out
-af sites deploy
+
+# Create a service (choose a starter template; set output dir to ./out)
+acc services create
+
+# Deploy it — pass the service id, or omit to pick interactively
+acc services deploy [id]
 ```
+
+These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
 
 ### React (Vite or Create React App)
 
 ```bash
 npm run build
-af sites init          # Set output directory to ./dist (Vite) or ./build (CRA)
-af sites deploy
+
+# Set output dir to ./dist (Vite) or ./build (CRA) when prompted
+acc services create
+acc services deploy [id]
 ```
 
 ### Other Frameworks
@@ -100,13 +112,9 @@ Any framework that produces static output works. Set the correct output director
 
 ### Add Domain to Alternate Futures
 
-```bash
-# Add the domain to your site
-af domains create --siteSlug my-site --hostname example.com
-
-# Get the required DNS records
-af domains detail --hostname example.com
-```
+::: info Where to configure domains
+Add custom domains from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) (a CLI `domains` command is not yet available). The dashboard shows the exact DNS records to set at your registrar.
+:::
 
 ### Update DNS Records
 
@@ -123,13 +131,10 @@ Value: cname.alternatefutures.ai
 ```
 Type: A
 Name: @
-Value: [IP from af domains detail]
+Value: [IP shown in the dashboard]
 ```
 
-```bash
-# Verify DNS configuration
-af domains verify --hostname example.com
-```
+The dashboard reports verification status once your DNS records propagate.
 
 ## Step 4: Migrate CI/CD
 
@@ -164,7 +169,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: npx @alternatefutures/cli sites deploy
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -173,8 +178,8 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with `af pat create --name "CI/CD"`)
-3. Add `AF_PROJECT_ID` -- your project ID (find it with `af projects list`)
+2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
+3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 5: Migrate Environment Variables
 
@@ -195,12 +200,12 @@ If your Vercel project uses environment variables:
 
 | Vercel Feature | Alternate Futures Equivalent |
 |----------------|------------------------------|
-| Preview deployments | Every deployment gets a unique CID URL |
-| Serverless functions | [Cloud Functions](./functions.md) with SGX encryption |
-| Edge functions | Cloud Functions (edge deployment) |
+| Preview deployments | Each deployment is content-addressed on IPFS |
+| Serverless functions | [Cloud Functions](./functions.md) (confidential-compute options where available) |
+| Edge functions | [Cloud Functions](./functions.md) |
 | Analytics | [Observability & APM](./observability.md) |
 | Image optimization | Build-time optimization (recommended) |
-| ISR/SSR | Static export + Cloud Functions for dynamic routes |
+| ISR/SSR | Static export; dynamic routes via [Cloud Functions](./functions.md) where available |
 | Cron jobs | Cloud Functions with external scheduling |
 
 ## Next Steps

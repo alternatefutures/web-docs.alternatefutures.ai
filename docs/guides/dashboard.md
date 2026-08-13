@@ -1,7 +1,11 @@
+---
+description: Overview of the Alternate Futures web dashboard for managing agents, sites, storage, and billing.
+---
+
 # Dashboard Overview
 
-::: warning Web App Under Development
-The Alternate Futures web dashboard is currently under development. For now, please use the [CLI](../cli/) or [SDK](../sdk/) to manage your infrastructure.
+::: warning Web dashboard in development
+The Alternate Clouds web dashboard is in active development. For now, manage your infrastructure with the [CLI](../cli/) (`acc`) or the [SDK](../sdk/).
 :::
 
 <!--
@@ -67,10 +71,10 @@ Bell icon shows:
 - Click on cards/items for detailed views
 -->
 
-## Current Options
+## Manage your infrastructure today
 
-Until the web dashboard is available, you can manage your infrastructure using:
+Until the dashboard ships, use:
 
-- **[CLI Documentation](../cli/)** - Command-line interface for all operations
-- **[SDK Documentation](../sdk/)** - Programmatic API access
-- **[Quick Start Guide](./quickstart.md)** - Get started with CLI/SDK
+- **[CLI](../cli/)** — the `acc` command-line interface for all operations
+- **[SDK](../sdk/)** — programmatic API access
+- **[Quick Start](./quickstart.md)** — get running with the CLI or SDK

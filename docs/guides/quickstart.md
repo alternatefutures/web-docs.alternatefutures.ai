@@ -1,3 +1,7 @@
+---
+description: Deploy your first site to decentralized infrastructure in 5 minutes with the Alternate Futures CLI.
+---
+
 # Quick Start Guide
 
 Get started with Alternate Futures in minutes. This guide will walk you through your first deployment to decentralized infrastructure.
@@ -31,7 +35,7 @@ Before you begin, make sure you have:
 The web application is currently in development. In the meantime, you can use the CLI or SDK to access the full platform.
 :::
 
-## Installation
+## Step 1: Install the CLI
 
 ::: code-group
 
@@ -57,7 +61,7 @@ There are two ways to authenticate with Alternate Futures:
 
 ```bash [CLI]
 # Login interactively
-af login
+acc login
 ```
 
 :::
@@ -74,22 +78,22 @@ After signing in, the CLI automatically saves your credentials. You're ready to 
 
 If you prefer tokens or need to automate deployments:
 
-1. Log in via the CLI first: `af login`
-2. Create a Personal Access Token: `af pat create --name "My Development Token"`
-3. Copy the token (it starts with `pat_...`)
-4. Note your project ID from `af projects list`
+1. Log in via the CLI first: `acc login`
+2. Create a Personal Access Token: `acc pat create --name "My Development Token"`
+3. Copy the token (it starts with `af_`, e.g. `af_prod_...` — see [`token.service.ts`](https://github.com/alternatefutures/service-auth/blob/main/src/services/token.service.ts))
+4. Note your project ID from `acc projects list`
 5. Set them as environment variables:
 
 ::: code-group
 
 ```bash [CLI]
 # Set environment variables
-export AF_TOKEN=pat_your_token_here
-export AF_PROJECT_ID=prj_your_project_id
+export AF_TOKEN=af_prod_your_token_here
+export AF_PROJECT_ID=clabc123yourprojectid
 
 # Or add to your .bashrc/.zshrc for persistence
-echo 'export AF_TOKEN=pat_your_token_here' >> ~/.bashrc
-echo 'export AF_PROJECT_ID=prj_your_project_id' >> ~/.bashrc
+echo 'export AF_TOKEN=af_prod_your_token_here' >> ~/.bashrc
+echo 'export AF_PROJECT_ID=clabc123yourprojectid' >> ~/.bashrc
 ```
 
 ```typescript [SDK]
@@ -114,9 +118,9 @@ Environment variables store sensitive information (like tokens) outside your cod
 
 **How to use them:**
 1. Store your token in a `.env` file:
-   ```env
-   AF_TOKEN=pat_your_token_here
-   AF_PROJECT_ID=prj_your_project_id
+   ```bash
+   AF_TOKEN=af_prod_your_token_here
+   AF_PROJECT_ID=clabc123yourprojectid
    ```
 2. Add `.env` to your `.gitignore` file so Git doesn't track it
 3. Your code reads from `process.env.AF_TOKEN` instead of hardcoding the key
@@ -135,7 +139,7 @@ Environment variables store sensitive information (like tokens) outside your cod
 
 ### Troubleshooting Authentication
 
-**"Command not found: af"**
+**"Command not found: acc"**
 - Make sure you installed the CLI: `npm install -g @alternatefutures/cli`
 - Try restarting your terminal
 - Check installation with `npm list -g @alternatefutures/cli`
@@ -146,9 +150,9 @@ Environment variables store sensitive information (like tokens) outside your cod
 - Make sure you have an account at [https://app.alternatefutures.ai](https://app.alternatefutures.ai)
 
 **"Invalid token"**
-- Double-check you copied the entire token (starts with `pat_`)
+- Double-check you copied the entire token (starts with `af_`)
 - Make sure there are no extra spaces
-- Generate a new token if needed: `af pat create --name "New Token"`
+- Generate a new token if needed: `acc pat create --name "New Token"`
 
 ## Step 3: Deploy Your First Site
 
@@ -174,7 +178,7 @@ We provide ready-to-deploy templates for popular frameworks. Choose one that fit
 
 ```bash
 # Clone the React template
-git clone https://github.com/alternatefutures/template-react my-site
+git clone https://github.com/alternatefutures/template-cloud-react my-site
 cd my-site
 
 # Install dependencies
@@ -183,18 +187,18 @@ npm install
 # Build for production
 npm run build
 
-# Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+# Create a service and deploy (build output is in ./dist)
+acc services create
+acc services deploy
 ```
 
-[Template Repository](https://github.com/alternatefutures/template-react) | [React Docs](https://react.dev/) | [Vite Docs](https://vitejs.dev/)
+[Template Repository](https://github.com/alternatefutures/template-cloud-react) | [React Docs](https://react.dev/) | [Vite Docs](https://vitejs.dev/)
 
 **Next.js (Static Export)**
 
 ```bash
 # Clone the Next.js template
-git clone https://github.com/alternatefutures/template-nextjs my-site
+git clone https://github.com/alternatefutures/template-cloud-nextjs my-site
 cd my-site
 
 # Install dependencies
@@ -203,18 +207,18 @@ npm install
 # Build static export
 npm run build
 
-# Initialize and deploy (build output is in ./out)
-af sites init
-af sites deploy
+# Create a service and deploy (build output is in ./out)
+acc services create
+acc services deploy
 ```
 
-[Template Repository](https://github.com/alternatefutures/template-nextjs) | [Next.js Docs](https://nextjs.org/docs)
+[Template Repository](https://github.com/alternatefutures/template-cloud-nextjs) | [Next.js Docs](https://nextjs.org/docs)
 
 **Vue.js (Vite)**
 
 ```bash
 # Clone the Vue template
-git clone https://github.com/alternatefutures/template-vue my-site
+git clone https://github.com/alternatefutures/template-cloud-vue my-site
 cd my-site
 
 # Install dependencies
@@ -223,18 +227,18 @@ npm install
 # Build for production
 npm run build
 
-# Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+# Create a service and deploy (build output is in ./dist)
+acc services create
+acc services deploy
 ```
 
-[Template Repository](https://github.com/alternatefutures/template-vue) | [Vue.js Docs](https://vuejs.org/guide/) | [Vite Docs](https://vitejs.dev/)
+[Template Repository](https://github.com/alternatefutures/template-cloud-vue) | [Vue.js Docs](https://vuejs.org/guide/) | [Vite Docs](https://vitejs.dev/)
 
 **Astro**
 
 ```bash
 # Clone the Astro template
-git clone https://github.com/alternatefutures/template-astro my-site
+git clone https://github.com/alternatefutures/template-cloud-astro my-site
 cd my-site
 
 # Install dependencies
@@ -243,69 +247,29 @@ npm install
 # Build for production
 npm run build
 
-# Initialize and deploy (build output is in ./dist)
-af sites init
-af sites deploy
+# Create a service and deploy (build output is in ./dist)
+acc services create
+acc services deploy
 ```
 
-[Template Repository](https://github.com/alternatefutures/template-astro) | [Astro Docs](https://docs.astro.build/)
-
-**SvelteKit (Static Adapter)**
-
-```bash
-# Clone the SvelteKit template
-git clone https://github.com/alternatefutures/template-sveltekit my-site
-cd my-site
-
-# Install dependencies
-npm install
-
-# Build static export
-npm run build
-
-# Initialize and deploy (build output is in ./build)
-af sites init
-af sites deploy
-```
-
-[Template Repository](https://github.com/alternatefutures/template-sveltekit) | [SvelteKit Docs](https://kit.svelte.dev/docs)
+[Template Repository](https://github.com/alternatefutures/template-cloud-astro) | [Astro Docs](https://docs.astro.build/)
 
 **Hugo (Static Site Generator)**
 
 ```bash
 # Clone the Hugo template
-git clone https://github.com/alternatefutures/template-hugo my-site
+git clone https://github.com/alternatefutures/template-cloud-hugo my-site
 cd my-site
 
 # Build for production (requires Hugo installed)
 hugo
 
-# Initialize and deploy (build output is in ./public)
-af sites init
-af sites deploy
+# Create a service and deploy (build output is in ./public)
+acc services create
+acc services deploy
 ```
 
-[Template Repository](https://github.com/alternatefutures/template-hugo) | [Hugo Docs](https://gohugo.io/documentation/)
-
-**VitePress (Documentation)**
-
-```bash
-# Clone the VitePress template
-git clone https://github.com/alternatefutures/template-vitepress my-site
-cd my-site
-
-# Install dependencies
-npm install
-
-# Build for production
-npm run docs:build
-
-# Initialize and deploy (build output is in ./docs/.vitepress/dist)
-af sites init
-af sites deploy
-```
-
-[Template Repository](https://github.com/alternatefutures/template-vitepress) | [VitePress Docs](https://vitepress.dev/)
+[Template Repository](https://github.com/alternatefutures/template-cloud-hugo) | [Hugo Docs](https://gohugo.io/documentation/)
 
 ::: tip Framework Not Listed?
 Any static site generator works with Alternate Futures! Just build your site and deploy the output directory. Common output folders: `dist/`, `build/`, `out/`, `public/`.
@@ -373,7 +337,7 @@ Now let's deploy your site to a decentralized storage network. You have three op
 
 ```bash [CLI]
 # Initialize site configuration (creates af.config.json)
-af sites init
+acc services create
 
 # Follow the prompts to configure:
 # - Site name
@@ -382,7 +346,7 @@ af sites init
 # - Storage network (IPFS, Filecoin, Arweave)
 
 # Deploy the site
-af sites deploy
+acc services deploy
 
 # You should see output like:
 # ✓ Building site...
@@ -403,9 +367,10 @@ const af = new AlternateFuturesSdk({
   }),
 });
 
-// Upload to IPFS
-const result = await af.ipfs().add('./dist');
-console.log('CID:', result.pin.cid);
+// Upload a build directory to IPFS
+const [result] = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
+// ipfs client source: package-cloud-sdk/src/clients/ipfs.ts
 
 // List your sites
 const sites = await af.sites().list();
@@ -431,11 +396,11 @@ When you deployed, Alternate Futures:
 ::: code-group
 
 ```bash [CLI]
-# List all your sites
-af sites list
+# List all your services
+acc services list
 
-# View deployments for a specific site
-af sites deployments --slug my-site
+# View deployments for a specific service
+acc deployments --service my-site
 
 # Output shows:
 # - Site name and slug
@@ -469,11 +434,11 @@ sites.forEach(site => {
 **"No such file or directory: ./dist"**
 - Make sure the directory exists
 - Use the correct path to your build output
-- Try an absolute path: `af sites deploy /full/path/to/dist --network ipfs`
+- Re-run the deploy from the correct directory: `acc services deploy`
 
 **"Deployment failed" or timeout errors**
 - Check your internet connection
-- Verify you're authenticated: `af login`
+- Verify you're authenticated: `acc login`
 - Try again—network issues can be temporary
 - Try a smaller deployment first to test
 
@@ -535,7 +500,7 @@ Congratulations! You've deployed your first site to decentralized infrastructure
 
 ### Need Help?
 
-- **[Glossary](./glossary.md)** - Definitions of technical terms (coming soon)
+- **[Glossary](./glossary.md)** - Definitions of technical terms
 - **GitHub Issues** - [Report bugs or request features](https://github.com/alternatefutures)
 - **Community** - Join our [Discord](https://discord.gg/alternatefutures) or [Twitter](https://twitter.com/alternatefutures)
 

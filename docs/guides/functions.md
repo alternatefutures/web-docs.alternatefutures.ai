@@ -1,10 +1,14 @@
+---
+description: Deploy serverless functions on decentralized infrastructure, with an optional SGX flag, using Alternate Futures Cloud Functions.
+---
+
 # Cloud Functions
 
-Deploy serverless edge functions on decentralized infrastructure with Alternate Futures Functions.
+Deploy serverless functions on decentralized infrastructure with Alternate Futures Cloud Functions.
 
 ## What are Cloud Functions?
 
-Cloud Functions are serverless compute that runs on the edge, close to your users. They enable:
+Cloud Functions are serverless compute that runs on decentralized infrastructure. Use them to build:
 
 - **API Endpoints** - Create backend APIs without managing servers
 - **Dynamic Content** - Generate personalized content at the edge
@@ -14,30 +18,33 @@ Cloud Functions are serverless compute that runs on the edge, close to your user
 
 ## Function Runtime
 
-Functions run in a secure JavaScript/TypeScript runtime with:
+Functions run in a JavaScript/TypeScript runtime with:
 
 - Node.js-compatible APIs
-- Access to Web APIs (fetch, Request, Response)
-- Optional SGX (Software Guard Extensions) for enhanced security
-- Automatic scaling based on demand
+- Web APIs (`fetch`, `Request`, `Response`)
+- An optional SGX (Software Guard Extensions) deployment flag for workloads that need extra isolation
+
+::: info What this maps to in code
+- **SDK:** [functions client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/functions.ts) — `create`, `deploy`, `list`, `listDeployments`, `update`, `delete`.
+- **API:** [`AFFunction` data model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma) and [`AFFunction` GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) — exposes `invokeUrl`, `routes`, `status`.
+:::
+
+::: tip CLI
+There is no `acc functions` command. Functions are created and deployed through the **SDK / GraphQL API** and served as services via `acc services`. The examples below use the SDK.
+:::
 
 ## Creating a Function
 
 ::: code-group
 
-```bash [CLI]
-# Create a new function
-af functions create --name my-function
-
-# Create and attach to a site
-af functions create --name my-function --site-id <site-id>
-```
-
 ```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Create a function
@@ -114,36 +121,16 @@ export default async function handler(request) {
 
 ::: code-group
 
-```bash [CLI]
-# Deploy function code
-af functions deploy \
-  --function-id <function-id> \
-  --code ./dist
-
-# Deploy with SGX security
-af functions deploy \
-  --function-id <function-id> \
-  --code ./dist \
-  --sgx
-
-# Deploy with assets
-af functions deploy \
-  --function-id <function-id> \
-  --code ./dist \
-  --assets ./public
-```
-
 ```typescript [SDK]
-// First, upload your code to IPFS
-const codeUpload = await af.uploadProxy().uploadDirectory({
-  path: './dist'
-});
+// First, upload your built function bundle to storage to get a CID.
+// (Use the storage client's upload method; it returns a CID.)
+const { cid } = await af.storage().uploadContent(/* your bundle */);
 
-// Deploy the function
+// Deploy the function using that CID
 const deployment = await af.functions().deploy({
   functionId: 'function-id',
-  cid: codeUpload.pin.cid,
-  sgx: true, // optional: enable SGX
+  cid,
+  sgx: true, // optional: request an SGX-enabled deployment
   blake3Hash: 'hash', // optional: for verification
   assetsCid: 'assets-cid' // optional: static assets
 });
@@ -157,11 +144,6 @@ console.log('Deployment ID:', deployment.id);
 
 ::: code-group
 
-```bash [CLI]
-# List all functions
-af functions list
-```
-
 ```typescript [SDK]
 // List all functions
 const functions = await af.functions().list();
@@ -169,7 +151,7 @@ const functions = await af.functions().list();
 functions.forEach(func => {
   console.log(`${func.name} (${func.slug})`);
   console.log(`Status: ${func.status}`);
-  console.log(`URL: https://${func.slug}.af-functions.app`);
+  console.log(`URL: ${func.invokeUrl}`); // e.g. https://crooked-bland-jackal.dev.on-af-functions.app
 });
 ```
 
@@ -178,11 +160,6 @@ functions.forEach(func => {
 ## Viewing Function Deployments
 
 ::: code-group
-
-```bash [CLI]
-# List deployments for a function
-af functions list-deployments --function-id <function-id>
-```
 
 ```typescript [SDK]
 // List function deployments
@@ -203,14 +180,6 @@ deployments.forEach(dep => {
 
 ::: code-group
 
-```bash [CLI]
-# Update function configuration
-af functions update \
-  --function-id <function-id> \
-  --name new-name \
-  --routes '/api/v2/*=handler.js'
-```
-
 ```typescript [SDK]
 // Update function
 await af.functions().update({
@@ -228,11 +197,6 @@ await af.functions().update({
 ## Deleting a Function
 
 ::: code-group
-
-```bash [CLI]
-# Delete a function
-af functions delete --function-id <function-id>
-```
 
 ```typescript [SDK]
 // Delete a function
@@ -280,25 +244,23 @@ Set variables during deployment or in your build process.
 
 ## SGX (Software Guard Extensions)
 
-Enable SGX for enhanced security and privacy:
+Request an SGX-enabled deployment with the `sgx` flag:
 
-```bash
-af functions deploy \
-  --function-id <function-id> \
-  --code ./dist \
-  --sgx
+```typescript
+await af.functions().deploy({
+  functionId: 'function-id',
+  cid,
+  sgx: true,
+});
 ```
 
-SGX provides:
-- **Encrypted Execution** - Code runs in encrypted memory
-- **Attestation** - Verify code hasn't been tampered with
-- **Confidential Computing** - Protect sensitive data during processing
+SGX is an optional deployment flag that requests your function run in an SGX-enabled environment for additional isolation of sensitive workloads. Exact guarantees and availability depend on the target provider.
 
 ## Function URLs
 
 Access your functions via:
 
-- **Default URL**: `https://<function-slug>.af-functions.app`
+- **Default URL**: returned by the API as `func.invokeUrl` (pattern `https://<function-slug>.<env>.on-af-functions.app`)
 - **Custom Domain**: Configure custom domains for your functions
 - **Site Integration**: Mount functions on specific routes within your site
 
@@ -426,7 +388,7 @@ export default async function handler(request) {
 
 **What is CORS?**
 
-CORS (Cross-Origin Resource Sharing) is a security feature that browsers use to prevent websites from making requests to different domains without permission. When your web app (e.g., `myapp.com`) tries to call your function (e.g., `function.af-functions.app`), the browser blocks it unless your function explicitly allows it.
+CORS (Cross-Origin Resource Sharing) is a security feature that browsers use to prevent websites from making requests to different domains without permission. When your web app (e.g., `myapp.com`) tries to call your function (e.g., `function.on-af-functions.app`), the browser blocks it unless your function explicitly allows it.
 
 **Solution 1: Basic CORS Headers**
 

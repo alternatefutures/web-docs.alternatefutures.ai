@@ -1,3 +1,7 @@
+---
+description: Optimize your Alternate Futures deployments for performance, cost, and reliability with storage, caching, and security best practices.
+---
+
 # Best Practices
 
 Optimize your Alternate Futures deployments for performance, cost, and reliability.
@@ -143,19 +147,10 @@ module.exports = {
 
 ### Storage Costs
 
-**Unpin Unused Content (IPFS):**
-```bash
-# List all pinned content
-af storage list --network ipfs --pinned
-
-# Unpin old deployments
-af storage unpin QmOldCID
-```
-
-**Use Filecoin for Archives:**
-```bash
-# Move old content from IPFS to Filecoin
-af storage migrate QmXxx --from ipfs --to filecoin
+**Unpin unused content (IPFS):** there is no `acc storage` command; manage pins through the SDK.
+```typescript
+const items = await af.storage().list();
+await af.ipfs().unpin('QmOldCID');
 ```
 
 **Compress Before Upload:**
@@ -163,8 +158,8 @@ af storage migrate QmXxx --from ipfs --to filecoin
 # Create compressed archive
 tar -czf site.tar.gz dist/
 
-# Deploy compressed (auto-extracted)
-af sites deploy site.tar.gz
+# Deploy the project's service
+acc services deploy
 ```
 
 ### Bandwidth Costs
@@ -185,19 +180,7 @@ af sites deploy site.tar.gz
 
 ### Compute Costs
 
-**Agent Optimization:**
-```javascript
-// Stop agents when not needed
-af agents stop agent-id
-
-// Start on-demand
-af agents start agent-id
-
-// Use smaller models
-{
-  model: "gpt-3.5-turbo"  // vs gpt-4
-}
-```
+**Agent Optimization:** choose a smaller/cheaper model when full capability isn't needed — set `model` on the agent to a lighter option.
 
 ## Security Best Practices
 
@@ -205,18 +188,19 @@ af agents start agent-id
 
 ```bash
 # Use environment variables
-export AF_API_KEY="af_xxx"
+export AF_TOKEN="af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Never commit to git
-echo "AF_API_KEY=*" >> .gitignore
+echo "AF_TOKEN=*" >> .gitignore
 
-# Rotate regularly
-af api-keys create --expires 90d
-af api-keys revoke old-key-id
-
-# Use minimal permissions
-af api-keys create --permissions agents:read,sites:write
+# Rotate regularly (personal access tokens)
+acc pat create --name "ci-2026-q3"
+acc pat delete <old-token-id>
 ```
+
+::: info
+Scoped permissions and expiry flags are not yet available on `acc pat create` (it takes only `--name`).
+:::
 
 ### Content Security
 
@@ -227,51 +211,25 @@ ipfs add --only-hash file.txt
 # Compare with retrieved CID
 ```
 
-**Sign Deployments:**
-```bash
-# Sign with private key for verification
-af sites deploy ./dist --sign
-```
+<!-- Removed: `acc sites deploy --sign` — deployment signing is not implemented in the CLI. -->
 
 ## Reliability Best Practices
 
 ### Redundancy
 
-**Pin on Multiple Services:**
-```bash
-# Primary pinning service
-af storage pin QmXxx --provider pinata
+**Pin on multiple services:** manage pins through the SDK (`af.ipfs()` / `af.storage()`). Provider selection at pin time is not exposed through the CLI.
 
-# Backup pinning
-af storage pin QmXxx --provider web3storage
-```
-
-**Use Multiple Networks:**
-```bash
-# Deploy to both IPFS and Arweave
-af sites deploy ./dist --network ipfs
-af sites deploy ./dist --network arweave
-```
+<!-- Removed: `acc sites deploy --network` — there is no sites command or --network flag. -->
 
 ### Monitoring
 
-**Set Up Alerts:**
+**Check deployment health:**
 ```bash
-# Monitor agent uptime
-af agents monitor agent-id --alert-email you@example.com
-
-# Monitor bandwidth usage
-af billing alert --type bandwidth --threshold 1TB
-```
-
-**Check Deployment Health:**
-```bash
-# Verify site accessibility
+# Verify accessibility via a gateway
 curl -I https://gateway.ipfs.io/ipfs/QmXxx
-
-# Check all gateways
-af sites check site-id --all-gateways
 ```
+
+<!-- Removed: `acc agents monitor`, `acc billing alert`, `acc sites check` — none of these commands exist. -->
 
 ## Development Workflow
 
@@ -281,14 +239,11 @@ af sites check site-id --all-gateways
 # Use local IPFS node
 ipfs daemon
 
-# Test locally before deploying
-af sites preview ./dist --local
+# Deploy your staging project first
+AF_PROJECT_ID=$STAGING_PROJECT_ID acc services deploy
 
-# Deploy to staging first
-af sites deploy ./dist --name staging
-
-# Test thoroughly, then deploy to production
-af sites deploy ./dist --name production
+# Test thoroughly, then deploy production
+AF_PROJECT_ID=$PROD_PROJECT_ID acc services deploy
 ```
 
 ### CI/CD
@@ -297,11 +252,15 @@ af sites deploy ./dist --name production
 # .github/workflows/deploy.yml
 - name: Deploy to staging
   if: github.ref == 'refs/heads/staging'
-  run: af sites deploy ./dist --network ipfs
+  run: acc services deploy
+  env:
+    AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_STAGING }}
 
 - name: Deploy to production
   if: github.ref == 'refs/heads/main'
-  run: af sites deploy ./dist --network arweave
+  run: acc services deploy
+  env:
+    AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_PROD }}
 ```
 
 ## Content Organization
@@ -309,16 +268,12 @@ af sites deploy ./dist --name production
 ### Naming Conventions
 
 ```bash
-# Use descriptive names
-af sites deploy ./dist --name "marketing-website-prod"
-af agents create --name "discord-bot-support"
-
-# Include version numbers
-af sites deploy ./dist --name "app-v1.2.0"
-
-# Use tags for organization
-af sites deploy ./dist --tags production,public
+# Name projects and services descriptively in the dashboard,
+# then deploy the selected project's service:
+acc services deploy
 ```
+
+<!-- Removed: --name/--tags flags and `acc agents create` — not implemented in the CLI. -->
 
 ### Project Structure
 
@@ -327,9 +282,11 @@ my-project/
 ├── dist/              # Built static files
 ├── .env              # API keys (not in git!)
 ├── .gitignore        # Include .env
-├── af-config.json    # Alternate Futures config
+├── af.config.json    # Alternate Clouds config
 └── deploy.sh         # Deployment script
 ```
+
+The CLI resolves configuration in order `af.config.ts` > `af.config.js` > `af.config.json` — see [getConfiguration.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/getConfiguration.ts).
 
 ## Next Steps
 

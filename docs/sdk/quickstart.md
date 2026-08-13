@@ -1,3 +1,7 @@
+---
+description: Get started with the Alternate Futures SDK in under 5 minutes. Deploy sites and upload to IPFS programmatically.
+---
+
 # SDK Quickstart
 
 Get started with the Alternate Futures SDK in under 5 minutes.
@@ -45,13 +49,14 @@ console.log('Sites:', sites);
 
 ### Browser
 
+> **What this maps to in code:** [`StaticAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/StaticAccessTokenService.ts) takes a single `accessToken` option.
+
 ```typescript
 import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
 
 // For browser apps, use StaticAccessTokenService
 const accessTokenService = new StaticAccessTokenService({
-  token: 'your-access-token',
-  projectId: 'your-project-id',
+  accessToken: 'your-access-token',
 });
 
 const af = new AlternateFuturesSdk({
@@ -73,13 +78,15 @@ for (const site of sites) {
 
 ### Upload to IPFS
 
+> **What this maps to in code:** [`af.ipfs().add`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts) takes an `IpfsFile` object `{ content, path? }`; use `addFromPath(path)` to upload from the filesystem.
+
 ```typescript
-// Node.js only - upload a file
-const result = await af.ipfs().add('./my-file.txt');
-console.log('CID:', result.pin.cid);
+// Node.js only - upload a file from a path
+const result = await af.ipfs().addFromPath('./my-file.txt');
+console.log('CID:', result.cid.toString());
 
 // Or upload content directly
-const result = await af.ipfs().addFromContent({
+const contentResult = await af.ipfs().add({
   content: 'Hello, decentralized web!',
   path: 'hello.txt',
 });
@@ -102,10 +109,10 @@ await af.storage().delete({ cid: 'bafybei...' });
 
 ```typescript
 // List domains for a site
-const domains = await af.domains().listBySite({ siteId: 'site_abc123' });
+const domains = await af.domains().listDomainsForSite({ siteId: 'site_abc123' });
 
 // Add a custom domain
-const domain = await af.domains().create({
+const domain = await af.domains().createCustomDomain({
   siteId: 'site_abc123',
   hostname: 'www.example.com',
 });
@@ -113,19 +120,25 @@ const domain = await af.domains().create({
 
 ### Create IPNS Records
 
+> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) — `createRecordForSite`, `publishRecord`, `listRecords`.
+
 ```typescript
 // Create an IPNS record for a site
-const ipns = await af.ipns().create({ siteId: 'site_abc123' });
+const ipns = await af.ipns().createRecordForSite({ siteId: 'site_abc123' });
 console.log('IPNS Name:', ipns.name);
 
-// Publish new content to IPNS
-await af.ipns().publish({
-  name: ipns.name,
+// Publish new content to IPNS (keyed by record id)
+await af.ipns().publishRecord({
+  id: ipns.id,
   hash: 'bafybei...',
 });
 ```
 
 ## Error Handling
+
+::: warning
+The exact shape of thrown errors (whether to branch on `error.name` or `error.code`) is not yet finalized in the SDK. Treat the example below as illustrative and inspect the caught error in your environment before depending on a specific field. See the [API Reference](./api#error-handling) for the current contract.
+:::
 
 ```typescript
 import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';

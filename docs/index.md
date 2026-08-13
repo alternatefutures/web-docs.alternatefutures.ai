@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: ""
-  text: Alternate Cloud Documentation <span class="beta-badge">BETA</span>
+  text: Alternate Clouds Documentation <span class="beta-badge">BETA</span>
   tagline: Deploy AI agents, cloud functions and sites to decentralized infrastructure
   actions:
     - theme: brand
@@ -35,7 +35,7 @@ features:
       src: /icons/database.svg
       alt: Storage
     title: Storage Management
-    details: Unified interface for managing decentralized storage across networks
+    details: Manage decentralized storage across IPFS, Filecoin, and Arweave from the SDK
     link: /guides/storage
     linkText: Learn more
   - icon:
@@ -54,10 +54,11 @@ features:
     linkText: Learn more
   - icon:
       src: /icons/chart.svg
-      alt: Analytics
-    title: Analytics
-    details: Track usage and performance metrics across all your deployments
-    status: in-progress
+      alt: Observability
+    title: Observability & APM
+    details: Distributed tracing, metrics, and logging for all your deployments
+    link: /guides/observability
+    linkText: Learn more
   - icon:
       src: /icons/credit-card.svg
       alt: Billing
@@ -94,8 +95,10 @@ features:
 - [CLI Commands](/cli/commands) - Complete CLI reference
 - [SDK API Reference](/sdk/api) - TypeScript SDK documentation
 - [Authentication](/guides/authentication) - Multi-method authentication guide
-- [Decentralized Registry](/guides/decentralized-registry) - Self-hosted container registry with IPFS
-- [Deploy Your Registry](/guides/registry-deployment) - Step-by-step Akash deployment guide
+- [Migrate from Fleek](/guides/migrate-from-fleek) - Moving from Fleek? Start here
+- [Migrate from Netlify](/guides/migrate-from-netlify) - Moving from Netlify? Start here
+- [Migrate from Spheron](/guides/migrate-from-spheron) - Moving from Spheron? Start here
+- [Migrate from Vercel](/guides/migrate-from-vercel) - Moving from Vercel? Start here
 
 ## Installation
 
@@ -103,7 +106,7 @@ features:
 
 ```bash [CLI]
 npm install -g @alternatefutures/cli
-af login
+acc login
 ```
 
 ```bash [SDK]
@@ -117,15 +120,16 @@ npm install @alternatefutures/sdk
 ::: code-group
 
 ```bash [CLI]
-# Initialize and deploy a site
-af sites init
-af sites deploy
+# Log in (opens your browser)
+acc login
 
-# List your sites
-af sites list
+# Create and deploy a service
+acc services create
+acc services deploy
 
-# Upload files to IPFS
-af storage add ./my-files
+# List services and view deployments
+acc services list
+acc deployments
 ```
 
 ```typescript [SDK]
@@ -143,9 +147,13 @@ const af = new AlternateFuturesSdk({
 const sites = await af.sites().list();
 console.log('Sites:', sites);
 
-// Upload to IPFS
-const result = await af.ipfs().add('./dist');
-console.log('CID:', result.pin.cid);
+// Upload a build directory to IPFS
+const [result] = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
 ```
 
+:::
+
+::: tip What this maps to in code
+CLI commands are registered in [`src/cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). The SDK's `ipfs().add()` / `addFromPath()` methods live in [`src/clients/ipfs.ts`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
 :::

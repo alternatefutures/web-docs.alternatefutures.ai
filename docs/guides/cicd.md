@@ -1,3 +1,7 @@
+---
+description: Automate Alternate Futures deployments with GitHub Actions, GitLab CI, and other CI/CD pipelines.
+---
+
 # CI/CD Integration
 
 Automate deployments with continuous integration and delivery pipelines.
@@ -32,17 +36,18 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Alternate Futures
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs
+      - name: Deploy to Alternate Clouds
+        run: npx @alternatefutures/cli services deploy
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
 ```
 
 ### Add API Key Secret
 
 1. Go to repository **Settings** → **Secrets and variables** → **Actions**
 2. Click **New repository secret**
-3. Name: `AF_API_KEY`
+3. Name: `AF_TOKEN`
 4. Value: Your API key from [app.alternatefutures.ai/api-keys](https://app.alternatefutures.ai/api-keys)
 5. Click **Add secret**
 
@@ -75,15 +80,17 @@ jobs:
 
       - name: Deploy to Staging
         if: github.ref == 'refs/heads/staging'
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs --name staging
+        run: npx @alternatefutures/cli services deploy
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY_STAGING }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN_STAGING }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_STAGING }}
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: npx @alternatefutures/cli sites deploy ./dist --network arweave --name production
+        run: npx @alternatefutures/cli services deploy
         env:
-          AF_API_KEY: ${{ secrets.AF_API_KEY_PROD }}
+          AF_TOKEN: ${{ secrets.AF_TOKEN_PROD }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_PROD }}
 ```
 
 ## GitLab CI/CD
@@ -117,12 +124,13 @@ deploy:
     - main
   script:
     - npm install -g @alternatefutures/cli
-    - af sites deploy ./dist --network ipfs
+    - acc services deploy
   variables:
-    AF_API_KEY: $AF_API_KEY
+    AF_TOKEN: $AF_TOKEN
+    AF_PROJECT_ID: $AF_PROJECT_ID
 ```
 
-Add `AF_API_KEY` in GitLab project settings:
+Add `AF_TOKEN` in GitLab project settings:
 - **Settings** → **CI/CD** → **Variables**
 
 ## CircleCI
@@ -160,7 +168,7 @@ jobs:
           name: Deploy
           command: |
             npm install -g @alternatefutures/cli
-            af sites deploy ./dist --network ipfs
+            acc services deploy
 
 workflows:
   deploy:
@@ -171,7 +179,7 @@ workflows:
               only: main
 ```
 
-Add `AF_API_KEY` in CircleCI project settings.
+Add `AF_TOKEN` in CircleCI project settings.
 
 ## Vercel Integration
 
@@ -192,13 +200,13 @@ Then add deployment hook:
 ```json
 {
   "scripts": {
-    "vercel-build": "npm run build && npm run deploy:af"
-    "deploy:af": "npx @alternatefutures/cli sites deploy ./dist --network ipfs"
+    "vercel-build": "npm run build && npm run deploy:af",
+    "deploy:af": "npx @alternatefutures/cli services deploy"
   }
 }
 ```
 
-Set `AF_API_KEY` in Vercel environment variables.
+Set `AF_TOKEN` in Vercel environment variables.
 
 ## Jenkins
 
@@ -209,7 +217,7 @@ pipeline {
     agent any
 
     environment {
-        AF_API_KEY = credentials('af-api-key')
+        AF_TOKEN = credentials('af-token')
     }
 
     stages {
@@ -231,43 +239,40 @@ pipeline {
             }
             steps {
                 sh 'npm install -g @alternatefutures/cli'
-                sh 'af sites deploy ./dist --network ipfs'
+                sh 'acc services deploy'
             }
         }
     }
 }
 ```
 
-Add `af-api-key` credential in Jenkins credentials manager.
+Add `af-token` credential in Jenkins credentials manager.
 
-## CLI Options
+## The deploy command
 
-Common deployment options:
+Deployments run through `services deploy`, scoped to a project:
 
 ```bash
-# Deploy with custom name
-af sites deploy ./dist --name "My Site" --network ipfs
+# Deploy the current project's service
+acc services deploy
 
-# Deploy with metadata
-af sites deploy ./dist --description "Production v1.2.0"
-
-# Deploy to specific network
-af sites deploy ./dist --network arweave  # or ipfs, filecoin
-
-# Wait for deployment completion
-af sites deploy ./dist --wait
-
-# Get deployment URL in JSON
-af sites deploy ./dist --json | jq -r '.url'
+# Target a specific service by id
+acc services deploy <service-id>
 ```
+
+::: tip What this maps to in code
+See the [services deploy command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts). It reads `AF_TOKEN`, `AF_PROJECT_ID`, and `AF_ORG_ID` from the environment ([secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts)). Flags such as `--name`, `--network`, `--wait`, and `--json` are not implemented.
+:::
 
 ## Environment Variables
 
-CLI reads these environment variables:
+The CLI reads these environment variables:
 
-- `AF_API_KEY` - API key for authentication
-- `AF_SITE_ID` - Default site ID (optional)
-- `AF_NETWORK` - Default network (optional)
+- `AF_TOKEN` - personal access token for authentication
+- `AF_PROJECT_ID` - default project id
+- `AF_ORG_ID` - default organization id
+
+See [secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
 
 ## Best Practices
 
@@ -291,7 +296,6 @@ CLI reads these environment variables:
 
 - ✅ Add status checks before deploying
 - ✅ Run tests before deployment
-- ✅ Use `--wait` flag for deployment confirmation
 - ✅ Monitor deployment success/failure
 - ✅ Set up notifications for failed deployments
 

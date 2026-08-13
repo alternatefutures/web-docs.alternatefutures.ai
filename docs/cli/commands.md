@@ -1,111 +1,390 @@
-# CLI Commands Reference
+---
+description: Complete reference for the Alternate Clouds CLI (acc) — authentication, projects, services, deployments, SSH, personal access tokens, templates, and billing.
+---
 
-Complete reference for all Alternate Futures CLI (`af`) commands.
+# CLI Commands
 
-## Command Structure
+Complete reference for the commands the Alternate Clouds CLI (`acc`) ships today. Every command below is verified against the `cloud-cli` source.
+
+::: tip New to the CLI?
+Start with the [CLI overview](./index) for installation, quick start, environment variables, and the `af.config` file. This page is the per-command reference.
+:::
+
+Get help for any command directly from your terminal:
 
 ```bash
-af <command> [subcommand] [options]
+acc --help                 # Top-level help
+acc services --help        # Help for a command group
+acc services deploy --help # Help for a single command
 ```
+
+## Command Groups
+
+| Command | Description |
+|---------|-------------|
+| [`acc login`](#acc-login) / [`acc logout`](#acc-logout) | Authenticate or end your CLI session |
+| [`acc projects`](#acc-projects) | Create, list, switch, rename, and delete projects |
+| [`acc services`](#acc-services) | Create, deploy, inspect, and manage services |
+| [`acc deployments`](#acc-deployments) | List and filter deployments |
+| [`acc ssh`](#acc-ssh) | Open an interactive shell in a running deployment |
+| [`acc pat`](#acc-pat) | Manage personal access tokens |
+| [`acc templates`](#acc-templates) | Browse service templates |
+| [`acc billing`](#acc-billing) | View your credit balance |
+| [`acc version`](#acc-version) | Print the installed CLI version |
 
 ## Authentication
 
-### `af login`
+### `acc login`
 
-Authenticate your CLI session.
+Log in to Alternate Clouds. By default this opens your browser to the web UI to complete authentication. Pass `--email` to authenticate with an email verification code instead — useful on headless machines with no browser.
 
 ```bash
-af login              # Opens browser for authentication
-af login --email      # Login via email verification (no browser)
+acc login              # Browser-based login (default)
+acc login --email      # Email verification code (no browser)
 ```
-
-**Options:**
 
 | Option | Description |
 |--------|-------------|
-| `-e, --email` | Login via email verification (no browser required) |
-| `--auth-url <url>` | Override auth service URL (for testing) |
+| `-e, --email` | Log in via email verification instead of a browser |
+| `--auth-url <url>` | Override the auth service URL (e.g. `http://localhost:3001`) |
 
-### `af logout`
+> **What this maps to in code:** the command is registered in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). Browser login runs [`login.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/login.ts); `--email` runs [`loginEmail.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/loginEmail.ts).
 
-End your active CLI session.
+### `acc logout`
+
+End your CLI session and clear stored credentials.
 
 ```bash
-af logout
+acc logout
 ```
 
-### `af signup`
+> **What this maps to in code:** registered in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts), handled by [`logout.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/logout.ts).
+
+## Projects
+
+Manage your projects. Running `acc projects` with no subcommand lists your projects.
+
+### `acc projects`
+
+```bash
+acc projects           # Same as `acc projects list`
+```
+
+#### `acc projects list`
+
+List all projects.
+
+```bash
+acc projects list
+```
+
+#### `acc projects create`
+
+Create a new project. If `--name` is omitted, the CLI prompts for one.
+
+```bash
+acc projects create
+acc projects create --name "my-project"
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <string>` | Project name |
+
+#### `acc projects update`
+
+Rename a project. Pass the project ID as a positional argument, or run without one to select interactively.
+
+```bash
+acc projects update
+acc projects update prj_abc123
+```
+
+#### `acc projects switch`
+
+Switch the active project. Subsequent commands use the selected project by default.
+
+```bash
+acc projects switch
+acc projects switch prj_abc123
+```
+
+#### `acc projects delete`
+
+Delete a project and all of its services.
+
+```bash
+acc projects delete
+acc projects delete prj_abc123
+```
+
+> **What this maps to in code:** all `projects` subcommands are wired up in [`projects/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/projects/index.ts).
+
+## Services
+
+Services are the deploy path for Alternate Clouds. Create a service from a template, then deploy it to decentralized compute. Running `acc services` with no subcommand lists services in the current (or selected) project.
+
+All `services` subcommands accept a `-p, --project <id-or-name>` flag to target a specific project instead of the active one.
+
+### `acc services`
+
+```bash
+acc services                        # List services in the active project
+acc services -p my-project          # List services in a specific project
+```
+
+#### `acc services list`
+
+List all services in the project.
+
+```bash
+acc services list
+```
+
+#### `acc services create`
+
+Create a new service from a template. Runs interactive prompts to choose the template and configure the service.
+
+```bash
+acc services create
+```
+
+#### `acc services info`
+
+Show details for a service. Pass a service ID or select interactively.
+
+```bash
+acc services info
+acc services info svc_abc123
+```
+
+#### `acc services deploy`
+
+Deploy (or redeploy) a service.
+
+```bash
+acc services deploy
+acc services deploy svc_abc123
+```
+
+#### `acc services logs`
+
+Fetch logs for a service.
+
+```bash
+acc services logs
+acc services logs svc_abc123 --tail 100
+```
+
+| Option | Description |
+|--------|-------------|
+| `--tail <n>` | Number of log lines to show (default: `50`) |
+
+#### `acc services close`
+
+Close the active deployment on a service (stops it without deleting the service).
+
+```bash
+acc services close
+acc services close svc_abc123
+```
+
+#### `acc services delete`
+
+Delete a service. If a deployment is running, it is closed first.
+
+```bash
+acc services delete
+acc services delete svc_abc123
+```
+
+> **What this maps to in code:** every `services` subcommand — including the `deploy` path — is registered in [`services/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts); the deploy handler lives in [`services/deploy.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/deploy.ts).
+
+## Deployments
+
+List and view deployments across all projects and services. Running `acc deployments` with no subcommand lists deployments; `acc deployments list` does the same.
+
+By default only active deployments (`ACTIVE`, `DEPLOYING`, `INITIALIZING`, `QUEUED`, `BUILDING`) are shown. Pass `--all` to include closed and old deployments.
+
+### `acc deployments`
+
+```bash
+acc deployments                          # Active deployments only
+acc deployments --all                    # Include closed/old deployments
+acc deployments --project my-project     # Filter by project
+acc deployments --service api            # Filter by service (name or ID)
+acc deployments --status failed          # Filter by status
+acc deployments --limit 100              # Cap the number of rows
+```
+
+| Option | Description |
+|--------|-------------|
+| `--project <name-or-id>` | Filter by project |
+| `--service <name-or-id>` | Filter by service |
+| `--status <status>` | Filter by status (e.g. `active`, `failed`, `closed`) |
+| `--all` | Include closed and old deployments |
+| `-l, --limit <n>` | Max deployments to show (default: `50`) |
+
+#### `acc deployments list`
+
+Alias for the above; accepts the same options.
+
+```bash
+acc deployments list --status active
+```
+
+> **What this maps to in code:** the `deployments` group and its filtering logic are in [`deployments/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/deployments/index.ts).
+
+## SSH
+
+### `acc ssh`
+
+Open an interactive shell in a running deployment. The service ID is required.
+
+```bash
+acc ssh svc_abc123
+acc ssh svc_abc123 --command "/bin/sh"
+acc ssh svc_abc123 --service worker      # For multi-service deployments
+```
+
+| Argument / Option | Description |
+|-------------------|-------------|
+| `<serviceId>` | Service to connect to (required) |
+| `--service <name>` | SDL service name, for multi-service deployments |
+| `--command <cmd>` | Command to run (default: `/bin/bash`) |
+
+> **What this maps to in code:** registered in [`ssh/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/ssh/index.ts).
+
+## Personal Access Tokens
+
+Manage personal access tokens (PATs) for CI/CD and automation. Use a PAT with the `AF_TOKEN` environment variable to authenticate non-interactively.
+
+### `acc pat list`
+
+List your personal access tokens.
+
+```bash
+acc pat list
+```
+
+### `acc pat create`
+
+Create a new personal access token.
+
+```bash
+acc pat create
+acc pat create --name "ci-pipeline"
+```
+
+| Option | Description |
+|--------|-------------|
+| `-n, --name <name>` | Name for the new token |
+
+### `acc pat delete`
+
+Delete a personal access token by ID.
+
+```bash
+acc pat delete <personalAccessTokenId>
+```
+
+> **What this maps to in code:** the `pat` group is defined in [`pat/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts).
+
+## Templates
+
+Browse the service templates available for `acc services create`. Running `acc templates` with no subcommand lists all templates.
+
+### `acc templates list`
+
+List available templates, optionally filtered by category.
+
+```bash
+acc templates list
+acc templates list --category AI_ML
+```
+
+| Option | Description |
+|--------|-------------|
+| `-c, --category <category>` | Filter by category: `AI_ML`, `WEB_SERVER`, `GAME_SERVER`, `DATABASE`, `DEVTOOLS`, `CUSTOM` |
+
+### `acc templates info`
+
+Show detailed information for a template.
+
+```bash
+acc templates info <templateId>
+```
+
+> **What this maps to in code:** the `templates` group is defined in [`templates/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/templates/index.ts).
+
+## Billing
+
+### `acc billing balance`
+
+Show your current credit balance.
+
+```bash
+acc billing balance
+```
+
+::: info Only `balance` is available today
+`acc billing` currently implements a single subcommand: `balance`. Additional billing commands are planned but not yet shipped.
+:::
+
+> **What this maps to in code:** the `billing` group is registered in [`billing/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/index.ts), with the handler in [`billing/balance.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/balance.ts).
+
+## Version
+
+### `acc version`
+
+Print the installed CLI version. `acc --version` prints the same value.
+
+```bash
+acc version
+acc --version
+```
+
+> **What this maps to in code:** the `version` command and `--version` flag are wired up in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+
+<!-- ROADMAP — not yet shipped. Uncomment each section as the feature ships.
+
+## Removed / re-architected commands (kept for reference)
+
+These Fleek-legacy commands were removed from the CLI in cloud-cli#64 and are not planned as CLI commands in their original form. Current direction is noted per feature. Triage: cloud-cli#118.
+
+### `acc signup`
+
+STATUS: Handler exists but is not registered in cli.ts.
 
 Create a new Alternate Futures account using email verification.
 
 ```bash
-af signup
+acc signup
 ```
-
----
-
-## Projects
-
-Manage your projects and switch between them.
-
-### `af projects list`
-
-Display all projects where you are a member.
-
-```bash
-af projects list
-```
-
-### `af projects create`
-
-Create a new project.
-
-```bash
-af projects create --name "my-project"
-```
-
-**Options:**
-
-| Option | Description |
-|--------|-------------|
-| `--name <name>` | Name for the new project |
-
-### `af projects switch`
-
-Switch to a different project.
-
-```bash
-af projects switch --id prj_abc123
-```
-
-**Options:**
-
-| Option | Description |
-|--------|-------------|
-| `--id <projectId>` | Project ID to switch to |
-
----
 
 ## Sites
 
+STATUS: Removed in cloud-cli#64. Static-site hosting is now via the dashboard.
+
 Deploy and manage static sites on decentralized infrastructure.
 
-### `af sites init`
+### `acc sites init`
 
 Initialize a new Alternate Futures site in the current directory. Creates an `af.config.json` file.
 
 ```bash
-af sites init
+acc sites init
 ```
 
-### `af sites deploy`
+### `acc sites deploy`
 
 Deploy your site to decentralized storage.
 
 ```bash
-af sites deploy
-af sites deploy --ipfs       # Deploy to IPFS
-af sites deploy --arweave    # Deploy to Arweave
+acc sites deploy
+acc sites deploy --ipfs       # Deploy to IPFS
+acc sites deploy --arweave    # Deploy to Arweave
+acc sites deploy --filecoin   # Deploy to Filecoin
 ```
 
 **Options:**
@@ -114,21 +393,22 @@ af sites deploy --arweave    # Deploy to Arweave
 |--------|-------------|
 | `--ipfs` | Deploy to IPFS network |
 | `--arweave` | Deploy to Arweave network |
+| `--filecoin` | Deploy to Filecoin network |
 
-### `af sites list`
+### `acc sites list`
 
 Display all sites in your project.
 
 ```bash
-af sites list
+acc sites list
 ```
 
-### `af sites deployments`
+### `acc sites deployments`
 
 Show deployment history for a site.
 
 ```bash
-af sites deployments --slug my-site
+acc sites deployments --slug my-site
 ```
 
 **Options:**
@@ -137,13 +417,13 @@ af sites deployments --slug my-site
 |--------|-------------|
 | `--slug <siteSlug>` | Site slug to show deployments for |
 
-### `af sites ci`
+### `acc sites ci`
 
 Generate CI/CD configuration files.
 
 ```bash
-af sites ci --provider github    # GitHub Actions
-af sites ci --provider gitlab    # GitLab CI
+acc sites ci --provider github    # GitHub Actions
+acc sites ci --provider gitlab    # GitLab CI
 ```
 
 **Options:**
@@ -154,34 +434,37 @@ af sites ci --provider gitlab    # GitLab CI
 
 ---
 
+
 ## Storage
+
+STATUS: Removed. Object storage is now the rustfs S3 BUCKET service template (`acc services create`).
 
 Manage files on decentralized storage (IPFS + Filecoin/Arweave backup).
 
-### `af storage add`
+### `acc storage add`
 
 Upload files or directories to storage.
 
 ```bash
-af storage add ./my-file.pdf
-af storage add ./my-folder
+acc storage add ./my-file.pdf
+acc storage add ./my-folder
 ```
 
-### `af storage list`
+### `acc storage list`
 
 List all files in your project's storage.
 
 ```bash
-af storage list
+acc storage list
 ```
 
-### `af storage get`
+### `acc storage get`
 
 Retrieve a file by name or CID.
 
 ```bash
-af storage get --name my-file.pdf
-af storage get --cid QmXxx...
+acc storage get --name my-file.pdf
+acc storage get --cid QmXxx...
 ```
 
 **Options:**
@@ -191,13 +474,13 @@ af storage get --cid QmXxx...
 | `--name <name>` | File name to retrieve |
 | `--cid <cid>` | Content identifier (CID) to retrieve |
 
-### `af storage delete`
+### `acc storage delete`
 
 Delete a file from storage.
 
 ```bash
-af storage delete --name my-file.pdf
-af storage delete --cid QmXxx...
+acc storage delete --name my-file.pdf
+acc storage delete --cid QmXxx...
 ```
 
 **Options:**
@@ -209,33 +492,39 @@ af storage delete --cid QmXxx...
 
 ---
 
+
 ## IPFS
+
+STATUS: Removed as a standalone command. IPFS pinning is internal to the deploy pipeline / dashboard.
 
 Direct IPFS operations for decentralized content storage.
 
-### `af ipfs add`
+### `acc ipfs add`
 
 Upload a file directly to IPFS.
 
 ```bash
-af ipfs add ./my-file.pdf
-af ipfs add ./my-folder
+acc ipfs add ./my-file.pdf
+acc ipfs add ./my-folder
 ```
 
 Returns the content identifier (CID) for the uploaded content.
 
 ---
 
+
 ## IPNS
+
+STATUS: Removed from the CLI. Handled via the DNS / custom-domain flow (backend WIP).
 
 InterPlanetary Naming System for mutable content addressing.
 
-### `af ipns create`
+### `acc ipns create`
 
 Create a new IPNS record.
 
 ```bash
-af ipns create --name my-website
+acc ipns create --name my-website
 ```
 
 **Options:**
@@ -244,12 +533,12 @@ af ipns create --name my-website
 |--------|-------------|
 | `--name <name>` | Name for the IPNS record |
 
-### `af ipns publish`
+### `acc ipns publish`
 
 Publish an IPFS hash to an IPNS name.
 
 ```bash
-af ipns publish --name my-website --hash QmXxx...
+acc ipns publish --name my-website --hash QmXxx...
 ```
 
 **Options:**
@@ -259,28 +548,28 @@ af ipns publish --name my-website --hash QmXxx...
 | `--name <name>` | IPNS name to publish to |
 | `--hash <hash>` | IPFS CID to publish |
 
-### `af ipns list`
+### `acc ipns list`
 
 List all IPNS records in your project.
 
 ```bash
-af ipns list
+acc ipns list
 ```
 
-### `af ipns resolve`
+### `acc ipns resolve`
 
 Resolve an IPNS name to its current IPFS hash.
 
 ```bash
-af ipns resolve k51qzi5uqu5...
+acc ipns resolve k51qzi5uqu5...
 ```
 
-### `af ipns delete`
+### `acc ipns delete`
 
 Delete an IPNS record.
 
 ```bash
-af ipns delete --name my-website
+acc ipns delete --name my-website
 ```
 
 **Options:**
@@ -291,16 +580,19 @@ af ipns delete --name my-website
 
 ---
 
+
 ## Functions
+
+STATUS: No longer a standalone group. Now a 'Function' kind inside `acc services create` (coming soon there).
 
 Deploy serverless functions to decentralized infrastructure.
 
-### `af functions create`
+### `acc functions create`
 
 Create a new function.
 
 ```bash
-af functions create --name my-function
+acc functions create --name my-function
 ```
 
 **Options:**
@@ -309,12 +601,12 @@ af functions create --name my-function
 |--------|-------------|
 | `--name <name>` | Name for the function |
 
-### `af functions deploy`
+### `acc functions deploy`
 
 Deploy a function.
 
 ```bash
-af functions deploy --name my-function
+acc functions deploy --name my-function
 ```
 
 **Options:**
@@ -323,20 +615,20 @@ af functions deploy --name my-function
 |--------|-------------|
 | `--name <name>` | Name of function to deploy |
 
-### `af functions list`
+### `acc functions list`
 
 List all functions in your project.
 
 ```bash
-af functions list
+acc functions list
 ```
 
-### `af functions update`
+### `acc functions update`
 
 Update an existing function.
 
 ```bash
-af functions update --name my-function
+acc functions update --name my-function
 ```
 
 **Options:**
@@ -345,12 +637,12 @@ af functions update --name my-function
 |--------|-------------|
 | `--name <name>` | Name of function to update |
 
-### `af functions delete`
+### `acc functions delete`
 
 Delete a function.
 
 ```bash
-af functions delete --name my-function
+acc functions delete --name my-function
 ```
 
 **Options:**
@@ -359,12 +651,12 @@ af functions delete --name my-function
 |--------|-------------|
 | `--name <name>` | Name of function to delete |
 
-### `af functions deployments`
+### `acc functions deployments`
 
 Show deployment history for a function.
 
 ```bash
-af functions deployments --name my-function
+acc functions deployments --name my-function
 ```
 
 **Options:**
@@ -375,24 +667,27 @@ af functions deployments --name my-function
 
 ---
 
+
 ## Domains
+
+STATUS: Removed. Custom domains are managed in the dashboard.
 
 Manage custom domains for your sites and gateways.
 
-### `af domains list`
+### `acc domains list`
 
 List all domains in your project.
 
 ```bash
-af domains list
+acc domains list
 ```
 
-### `af domains create`
+### `acc domains create`
 
 Add a custom domain to a site or gateway.
 
 ```bash
-af domains create --siteSlug my-site --hostname www.example.com
+acc domains create --siteSlug my-site --hostname www.example.com
 ```
 
 **Options:**
@@ -402,12 +697,12 @@ af domains create --siteSlug my-site --hostname www.example.com
 | `--siteSlug <slug>` | Site to attach domain to |
 | `--hostname <hostname>` | Domain hostname |
 
-### `af domains detail`
+### `acc domains detail`
 
 Show detailed information about a domain.
 
 ```bash
-af domains detail --hostname www.example.com
+acc domains detail --hostname www.example.com
 ```
 
 **Options:**
@@ -416,12 +711,12 @@ af domains detail --hostname www.example.com
 |--------|-------------|
 | `--hostname <hostname>` | Domain hostname |
 
-### `af domains verify`
+### `acc domains verify`
 
 Verify DNS configuration for a domain.
 
 ```bash
-af domains verify --hostname www.example.com
+acc domains verify --hostname www.example.com
 ```
 
 **Options:**
@@ -430,12 +725,12 @@ af domains verify --hostname www.example.com
 |--------|-------------|
 | `--hostname <hostname>` | Domain to verify |
 
-### `af domains delete`
+### `acc domains delete`
 
 Remove a custom domain.
 
 ```bash
-af domains delete --hostname www.example.com
+acc domains delete --hostname www.example.com
 ```
 
 **Options:**
@@ -446,16 +741,19 @@ af domains delete --hostname www.example.com
 
 ---
 
+
 ## ENS
+
+STATUS: Removed from the CLI. ENS backend is planned (service-cloud-api#64).
 
 Ethereum Name Service integration for .eth domains.
 
-### `af ens create`
+### `acc ens create`
 
 Create an ENS record linking a .eth domain to your site.
 
 ```bash
-af ens create --domain myapp.eth --siteSlug my-site
+acc ens create --domain myapp.eth --siteSlug my-site
 ```
 
 **Options:**
@@ -465,20 +763,20 @@ af ens create --domain myapp.eth --siteSlug my-site
 | `--domain <domain>` | ENS domain name |
 | `--siteSlug <slug>` | Site to link |
 
-### `af ens list`
+### `acc ens list`
 
 List all ENS records in your project.
 
 ```bash
-af ens list
+acc ens list
 ```
 
-### `af ens detail`
+### `acc ens detail`
 
 Show detailed information about an ENS record.
 
 ```bash
-af ens detail --domain myapp.eth
+acc ens detail --domain myapp.eth
 ```
 
 **Options:**
@@ -487,12 +785,12 @@ af ens detail --domain myapp.eth
 |--------|-------------|
 | `--domain <domain>` | ENS domain |
 
-### `af ens verify`
+### `acc ens verify`
 
 Verify ENS configuration.
 
 ```bash
-af ens verify --domain myapp.eth
+acc ens verify --domain myapp.eth
 ```
 
 **Options:**
@@ -501,12 +799,12 @@ af ens verify --domain myapp.eth
 |--------|-------------|
 | `--domain <domain>` | ENS domain to verify |
 
-### `af ens delete`
+### `acc ens delete`
 
 Remove an ENS record.
 
 ```bash
-af ens delete --domain myapp.eth
+acc ens delete --domain myapp.eth
 ```
 
 **Options:**
@@ -517,24 +815,27 @@ af ens delete --domain myapp.eth
 
 ---
 
+
 ## Gateways
+
+STATUS: Removed from the CLI. Private-gateway backend is not yet built.
 
 Manage private IPFS gateways for your content.
 
-### `af gateways list`
+### `acc gateways list`
 
 List all private gateways in your project.
 
 ```bash
-af gateways list
+acc gateways list
 ```
 
-### `af gateways create`
+### `acc gateways create`
 
 Create a new private gateway.
 
 ```bash
-af gateways create --name my-gateway
+acc gateways create --name my-gateway
 ```
 
 **Options:**
@@ -543,12 +844,12 @@ af gateways create --name my-gateway
 |--------|-------------|
 | `--name <name>` | Name for the gateway |
 
-### `af gateways detail`
+### `acc gateways detail`
 
 Show detailed information about a gateway.
 
 ```bash
-af gateways detail --id gw_abc123
+acc gateways detail --id gw_abc123
 ```
 
 **Options:**
@@ -557,12 +858,12 @@ af gateways detail --id gw_abc123
 |--------|-------------|
 | `--id <gatewayId>` | Gateway ID |
 
-### `af gateways delete`
+### `acc gateways delete`
 
 Delete a private gateway.
 
 ```bash
-af gateways delete --id gw_abc123
+acc gateways delete --id gw_abc123
 ```
 
 **Options:**
@@ -573,24 +874,27 @@ af gateways delete --id gw_abc123
 
 ---
 
+
 ## Applications
+
+STATUS: Removed (Fleek-legacy). Product intent under review.
 
 Manage SDK application Client IDs.
 
-### `af applications list`
+### `acc applications list`
 
 List all application Client IDs in your project.
 
 ```bash
-af applications list
+acc applications list
 ```
 
-### `af applications create`
+### `acc applications create`
 
 Generate a new Client ID for an SDK application.
 
 ```bash
-af applications create --name "My App"
+acc applications create --name "My App"
 ```
 
 **Options:**
@@ -599,12 +903,12 @@ af applications create --name "My App"
 |--------|-------------|
 | `--name <name>` | Application name |
 
-### `af applications update`
+### `acc applications update`
 
 Update an existing application.
 
 ```bash
-af applications update --id app_abc123 --name "New Name"
+acc applications update --id app_abc123 --name "New Name"
 ```
 
 **Options:**
@@ -614,12 +918,12 @@ af applications update --id app_abc123 --name "New Name"
 | `--id <appId>` | Application ID |
 | `--name <name>` | New application name |
 
-### `af applications delete`
+### `acc applications delete`
 
 Delete an application Client ID.
 
 ```bash
-af applications delete --id app_abc123
+acc applications delete --id app_abc123
 ```
 
 **Options:**
@@ -630,71 +934,38 @@ af applications delete --id app_abc123
 
 ---
 
-## Personal Access Tokens
-
-Manage tokens for API and CLI authentication.
-
-### `af pat list`
-
-List all personal access tokens.
-
-```bash
-af pat list
-```
-
-### `af pat create`
-
-Generate a new personal access token.
-
-```bash
-af pat create --name "CI/CD Token"
-```
-
-**Options:**
-
-| Option | Description |
-|--------|-------------|
-| `--name <name>` | Token name |
-
-### `af pat delete`
-
-Revoke a personal access token.
-
-```bash
-af pat delete pat_abc123
-```
-
----
 
 ## Observability
 
-Query and manage APM observability data (traces, logs, metrics). Use `af observability` or the short alias `af obs`.
+STATUS: No longer a separate group. Use `acc services logs`, plus SDK/API observability.
 
-### `af observability traces`
+Query and manage APM observability data (traces, logs, metrics). Use `acc observability` or the short alias `acc obs`.
+
+### `acc observability traces`
 
 List recent traces with optional filtering.
 
 ```bash
 # List recent traces
-af observability traces
+acc observability traces
 
 # Filter by service name
-af observability traces --service api-gateway
+acc observability traces --service api-gateway
 
 # Filter by status (OK, ERROR, UNSET)
-af observability traces --status ERROR
+acc observability traces --status ERROR
 
 # Filter by minimum duration (slow requests only)
-af observability traces --min-duration 500
+acc observability traces --min-duration 500
 
 # Look back more hours
-af observability traces --hours 24
+acc observability traces --hours 24
 
 # Limit results
-af observability traces --limit 100
+acc observability traces --limit 100
 
 # Combine filters
-af obs traces --service checkout --status ERROR --hours 4
+acc obs traces --service checkout --status ERROR --hours 4
 ```
 
 **Options:**
@@ -707,15 +978,15 @@ af obs traces --service checkout --status ERROR --hours 4
 | `--hours <number>` | Look back N hours (default: 1) |
 | `--limit <number>` | Maximum traces to return (default: 20) |
 
-### `af observability trace <traceId>`
+### `acc observability trace <traceId>`
 
 Get detailed information about a specific trace, including all spans.
 
 ```bash
-af observability trace abc123def456789...
+acc observability trace abc123def456789...
 
 # Short alias
-af obs trace abc123def456789...
+acc obs trace abc123def456789...
 ```
 
 **Output includes:**
@@ -723,29 +994,29 @@ af obs trace abc123def456789...
 - List of all spans with timing and status
 - Span relationships (parent/child)
 
-### `af observability logs`
+### `acc observability logs`
 
 Query logs with filtering options.
 
 ```bash
 # Recent logs
-af observability logs
+acc observability logs
 
 # Filter by service
-af observability logs --service database-worker
+acc observability logs --service database-worker
 
 # Filter by severity level
-af observability logs --severity ERROR
-af observability logs --severity WARN
+acc observability logs --severity ERROR
+acc observability logs --severity WARN
 
 # Search in log body
-af observability logs --search "connection refused"
+acc observability logs --search "connection refused"
 
 # Combine filters
-af obs logs --service checkout-service --severity ERROR --search payment --hours 12
+acc obs logs --service checkout-service --severity ERROR --search payment --hours 12
 
 # Adjust time range and limit
-af obs logs --hours 24 --limit 200
+acc obs logs --hours 24 --limit 200
 ```
 
 **Options:**
@@ -758,19 +1029,19 @@ af obs logs --hours 24 --limit 200
 | `--hours <number>` | Look back N hours (default: 1) |
 | `--limit <number>` | Maximum logs to return (default: 50) |
 
-### `af observability services`
+### `acc observability services`
 
 List all services with performance statistics.
 
 ```bash
 # Get service statistics for last 24 hours
-af observability services
+acc observability services
 
 # Look at a longer period
-af observability services --hours 168  # 7 days
+acc observability services --hours 168  # 7 days
 
 # Short alias
-af obs services --hours 48
+acc obs services --hours 48
 ```
 
 **Options:**
@@ -785,17 +1056,17 @@ af obs services --hours 48
 - Error count and error rate
 - Latency percentiles (avg, p50, p95, p99)
 
-### `af observability usage`
+### `acc observability usage`
 
 Show telemetry usage and estimated cost for billing period.
 
 ```bash
 # Usage for last 30 days
-af observability usage
+acc observability usage
 
 # Custom period
-af observability usage --days 7
-af obs usage --days 90
+acc observability usage --days 7
+acc obs usage --days 90
 ```
 
 **Options:**
@@ -809,13 +1080,13 @@ af obs usage --days 90
 - Total data volume
 - Estimated cost ($0.35/GB)
 
-### `af observability settings`
+### `acc observability settings`
 
 View current observability settings for the project.
 
 ```bash
-af observability settings
-af obs settings
+acc observability settings
+acc obs settings
 ```
 
 **Output includes:**
@@ -824,25 +1095,25 @@ af obs settings
 - Retention periods
 - Rate limits
 
-### `af observability settings:update`
+### `acc observability settings:update`
 
 Update observability settings for the project.
 
 ```bash
 # Enable/disable telemetry types
-af observability settings:update --traces true
-af observability settings:update --metrics false
-af observability settings:update --logs true
+acc observability settings:update --traces true
+acc observability settings:update --metrics false
+acc observability settings:update --logs true
 
 # Adjust sampling rate (0.0 to 1.0)
-af observability settings:update --sample-rate 0.5
+acc observability settings:update --sample-rate 0.5
 
 # Change retention periods
-af observability settings:update --trace-retention 14
-af observability settings:update --log-retention 30
+acc observability settings:update --trace-retention 14
+acc observability settings:update --log-retention 30
 
 # Multiple updates at once
-af obs settings:update --sample-rate 0.1 --trace-retention 7 --log-retention 7
+acc obs settings:update --sample-rate 0.1 --trace-retention 7 --log-retention 7
 ```
 
 **Options:**
@@ -858,33 +1129,135 @@ af obs settings:update --sample-rate 0.1 --trace-retention 7 --log-retention 7
 
 ---
 
+
+## Agents
+
+STATUS: Not a deployable-runtime CLI group. Deployable agents are templates via `acc services`/templates; `acc chat` provides chat orchestration.
+
+Deploy and manage AI agents on decentralized infrastructure. Supported agent types include Eliza (conversational AI), ComfyUI (image generation), and custom agents.
+
+### `acc agents create`
+
+Create a new AI agent.
+
+```bash
+acc agents create --name "My Agent" --type eliza --character ./character.json
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Name for the agent |
+| `--type <type>` | Agent type: `eliza`, `comfyui`, or `custom` |
+| `--character <path>` | Path to character file (Eliza agents) |
+| `--env <KEY=VALUE>` | Set environment variable (can be repeated) |
+
+### `acc agents list`
+
+List all agents in your project.
+
+```bash
+acc agents list
+```
+
+### `acc agents status`
+
+Get the current status of an agent.
+
+```bash
+acc agents status <agent-id>
+```
+
+### `acc agents start`
+
+Start a stopped agent.
+
+```bash
+acc agents start <agent-id>
+```
+
+### `acc agents stop`
+
+Stop a running agent.
+
+```bash
+acc agents stop <agent-id>
+```
+
+### `acc agents update`
+
+Update an agent's configuration or environment variables.
+
+```bash
+acc agents update <agent-id> --env TEMPERATURE=0.8
+acc agents update <agent-id> --name "New Name"
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Update agent name |
+| `--env <KEY=VALUE>` | Update environment variable (can be repeated) |
+
+### `acc agents logs`
+
+View logs for a running agent.
+
+```bash
+acc agents logs <agent-id>
+acc agents logs <agent-id> --follow
+acc agents logs <agent-id> --tail 100
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--follow` | Stream logs in real time |
+| `--tail <number>` | Number of recent log lines to show |
+
+### `acc agents delete`
+
+Delete an agent permanently.
+
+```bash
+acc agents delete <agent-id>
+```
+
+---
+
+
 ## Billing
+
+STATUS: Only `acc billing balance` ships; the other billing subcommands are not implemented.
 
 View billing information and usage metrics.
 
-### `af billing customer`
+### `acc billing customer`
 
 View customer billing information.
 
 ```bash
-af billing customer
+acc billing customer
 ```
 
-### `af billing subscriptions`
+### `acc billing subscriptions`
 
 List active subscriptions.
 
 ```bash
-af billing subscriptions
+acc billing subscriptions
 ```
 
-### `af billing invoices`
+### `acc billing invoices`
 
 List billing invoices.
 
 ```bash
-af billing invoices
-af billing invoices --limit 10
+acc billing invoices
+acc billing invoices --limit 10
 ```
 
 **Options:**
@@ -893,63 +1266,23 @@ af billing invoices --limit 10
 |--------|-------------|
 | `--limit <number>` | Number of invoices to show |
 
-### `af billing usage`
+### `acc billing usage`
 
 View current usage metrics.
 
 ```bash
-af billing usage
+acc billing usage
 ```
 
-### `af billing payment-methods`
+### `acc billing payment-methods`
 
 List payment methods on file.
 
 ```bash
-af billing payment-methods
+acc billing payment-methods
 ```
 
 ---
 
-## Global Options
 
-Available for all commands:
-
-| Option | Description |
-|--------|-------------|
-| `--debug` | Enable debug output |
-| `-V, --version` | Show CLI version |
-| `-h, --help` | Show help for command |
-
-## Getting Help
-
-```bash
-# General help
-af --help
-
-# Help for a command group
-af sites --help
-
-# Help for a specific subcommand
-af sites deploy --help
-```
-
-## Environment Variables
-
-For CI/CD and automation:
-
-| Variable | Description |
-|----------|-------------|
-| `AF_TOKEN` | Personal access token for authentication |
-| `AF_PROJECT_ID` | Default project ID |
-| `AF_BASE_URL` | Override API endpoint (for testing) |
-
-Example:
-
-```bash
-export AF_TOKEN="your-personal-access-token"
-export AF_PROJECT_ID="prj_abc123"
-
-# Commands now use these credentials
-af sites deploy
-```
+-->

@@ -8,7 +8,7 @@ Solutions for common issues when deploying and managing sites on Alternate Futur
 
 ## Deployment Errors
 
-### "Command not found: af"
+### "Command not found: acc"
 
 The CLI is not installed or not in your PATH.
 
@@ -19,7 +19,7 @@ The CLI is not installed or not in your PATH.
 npm install -g @alternatefutures/cli
 
 # Verify installation
-af --version
+acc --version
 
 # If still not found, check your npm global bin directory
 npm config get prefix
@@ -43,13 +43,13 @@ Your session has expired or your token is incorrect.
 
 ```bash
 # Re-authenticate interactively
-af login
+acc login
 
 # Or verify your token
 echo $AF_TOKEN
 
 # Generate a new Personal Access Token
-af pat create --name "New Token"
+acc pat create --name "New Token"
 ```
 
 Common causes:
@@ -73,6 +73,9 @@ npm run build
 
 # Check your af.config.json for the correct output directory
 cat af.config.json
+
+# The CLI resolves af.config using the lookup order in
+# src/utils/configuration/getConfiguration.ts
 ```
 
 ### "Deployment timed out"
@@ -83,7 +86,7 @@ The upload took too long, usually due to a large deployment or slow connection.
 
 ```bash
 # Try deploying again (network issues are often temporary)
-af sites deploy
+acc services deploy
 
 # For large deployments, check your file count and total size
 du -sh ./dist
@@ -253,10 +256,10 @@ The content is not pinned or the IPFS gateway cannot find it.
 
 ```bash
 # Verify the deployment status
-af sites list
+acc deployments
 
-# Re-pin the content
-af sites deploy ./dist --network ipfs
+# Re-deploy to re-pin the content
+acc services deploy
 ```
 
 Common causes:
@@ -299,10 +302,10 @@ You have reached the storage limit for your plan.
 
 **Fix:**
 
-- Remove old deployments that are no longer needed: `af sites delete <site-slug>`
+- Remove services that are no longer needed: `acc services delete <id>`
 - Upgrade your plan for more storage
 - Use Filecoin for large files (cheaper per GB)
-- Check your current usage: `af billing usage`
+- Check your current credit balance: `acc billing balance`
 
 ## SSL Certificate Problems
 
@@ -359,12 +362,12 @@ If your issue is not listed here:
 
 1. **Check the logs** - Run your build and deploy commands with verbose output
 2. **Search existing issues** - [GitHub Issues](https://github.com/alternatefutures/alternatefutures/issues)
-3. **Open a new issue** - Include your error message, CLI version (`af --version`), and steps to reproduce
+3. **Open a new issue** - Include your error message, CLI version (`acc --version`), and steps to reproduce
 4. **Community** - Join our [Discord](https://discord.gg/alternatefutures) for real-time help
 
 When reporting an issue, please include:
 - Your operating system and Node.js version
-- The AF CLI version (`af --version`)
+- The AF CLI version (`acc --version`)
 - The full error message and stack trace
 - Steps to reproduce the problem
 - Your framework and its version

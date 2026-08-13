@@ -1,6 +1,10 @@
+---
+description: Deploy static sites to IPFS, Filecoin, or Arweave using the Alternate Futures CLI or SDK. Supports React, Next.js, Vue, Astro, and more.
+---
+
 # Deploying Sites
 
-Deploy static sites to decentralized storage networks (IPFS, Filecoin, Arweave).
+Deploy static sites to Alternate Clouds and serve them from decentralized storage networks — IPFS, Filecoin, and Arweave. This guide covers the `acc` CLI flow available today and the web-app methods shipping soon.
 
 ## Deployment Methods
 
@@ -42,18 +46,21 @@ Deploy a local build folder:
 
 ### CLI Deployment (Available Now)
 
-Deploy via command line:
+Deployments are service-based. Create a service from a template, then deploy it:
 
 ```bash
-# Deploy to IPFS
-af sites deploy ./dist --network ipfs
+# Create a service (interactive: pick a template and configure it)
+acc services create
 
-# Deploy to Arweave
-af sites deploy ./dist --network arweave
+# Deploy the service by id
+acc services deploy <service-id>
 
-# Deploy to Filecoin
-af sites deploy ./dist --network filecoin
+# List your deployments (add --all to include closed/older ones)
+acc deployments
+acc deployments --all
 ```
+
+> **What this maps to in code:** the CLI command surface is defined in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts); the [`services` command (deploy/create/list)](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts) implements `acc services deploy [id]`. There is no `sites` command and no `--network` flag — storage network selection is not a CLI option.
 
 ## Storage Networks
 
@@ -319,28 +326,36 @@ Here's what different project sizes cost across networks:
 
 ## Build Configuration
 
-### Framework Detection
+### Output Directory by Framework
 
-Automatic detection for:
+Set `distDir` in your `af.config` to your framework's build output directory. Common defaults:
 
-- **React/Vite** - `dist/`
-- **Next.js** - `.next/`
-- **SvelteKit** - `.svelte-kit/output/client/`
-- **Nuxt** - `.output/public/`
-- **Astro** - `dist/`
-- **Hugo** - `public/`
+| Framework | Output directory |
+|-----------|------------------|
+| React / Vite | `dist` |
+| Next.js | `.next` |
+| SvelteKit | `.svelte-kit/output/client` |
+| Nuxt | `.output/public` |
+| Astro | `dist` |
+| Hugo | `public` |
 
-### Custom Build
+### Build Configuration
 
-Specify custom build settings:
+Configure your site in an `af.config.ts` (or `.js` / `.json`) file at the project root:
 
-```yaml
-build:
-  command: npm run build
-  output: dist
-  environment:
-    NODE_ENV: production
+```typescript
+export default {
+  sites: [
+    {
+      slug: 'my-site',
+      distDir: 'dist',
+      buildCommand: 'npm run build', // optional
+    },
+  ],
+};
 ```
+
+> **What this maps to in code:** the [af.config site configuration schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) defines the supported keys — `slug`, `distDir`, and optional `buildCommand`. There is no `output`, `command`, or `environment` (env-var injection) support today.
 
 ## Custom Domains
 
@@ -364,7 +379,7 @@ See [Custom Domains](./custom-domains.md) for detailed instructions.
 ## Deployment History
 
 ::: warning Coming Soon
-Deployment history viewing via the web interface is in development. Use the CLI to view deployment history: `af sites list --history`
+Deployment history viewing via the web interface is in development. In the meantime, list deployments from the CLI with `acc deployments --all` (filter with `--service <name>` or `--status <status>`).
 :::
 
 View all deployments for a site:
@@ -375,7 +390,7 @@ View all deployments for a site:
 - **Size** - Total deployment size
 - **Cost** - Deployment cost
 
-Roll back to any previous deployment with one click.
+> Rollback to a previous deployment is planned for the web app and is not yet available.
 
 ## Next Steps
 
