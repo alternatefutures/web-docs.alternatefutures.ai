@@ -4,16 +4,16 @@ description: Step-by-step guide to deploying a React application (Vite or Create
 
 # Deploy a React App
 
-Deploy your React application to decentralized infrastructure using Alternate Futures. This guide covers both Vite-based and Create React App projects.
+Deploy a React app to Alternate Clouds, the decentralized cloud platform from Alternate Futures. This guide covers both Vite and Create React App builds, from local build through custom-domain routing.
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-- **An Alternate Futures account** - [Sign up here](https://app.alternatefutures.ai) (free, no credit card required)
-- **The AF CLI installed** - `npm install -g @alternatefutures/cli`
+- **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
+- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/cli`
 - **Node.js 18 or later** - [Download here](https://nodejs.org/en/download)
-- **A React project** (or we will create one below)
+- **A React project** (or create one below)
 
 ## Quick Deploy (Existing React Project)
 
@@ -25,22 +25,18 @@ If you already have a React project, deploy it in three commands:
 # Build the production bundle
 npm run build
 
-# Initialize AF configuration
-acc sites init
-
-# Deploy to IPFS
-acc sites deploy
+# Authenticate, then deploy
+acc login
+acc services deploy
 ```
 
 ```bash [Create React App]
 # Build the production bundle
 npm run build
 
-# Initialize AF configuration (set output directory to 'build')
-acc sites init
-
-# Deploy to IPFS
-acc sites deploy
+# Authenticate, then deploy (set distDir to 'build' in acc.config)
+acc login
+acc services deploy
 ```
 
 :::
@@ -49,7 +45,7 @@ acc sites deploy
 - **Vite projects** output to `./dist` by default
 - **Create React App projects** output to `./build` by default
 
-Set the correct directory when running `acc sites init`.
+Set `distDir` to the matching folder in your `acc.config` — it is a real field in the [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) (alongside `slug` and `buildCommand`).
 :::
 
 ## Step 1: Create a New React Project
@@ -59,8 +55,8 @@ If you do not have a project yet, start from our template or create one from scr
 ### Option A: Use the AF Template (Recommended)
 
 ```bash
-# Clone the AF-optimized React template
-git clone https://github.com/alternatefutures/template-react my-react-app
+# Clone the Alternate Clouds React template
+git clone https://github.com/alternatefutures/template-cloud-react my-react-app
 cd my-react-app
 
 # Install dependencies
@@ -156,7 +152,7 @@ npx serve build
 
 :::
 
-## Step 4: Authenticate with AF
+## Step 4: Authenticate with Alternate Clouds
 
 If you have not already authenticated:
 
@@ -173,33 +169,23 @@ export AF_TOKEN=pat_your_token_here
 ::: code-group
 
 ```bash [Vite]
-# Initialize AF site configuration
-acc sites init
-
-# When prompted, configure:
-#   Site name: my-react-app
-#   Build command: npm run build
-#   Output directory: dist
-#   Storage network: ipfs
+# acc.config: { "slug": "my-react-app", "buildCommand": "npm run build", "distDir": "dist" }
 
 # Deploy to decentralized storage
-acc sites deploy
+acc services deploy
 ```
 
 ```bash [Create React App]
-# Initialize AF site configuration
-acc sites init
-
-# When prompted, configure:
-#   Site name: my-react-app
-#   Build command: npm run build
-#   Output directory: build
-#   Storage network: ipfs
+# acc.config: { "slug": "my-react-app", "buildCommand": "npm run build", "distDir": "build" }
 
 # Deploy to decentralized storage
-acc sites deploy
+acc services deploy
 ```
 
+:::
+
+::: info What this maps to in code
+`acc services deploy` is the CLI's only deploy subcommand — see [the CLI's actual command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). `slug`, `buildCommand`, and `distDir` are real [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) fields.
 :::
 
 You should see output like:
@@ -276,8 +262,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to AF
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs
+      - name: Deploy to Alternate Clouds
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
@@ -296,12 +282,19 @@ const af = new AlternateFuturesSdk({
     personalAccessToken: process.env.AF_TOKEN,
     projectId: process.env.AF_PROJECT_ID,
   }),
+  // Required — the SDK throws EnvNotSetError if these are unset
+  ipfsStorageApiUrl: process.env.SDK__IPFS__STORAGE_API_URL,
+  uploadProxyApiUrl: process.env.SDK__UPLOAD_PROXY_API_URL,
 });
 
-// Deploy the build output
-const result = await af.ipfs().add('./dist');
-console.log('Deployed! CID:', result.pin.cid);
+// Upload the build directory. addFromPath() returns an array of results.
+const results = await af.ipfs().addFromPath('./dist');
+console.log('Deployed! CID:', results[0].cid);
 ```
+
+::: info What this maps to in code
+Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
+:::
 
 ## Environment Variables
 

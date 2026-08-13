@@ -4,11 +4,15 @@ description: Technical deep dive into the decentralized container registry archi
 
 # Registry Architecture
 
-Deep dive into the technical architecture of the decentralized container registry.
+::: warning Reference architecture
+This is a technical reference for a **self-hostable** decentralized registry built from open-source components (OpenRegistry, Kubo/IPFS, PostgreSQL) on Akash. It is not a description of a running, managed Alternate Futures service. Schemas, resource profiles, environment variables, endpoints, and JWT structures below are design guidance for your own deployment — verify each value against the upstream projects and your own SDL before relying on it.
+:::
+
+Deep dive into the technical architecture of a decentralized container registry you can run yourself.
 
 ## System Overview
 
-The Alternate Futures registry is a **fully decentralized** container registry built on open-source components running on Akash Network with IPFS storage.
+This registry is a **self-hostable, decentralized** container registry built on open-source components running on Akash Network with IPFS storage.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -569,8 +573,8 @@ Use GeoDNS to route clients to nearest instance.
 
 ## Comparison with Centralized Registries
 
-| Feature | Docker Hub | Alternate Futures Registry |
-|---------|------------|----------------------------|
+| Feature | Docker Hub | Self-Hosted Decentralized Registry |
+|---------|------------|-------------------------------------|
 | **Storage** | Centralized S3 | Decentralized IPFS |
 | **Compute** | AWS/GCP | Akash Network |
 | **Control** | Docker, Inc. | You |

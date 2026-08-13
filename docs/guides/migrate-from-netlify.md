@@ -4,7 +4,7 @@ description: Move your static sites, serverless functions, and custom domains fr
 
 # Migrate from Netlify
 
-Move your static sites from Netlify to Alternate Futures for decentralized hosting with IPFS, Filecoin, and Arweave storage options.
+Move your static sites from Netlify onto Alternate Clouds — decentralized hosting from Alternate Futures with IPFS, Filecoin, and Arweave storage.
 
 **Time to complete:** 15-30 minutes per site
 
@@ -34,12 +34,16 @@ Migrating from Netlify works best for **static sites** and **JAMstack apps** (Ne
 ## Step 1: Install and Authenticate
 
 ```bash
-# Install the Alternate Futures CLI
+# Install the Alternate Clouds CLI
 npm install -g @alternatefutures/cli
 
 # Authenticate
 acc login
 ```
+
+::: warning CLI binary name
+Commands here use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+:::
 
 ## Step 2: Update Your Configuration
 
@@ -59,7 +63,7 @@ Netlify uses `netlify.toml` for configuration. You will replace this with `af.co
   status = 200
 ```
 
-**New (`af.config.json` -- created by `acc sites init`):**
+**New (`af.config.json`):**
 ```json
 {
   "sites": [
@@ -72,6 +76,8 @@ Netlify uses `netlify.toml` for configuration. You will replace this with `af.co
 }
 ```
 
+> **What this maps to in code:** these fields are the [`af.config` schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+
 ::: info SPA Redirects
 Netlify's `_redirects` file and redirect rules in `netlify.toml` are specific to Netlify. For single-page apps on IPFS, ensure your build produces a `200.html` or `index.html` fallback. Most SPA frameworks handle this automatically.
 :::
@@ -82,9 +88,15 @@ Build and deploy your site:
 
 ```bash
 npm run build
-acc sites init          # Select your output directory
-acc sites deploy
+
+# Create a service (choose a starter template when prompted)
+acc services create
+
+# Deploy it — pass the service id, or omit to pick interactively
+acc services deploy [id]
 ```
+
+These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
 
 ### Framework Output Directories
 
@@ -125,13 +137,9 @@ export const main = (params) => {
 };
 ```
 
-Deploy the function:
-```bash
-acc functions create --name hello --path ./functions/hello.js
-acc functions deploy --name hello
-```
+Deploy functions from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) or the SDK functions client — there is no `acc functions` command yet.
 
-See the [Cloud Functions guide](./functions.md) for full details on function deployment, environment variables, and SGX encryption.
+See the [Cloud Functions guide](./functions.md) for full details on function deployment and environment variables.
 
 ## Step 4: Migrate Custom Domains
 
@@ -143,13 +151,9 @@ See the [Cloud Functions guide](./functions.md) for full details on function dep
 
 ### Add Domain to Alternate Futures
 
-```bash
-# Add the domain to your site
-acc domains create --siteSlug my-site --hostname example.com
-
-# Get the required DNS records
-acc domains detail --hostname example.com
-```
+::: info Where to configure domains
+Add custom domains from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) (a CLI `domains` command is not yet available). The dashboard shows the exact DNS records to set at your registrar.
+:::
 
 ### Update DNS Records
 
@@ -166,13 +170,10 @@ Value: cname.alternatefutures.ai
 ```
 Type: A
 Name: @
-Value: [IP from acc domains detail]
+Value: [IP shown in the dashboard]
 ```
 
-```bash
-# Verify DNS configuration
-acc domains verify --hostname example.com
-```
+The dashboard reports verification status once your DNS records propagate.
 
 ::: warning Netlify DNS Users
 If you used Netlify DNS as your nameserver, you will need to either migrate your nameservers to another provider (Cloudflare, Google DNS, etc.) or update records at Netlify DNS to point to Alternate Futures. We recommend migrating to a dedicated DNS provider for more control.
@@ -211,7 +212,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: npx @alternatefutures/cli sites deploy
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -220,7 +221,7 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with `acc pat create --name "CI/CD"`)
+2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
 3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 6: Migrate Environment Variables
@@ -251,14 +252,14 @@ If your Netlify project uses environment variables:
 
 | Netlify Feature | Alternate Futures Equivalent |
 |-----------------|------------------------------|
-| Deploy previews | Every deployment gets a unique CID URL |
-| Netlify Functions | [Cloud Functions](./functions.md) with SGX encryption |
-| Edge Functions | Cloud Functions (edge deployment) |
+| Deploy previews | Each deployment is content-addressed on IPFS |
+| Netlify Functions | [Cloud Functions](./functions.md) (confidential-compute options where available) |
+| Edge Functions | [Cloud Functions](./functions.md) |
 | Netlify Analytics | [Observability & APM](./observability.md) |
 | Forms | Cloud Functions with form handling |
 | Identity | [Authentication](./authentication.md) with multi-method support |
 | Large Media | [Storage Management](./storage.md) on IPFS/Filecoin |
-| Split testing | Multiple deployments with unique CID URLs |
+| Split testing | Multiple content-addressed deployments |
 | `_redirects` / `_headers` | Build-time configuration (framework-level) |
 
 ## Troubleshooting

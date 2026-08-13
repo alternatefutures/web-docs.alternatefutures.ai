@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: ""
-  text: Alternate Cloud Documentation <span class="beta-badge">BETA</span>
+  text: Alternate Clouds Documentation <span class="beta-badge">BETA</span>
   tagline: Deploy AI agents, cloud functions and sites to decentralized infrastructure
   actions:
     - theme: brand
@@ -35,7 +35,7 @@ features:
       src: /icons/database.svg
       alt: Storage
     title: Storage Management
-    details: Unified interface for managing decentralized storage across networks
+    details: Manage decentralized storage across IPFS, Filecoin, and Arweave from the SDK
     link: /guides/storage
     linkText: Learn more
   - icon:
@@ -120,15 +120,16 @@ npm install @alternatefutures/sdk
 ::: code-group
 
 ```bash [CLI]
-# Initialize and deploy a site
-acc sites init
-acc sites deploy
+# Log in (opens your browser)
+acc login
 
-# List your sites
-acc sites list
+# Create and deploy a service
+acc services create
+acc services deploy
 
-# Upload files to IPFS
-acc storage add ./my-files
+# List services and view deployments
+acc services list
+acc deployments
 ```
 
 ```typescript [SDK]
@@ -146,9 +147,13 @@ const af = new AlternateFuturesSdk({
 const sites = await af.sites().list();
 console.log('Sites:', sites);
 
-// Upload to IPFS
-const result = await af.ipfs().add('./dist');
-console.log('CID:', result.pin.cid);
+// Upload a build directory to IPFS
+const [result] = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
 ```
 
+:::
+
+::: tip What this maps to in code
+CLI commands are registered in [`src/cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). The SDK's `ipfs().add()` / `addFromPath()` methods live in [`src/clients/ipfs.ts`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
 :::

@@ -36,10 +36,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Alternate Futures
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs
+      - name: Deploy to Alternate Clouds
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
 ```
 
 ### Add API Key Secret
@@ -79,15 +80,17 @@ jobs:
 
       - name: Deploy to Staging
         if: github.ref == 'refs/heads/staging'
-        run: npx @alternatefutures/cli sites deploy ./dist --network ipfs --name staging
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN_STAGING }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_STAGING }}
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: npx @alternatefutures/cli sites deploy ./dist --network arweave --name production
+        run: npx @alternatefutures/cli services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN_PROD }}
+          AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_PROD }}
 ```
 
 ## GitLab CI/CD
@@ -121,9 +124,10 @@ deploy:
     - main
   script:
     - npm install -g @alternatefutures/cli
-    - acc sites deploy ./dist --network ipfs
+    - acc services deploy
   variables:
     AF_TOKEN: $AF_TOKEN
+    AF_PROJECT_ID: $AF_PROJECT_ID
 ```
 
 Add `AF_TOKEN` in GitLab project settings:
@@ -164,7 +168,7 @@ jobs:
           name: Deploy
           command: |
             npm install -g @alternatefutures/cli
-            acc sites deploy ./dist --network ipfs
+            acc services deploy
 
 workflows:
   deploy:
@@ -197,7 +201,7 @@ Then add deployment hook:
 {
   "scripts": {
     "vercel-build": "npm run build && npm run deploy:af",
-    "deploy:af": "npx @alternatefutures/cli sites deploy ./dist --network ipfs"
+    "deploy:af": "npx @alternatefutures/cli services deploy"
   }
 }
 ```
@@ -235,7 +239,7 @@ pipeline {
             }
             steps {
                 sh 'npm install -g @alternatefutures/cli'
-                sh 'acc sites deploy ./dist --network ipfs'
+                sh 'acc services deploy'
             }
         }
     }
@@ -244,34 +248,31 @@ pipeline {
 
 Add `af-token` credential in Jenkins credentials manager.
 
-## CLI Options
+## The deploy command
 
-Common deployment options:
+Deployments run through `services deploy`, scoped to a project:
 
 ```bash
-# Deploy with custom name
-acc sites deploy ./dist --name "My Site" --network ipfs
+# Deploy the current project's service
+acc services deploy
 
-# Deploy with metadata
-acc sites deploy ./dist --description "Production v1.2.0"
-
-# Deploy to specific network
-acc sites deploy ./dist --network arweave  # or ipfs, filecoin
-
-# Wait for deployment completion
-acc sites deploy ./dist --wait
-
-# Get deployment URL in JSON
-acc sites deploy ./dist --json | jq -r '.url'
+# Target a specific service by id
+acc services deploy <service-id>
 ```
+
+::: tip What this maps to in code
+See the [services deploy command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts). It reads `AF_TOKEN`, `AF_PROJECT_ID`, and `AF_ORG_ID` from the environment ([secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts)). Flags such as `--name`, `--network`, `--wait`, and `--json` are not implemented.
+:::
 
 ## Environment Variables
 
-CLI reads these environment variables:
+The CLI reads these environment variables:
 
-- `AF_TOKEN` - API key for authentication
-- `AF_SITE_ID` - Default site ID (optional)
-- `AF_NETWORK` - Default network (optional)
+- `AF_TOKEN` - personal access token for authentication
+- `AF_PROJECT_ID` - default project id
+- `AF_ORG_ID` - default organization id
+
+See [secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
 
 ## Best Practices
 
@@ -295,7 +296,6 @@ CLI reads these environment variables:
 
 - ✅ Add status checks before deploying
 - ✅ Run tests before deployment
-- ✅ Use `--wait` flag for deployment confirmation
 - ✅ Monitor deployment success/failure
 - ✅ Set up notifications for failed deployments
 

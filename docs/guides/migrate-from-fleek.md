@@ -4,7 +4,7 @@ description: Step-by-step guide to migrate your sites, IPFS content, domains, an
 
 # Migrate from Fleek
 
-Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have sites, storage, or deployments on Fleek, this guide walks you through migrating everything to Alternate Futures.
+Fleek has pivoted away from Web3 hosting to focus on AI inference. If you still run sites, storage, or deployments there, this guide moves all of it onto Alternate Clouds — decentralized hosting from Alternate Futures across IPFS, Filecoin, and Arweave.
 
 **Time to complete:** 15-30 minutes per site
 
@@ -21,7 +21,7 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have s
 | **IPFS support** | Yes | Yes |
 | **Arweave support** | Limited | Full |
 | **Filecoin support** | No | Yes |
-| **AI agents** | No | Yes (Eliza, ComfyUI, custom) |
+| **AI agents** | No | Yes (via `acc services create` templates) |
 | **Observability** | No | Yes (OpenTelemetry) |
 
 ## Before You Start
@@ -34,11 +34,15 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you have s
 
 2. **Create an Alternate Futures account** at [app.alternatefutures.ai](https://app.alternatefutures.ai)
 
-3. **Install the Alternate Futures CLI:**
+3. **Install the Alternate Clouds CLI:**
    ```bash
    npm install -g @alternatefutures/cli
    acc login
    ```
+
+   ::: warning CLI binary name
+   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+   :::
 
 ## Step 1: Migrate Your Site
 
@@ -52,13 +56,21 @@ fleek sites init
 fleek sites deploy
 ```
 
-**New (Alternate Futures):**
+**New (Alternate Clouds):**
 ```bash
-acc sites init
-acc sites deploy
+# Create a service (choose a starter template when prompted)
+acc services create
+
+# Deploy it — pass the service id, or omit to pick interactively
+acc services deploy [id]
+
+# List deployments and their URLs
+acc deployments
 ```
 
-The `acc sites init` command creates an `af.config.json` file. If you had a `fleek.json`, here is how the configuration maps:
+Deploys run through `acc services`; the full set of registered top-level commands (`login`, `logout`, `projects`, `services`, `deployments`, `billing`, `ssh`) is defined in [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+
+If you keep an `af.config.json` in your project, here is how a `fleek.json` maps onto it:
 
 **Fleek config (`fleek.json`):**
 ```json
@@ -70,7 +82,7 @@ The `acc sites init` command creates an `af.config.json` file. If you had a `fle
 }
 ```
 
-**Alternate Futures config (`af.config.json`):**
+**Alternate Clouds config (`af.config.json`):**
 ```json
 {
   "sites": [
@@ -82,6 +94,8 @@ The `acc sites init` command creates an `af.config.json` file. If you had a `fle
   ]
 }
 ```
+
+> **What this maps to in code:** these fields are the [`af.config` schema (sites: slug/distDir/buildCommand)](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
 
 ### From Fleek SDK to AF SDK
 
@@ -110,21 +124,23 @@ const af = new AlternateFuturesSdk({
   }),
 });
 
-const result = await af.ipfs().add('./dist');
+// Upload a directory from disk
+const [result] = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
 ```
 
-The SDK API is largely compatible. The main changes are the import path and environment variable names.
+The import path and environment variable names change. Note one API difference: `af.ipfs().add()` takes an in-memory `{ path, content }` file, while `af.ipfs().addFromPath('./dist')` uploads a directory and returns a `UploadResult[]` — see the [IPFS client (add / addFromPath)](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
 
 ## Step 2: Migrate IPFS Content
 
 If you have content pinned on Fleek's IPFS infrastructure, you should re-pin it on Alternate Futures before Fleek's pinning service goes offline.
 
-```bash
-# If you have the original files, re-upload them
-acc storage add ./my-files
+There is no direct `acc` storage command today — re-pin through the SDK:
 
-# Or upload from a directory
-acc ipfs add ./my-content
+```typescript
+// Re-upload your files; the same bytes always produce the same CID
+const results = await af.ipfs().addFromPath('./my-content');
+console.log('CID:', results[0].cid.toString());
 ```
 
 Your CIDs will remain the same since IPFS content-addressing is deterministic -- the same files always produce the same CID.
@@ -144,13 +160,9 @@ dig yourdomain.com TXT
 
 ### Configure Domains on Alternate Futures
 
-```bash
-# Add your domain to your AF site
-acc domains create --siteSlug my-site --hostname yourdomain.com
-
-# Verify DNS configuration
-acc domains verify --hostname yourdomain.com
-```
+::: info Where to configure domains
+Custom domains are configured from the [Alternate Clouds dashboard](https://app.alternatefutures.ai) (a CLI `domains` command is not yet available). Add your hostname there, then update DNS at your registrar using the records the dashboard shows.
+:::
 
 ### Update DNS Records
 
@@ -168,7 +180,7 @@ TTL: 3600
 ```
 Type: A
 Name: @
-Value: [Platform IP from acc domains detail]
+Value: [Platform IP shown in the dashboard]
 TTL: 3600
 ```
 
@@ -189,7 +201,7 @@ See the [Custom Domains guide](./custom-domains.md) for full details.
 **New (Alternate Futures):**
 ```yaml
 - name: Deploy to Alternate Futures
-  run: npx @alternatefutures/cli sites deploy
+  run: npx @alternatefutures/cli services deploy
   env:
     AF_TOKEN: ${{ secrets.AF_TOKEN }}
     AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -206,13 +218,7 @@ See the [Custom Domains guide](./custom-domains.md) for full details.
 
 If you had ENS domains linked through Fleek:
 
-```bash
-# Link your ENS domain to your AF site
-acc ens create --domain mysite.eth --siteSlug my-site
-
-# Verify the configuration
-acc ens verify --domain mysite.eth
-```
+ENS linking is available through the [Alternate Clouds dashboard](https://app.alternatefutures.ai) and the SDK ENS client (there is no `acc ens` command yet). Point your `.eth` name at the site's IPFS CID or IPNS record from there.
 
 ## Step 6: Clean Up
 
@@ -225,10 +231,10 @@ acc ens verify --domain mysite.eth
 
 Beyond replacing Fleek's functionality, Alternate Futures provides additional features:
 
-- **Filecoin storage** -- Cheaper long-term archival (~$0.03/GB/month)
-- **AI agent deployment** -- Deploy Eliza chatbots, ComfyUI image generators
+- **Filecoin storage** -- Cost-effective long-term archival (see current pricing in the dashboard)
+- **AI agent deployment** -- Deploy agents such as Eliza and ComfyUI via `acc services create` templates
 - **Observability** -- OpenTelemetry-based APM with distributed tracing
-- **Cloud functions** -- Serverless edge functions with optional SGX encryption
+- **Cloud functions** -- Serverless functions (confidential-compute options where available)
 - **Decentralized container registry** -- Self-hosted Docker registry on Akash
 - **Multi-method auth** -- Email, social OAuth, Web3 wallets (SIWE)
 

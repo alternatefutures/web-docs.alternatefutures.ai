@@ -4,14 +4,14 @@ description: The Alternate Futures JavaScript/TypeScript SDK for programmatic ac
 
 # SDK Documentation
 
-The Alternate Futures SDK provides a JavaScript/TypeScript library for programmatic access to the platform. Build decentralized applications with IPFS storage, serverless functions, and more.
+The Alternate Futures SDK is the JavaScript/TypeScript client for Alternate Clouds. Use it to manage sites, storage, domains, IPNS, ENS, and cloud functions programmatically — from a Node.js backend, a CI pipeline, or the browser.
 
 ## Features
 
 - **Type-Safe** - Full TypeScript support with comprehensive type definitions
 - **Multi-Platform** - Works in both Node.js and browser environments
 - **Complete API Access** - Sites, storage, domains, IPNS, ENS, functions, and billing
-- **Multiple Auth Methods** - Personal access tokens, static tokens, and OAuth flows
+- **Multiple Auth Methods** - Personal access tokens (server-side), static tokens (browser), and an application access-token service for user-facing apps
 
 ## Installation
 
@@ -52,9 +52,9 @@ const af = new AlternateFuturesSdk({
 const sites = await af.sites().list();
 console.log('Sites:', sites);
 
-// Upload to IPFS
-const result = await af.ipfs().add('./dist');
-console.log('CID:', result.pin.cid);
+// Upload a directory to IPFS
+const result = await af.ipfs().addFromPath('./dist');
+console.log('CID:', result.cid.toString());
 ```
 
 ### Browser
@@ -63,8 +63,7 @@ console.log('CID:', result.pin.cid);
 import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new StaticAccessTokenService({
-  token: 'your-access-token',
-  projectId: 'your-project-id',
+  accessToken: 'your-access-token',
 });
 
 const af = new AlternateFuturesSdk({
@@ -78,6 +77,8 @@ const sites = await af.sites().list();
 **Note:** The Node.js version (`@alternatefutures/sdk/node`) provides access to filesystem-dependent features like directory uploads. The browser version has a narrower feature set suitable for web applications.
 
 ## SDK Clients
+
+> **What this maps to in code:** every accessor below is defined on [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) — `sites()`, `storage()`, `ipfs()`, `ipns()`, `ens()`, `functions()`, `projects()`, `applications()`, `privateGateways()`, `user()`, `billing()`, plus `observability()` and `getVersion()`.
 
 | Client | Method | Description |
 |--------|--------|-------------|
@@ -119,8 +120,7 @@ Best for client-side apps where the token is already available.
 import { StaticAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new StaticAccessTokenService({
-  token: 'jwt-token',
-  projectId: 'project-id',
+  accessToken: 'jwt-token',
 });
 ```
 
@@ -133,27 +133,31 @@ import { ApplicationAccessTokenService } from '@alternatefutures/sdk';
 
 const accessTokenService = new ApplicationAccessTokenService({
   clientId: 'your-client-id',
+  // Browser only. Also requires the SDK__AUTH_APPS_URL env var
+  // (or pass authAppsServiceUrl here).
 });
 
-// Trigger user login
-await accessTokenService.login();
+// No explicit login step — the token is fetched lazily on first use:
+const token = await accessTokenService.getAccessToken();
 ```
 
 ## Common Examples
 
 ### Deploy a Site
 
+> **What this maps to in code:** [`af.ipfs()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts) exposes `add(file)`, `addAll()`, and `addFromPath(path)`, each returning `UploadResult { cid, size, path }`.
+
 ```typescript
 // Create a new site
 const site = await af.sites().create({ name: 'my-site' });
 
-// Upload content to IPFS
-const upload = await af.ipfs().add('./dist');
+// Upload the build output to IPFS
+const upload = await af.ipfs().addFromPath('./dist');
 
-// Create deployment
-const deployment = await af.sites().createDeployment({
+// Deploy the uploaded CID to the site
+const deployment = await af.sites().createCustomIpfsDeployment({
   siteId: site.id,
-  cid: upload.pin.cid,
+  cid: upload.cid,
 });
 ```
 
@@ -172,31 +176,35 @@ await af.storage().delete({ cid: 'bafybei...' });
 
 ### Work with IPNS
 
-```typescript
-// Create IPNS record
-const ipns = await af.ipns().create({ siteId: 'site_abc123' });
+> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) — `createRecord`, `createRecordForSite`, `publishRecord`, `listRecords`, `getRecord`, `deleteRecord`.
 
-// Publish new content
-await af.ipns().publish({
-  name: ipns.name,
+```typescript
+// Create an IPNS record for a site
+const ipns = await af.ipns().createRecordForSite({ siteId: 'site_abc123' });
+
+// Publish new content (keyed by record id, not name)
+await af.ipns().publishRecord({
+  id: ipns.id,
   hash: 'bafybei...',
 });
 
 // List all IPNS records
-const records = await af.ipns().list();
+const records = await af.ipns().listRecords();
 ```
 
 ### Custom Domains
 
+> **What this maps to in code:** [`af.domains()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/domains.ts) — `createCustomDomain`, `verifyCustomDomain`, `listDomainsForSite`.
+
 ```typescript
-// Add a domain to a site
-const domain = await af.domains().create({
+// Add a custom domain to a site
+const domain = await af.domains().createCustomDomain({
   siteId: 'site_abc123',
   hostname: 'www.example.com',
 });
 
 // Verify DNS configuration
-const verified = await af.domains().verify({ id: domain.id });
+const verified = await af.domains().verifyCustomDomain({ domainId: domain.id });
 ```
 
 ## TypeScript Support

@@ -4,7 +4,7 @@ description: Connect custom domains from any registrar to your Alternate Futures
 
 # Custom Domains
 
-Bring your own domain from any registrar (GoDaddy, Namecheap, Cloudflare, etc.) and point it to your AlternateFutures site.
+Bring your own domain from any registrar (GoDaddy, Namecheap, Cloudflare, etc.) and point it to your Alternate Futures site.
 
 ## Overview
 
@@ -20,6 +20,12 @@ Custom domains provide:
 - SEO benefits
 - Professional appearance
 - Automatic SSL/TLS certificates via Let's Encrypt
+
+::: tip What this maps to in code
+- SDK methods live in the [`domains.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/domains.ts) (`createCustomDomain`, `verifyCustomDomain`, `provisionSsl`, `setPrimaryDomain`, `removeCustomDomain`).
+- The authoritative GraphQL surface (Domain type, mutations, `CreateDomainInput`) is in [`typeDefs.ts`](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts).
+- Verification and SSL status fields are backed by the [Prisma `Domain` model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma).
+:::
 
 ## Adding a Custom Domain
 
@@ -46,9 +52,10 @@ const af = new AlternateFuturesSdk({
 });
 
 // Add a custom domain
-const domain = await af.domains().create({
+const domain = await af.domains().createCustomDomain({
   siteId: 'site_abc123',
   hostname: 'example.com',
+  verificationMethod: 'TXT',
 });
 
 console.log('Domain created:', domain.hostname);
@@ -60,7 +67,7 @@ mutation {
   createDomain(input: {
     hostname: "example.com"
     siteId: "site-123"
-    verificationMethod: TXT
+    verificationMethod: "TXT"
   }) {
     id
     hostname
@@ -100,7 +107,7 @@ mutation {
   createDomain(input: {
     hostname: "example.com"
     siteId: "site-123"
-    verificationMethod: TXT
+    verificationMethod: "TXT"
   }) {
     id
     txtVerificationToken  # Use this value
@@ -132,10 +139,10 @@ mutation {
   createDomain(input: {
     hostname: "www.example.com"
     siteId: "site-123"
-    verificationMethod: CNAME
+    verificationMethod: "CNAME"
   }) {
     id
-    expectedCname  # Points to platform
+    dnsConfigs  # Contains the CNAME target to set at your registrar
   }
 }
 ```
@@ -167,10 +174,10 @@ mutation {
   createDomain(input: {
     hostname: "example.com"
     siteId: "site-123"
-    verificationMethod: A
+    verificationMethod: "A"
   }) {
     id
-    expectedARecord  # Platform IP
+    dnsConfigs  # Contains the A-record target IP to set at your registrar
   }
 }
 ```
@@ -198,7 +205,7 @@ acc domains detail --hostname example.com
 
 ```typescript [SDK]
 // Verify DNS configuration
-const verified = await af.domains().verify({ id: domain.id });
+const verified = await af.domains().verifyCustomDomain({ domainId: domain.id });
 console.log('Verified:', verified);
 ```
 
@@ -306,15 +313,8 @@ Set a verified domain as the primary domain for your site:
 
 ```graphql
 mutation {
-  setPrimaryDomain(
-    siteId: "site-123"
-    domainId: "domain-123"
-  ) {
-    id
-    primaryDomain {
-      hostname
-    }
-  }
+  # setPrimaryDomain returns Boolean!
+  setPrimaryDomain(siteId: "site-123", domainId: "domain-123")
 }
 ```
 
@@ -328,7 +328,7 @@ Remove a custom domain:
 
 ```graphql
 mutation {
-  removeDomain(domainId: "domain-123")
+  deleteDomain(id: "domain-123")
 }
 ```
 
@@ -454,17 +454,17 @@ openssl s_client -connect example.com:443 -servername example.com
 
 ## Supported DNS Providers
 
-Tested and working with:
+Custom domains work with any DNS provider that supports standard TXT, CNAME, and A records, including:
 
-- **Cloudflare** - Fast propagation (5-15 min), excellent DNS management
-- **Namecheap** - Good propagation (30-60 min)
-- **GoDaddy** - Slower propagation (2-24 hours)
-- **Google Domains** - Fast and reliable
-- **AWS Route53** - Enterprise-grade, fast propagation
-- **DigitalOcean DNS** - Fast and simple
-- **Vercel DNS** - Fast propagation
+- **Cloudflare**
+- **Namecheap**
+- **GoDaddy**
+- **Google Domains / Cloud DNS**
+- **AWS Route53**
+- **DigitalOcean DNS**
+- **Vercel DNS**
 
-All major DNS providers support TXT, CNAME, and A records needed for domain verification.
+Propagation time depends entirely on your provider and the TTL you set — it can range from a few minutes to several hours. All major providers support the TXT, CNAME, and A records needed for domain verification.
 
 ## Web3 Domains
 
@@ -474,13 +474,13 @@ Register permanent domains on Arweave:
 
 ```graphql
 mutation {
-  registerArnsName(
-    siteId: "site-123"
+  registerArns(
+    domainId: "domain-123"
     arnsName: "my-site"
+    contentId: "<ipfs-or-arweave-content-id>"
   ) {
-    name
-    transactionId
-    contentId
+    id
+    arnsName
   }
 }
 ```
@@ -492,20 +492,7 @@ mutation {
 
 ### ENS (Ethereum Name System)
 
-Link ENS domains to your content:
-
-```graphql
-mutation {
-  linkEnsDomain(
-    siteId: "site-123"
-    ensName: "mysite.eth"
-  ) {
-    ensName
-    contentHash
-    resolverAddress
-  }
-}
-```
+Link ENS domains to your content using the SDK's ENS client. See the dedicated [ENS guide](./ens.md) for the full flow (`af.ens().create(...)`, setting the content hash, and verification).
 
 **Features:**
 - Ethereum-based domain names
@@ -514,20 +501,7 @@ mutation {
 
 ### IPNS (IPFS Name System)
 
-Create mutable IPNS pointers:
-
-```graphql
-mutation {
-  createIpnsName(
-    siteId: "site-123"
-    ipnsName: "my-ipns-site"
-  ) {
-    ipnsName
-    ipnsHash
-    currentCid
-  }
-}
-```
+Create mutable IPNS pointers using the SDK's IPNS client. See the [IPNS guide](./ipns.md) for `af.ipns().createRecordForSite(...)` and publishing updates.
 
 **Features:**
 - Mutable pointers to IPFS content
@@ -544,7 +518,7 @@ mutation CreateDomain {
   createDomain(input: {
     hostname: "example.com"
     siteId: "site-abc123"
-    verificationMethod: TXT
+    verificationMethod: "TXT"
   }) {
     id
     hostname
@@ -596,17 +570,9 @@ mutation ProvisionSSL {
 # Step 7: Wait 5-10 minutes for Let's Encrypt
 # Your site is now live at https://example.com!
 
-# Step 8: Set as primary domain (optional)
+# Step 8: Set as primary domain (optional) — returns Boolean
 mutation SetPrimary {
-  setPrimaryDomain(
-    siteId: "site-abc123"
-    domainId: "domain-xyz789"
-  ) {
-    id
-    primaryDomain {
-      hostname
-    }
-  }
+  setPrimaryDomain(siteId: "site-abc123", domainId: "domain-xyz789")
 }
 ```
 
@@ -628,10 +594,10 @@ mutation SetPrimary {
 
 **setPrimaryDomain** - Set primary domain for site
 - Input: `siteId: ID!`, `domainId: ID!`
-- Returns: `Site`
+- Returns: `Boolean`
 
-**removeDomain** - Remove custom domain
-- Input: `domainId: ID!`
+**deleteDomain** - Remove custom domain
+- Input: `id: ID!`
 - Returns: `Boolean`
 
 ### Queries
@@ -640,8 +606,8 @@ mutation SetPrimary {
 - Input: `id: ID!`
 - Returns: `Domain`
 
-**domains** - List all domains for a site
-- Input: `siteId: ID!`
+**Site.domains** - List all domains for a site
+- Accessed via the `site(id: ID!) { domains { ... } }` query (there is no top-level `domains` root query)
 - Returns: `[Domain!]!`
 
 ## Next Steps

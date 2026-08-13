@@ -16,36 +16,47 @@ Passwordless authentication via email:
 2. Check your inbox for the magic link
 3. Click the link to sign in
 
-### SMS Magic Link
+### SMS OTP
 
-Passwordless authentication via SMS:
+Passwordless authentication via a one-time code:
 
 1. Enter your phone number
-2. Receive a text message with the link
-3. Click the link to sign in
+2. Receive a 6-digit code by text
+3. Enter the code to sign in
+
+::: tip What this maps to in code
+See the [SMS OTP endpoint](https://github.com/alternatefutures/service-auth/blob/main/src/routes/auth/sms.ts) — it generates a 6-digit code and verifies it at `/auth/sms/verify`.
+:::
 
 ### Web3 Wallets
 
-Sign in with your cryptocurrency wallet:
+Sign in with an Ethereum wallet using the "Sign in with Ethereum" (SIWE) standard:
 
-- **MetaMask** - Ethereum wallet
-- **Phantom** - Solana wallet
-- **WalletConnect** - Universal wallet connection
-- **Coinbase Wallet**
-- **Rainbow Wallet**
+- **MetaMask**
+- **WalletConnect**
 
-Uses "Sign in with Ethereum" (SIWE) standard for secure authentication.
+Other EVM-compatible wallets (Coinbase Wallet, Rainbow) generally work through the same SIWE flow.
+
+::: info Solana not yet supported
+Solana wallets (including Phantom) are not currently supported — the wallet flow rejects Solana addresses and asks you to use an Ethereum wallet.
+:::
+
+::: tip What this maps to in code
+See the [Web3 wallet (SIWE) handler](https://github.com/alternatefutures/service-auth/blob/main/src/routes/auth/wallet.ts).
+:::
 
 ### Social OAuth
 
-Sign in with your existing accounts:
+Sign in with an existing account:
 
 - **Google**
-- **Apple**
-- **Twitter**
-- **Discord**
 - **GitHub**
-- **Facebook**
+- **Twitter/X**
+- **Discord**
+
+::: tip What this maps to in code
+Providers are registered in the [OAuth provider configuration](https://github.com/alternatefutures/service-auth/blob/main/src/services/oauth.service.ts). Apple Sign In is temporarily disabled; Facebook is not yet available.
+:::
 
 ## Account Linking
 
@@ -81,9 +92,9 @@ API key management via the web interface is currently in development. In the mea
 
 **CLI:**
 ```bash
-export AF_TOKEN="your-personal-access-token"
+export AF_TOKEN="af_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AF_PROJECT_ID="your-project-id"
-acc sites list
+acc projects list
 ```
 
 **SDK:**

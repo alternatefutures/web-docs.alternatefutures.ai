@@ -14,24 +14,27 @@ Applications are OAuth 2.0 applications that can authenticate users and access t
 - **Name** - Human-readable application name
 - **Whitelist Domains** - Allowed domains for CORS and OAuth redirects
 
+::: info What this maps to in code
+- **SDK:** [applications client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/applications.ts) — `create({ name, whitelistDomains }) → clientId`, `list`, `update`, `delete`.
+- **API:** [`Application` GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) — `clientId`, `whitelistDomains`.
+:::
+
+::: tip CLI
+There is no `acc applications` command. Applications are managed entirely through the **SDK / GraphQL API**. The examples below use the SDK.
+:::
+
 ## Creating an Application
 
 ::: code-group
 
-```bash [CLI]
-# Create a new application
-acc applications create
-
-# You'll be prompted for:
-# - Application name
-# - Whitelist domains (comma-separated)
-```
-
 ```typescript [SDK]
-import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
 const af = new AlternateFuturesSdk({
-  personalAccessToken: process.env.AF_TOKEN
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
 });
 
 // Create an application
@@ -49,11 +52,6 @@ console.log('Client ID:', app.clientId);
 
 ::: code-group
 
-```bash [CLI]
-# List all applications
-acc applications list
-```
-
 ```typescript [SDK]
 // List all applications
 const applications = await af.applications().list();
@@ -70,15 +68,6 @@ applications.forEach(app => {
 
 ::: code-group
 
-```bash [CLI]
-# Update an application
-acc applications update
-
-# You'll be prompted to:
-# 1. Select the application
-# 2. Update name and/or whitelist domains
-```
-
 ```typescript [SDK]
 // Update application
 await af.applications().update({
@@ -93,13 +82,6 @@ await af.applications().update({
 ## Deleting an Application
 
 ::: code-group
-
-```bash [CLI]
-# Delete an application
-acc applications delete
-
-# You'll be prompted to select which application to delete
-```
 
 ```typescript [SDK]
 // Delete an application
@@ -119,12 +101,15 @@ Use applications to authenticate users in your web application:
 3. Users can sign in with their Alternate Futures account
 4. Your application receives an access token to make API calls
 
-### CORS Configuration
+::: info
+The application record (Client ID and whitelisted domains) is available today. Confirm which parts of the end-to-end OAuth authorization flow are live before building against it.
+:::
 
-Whitelist domains are automatically allowed for CORS requests:
+### CORS and whitelisted domains
+
+Whitelisted domains are stored on the application record and are intended to control which origins may use it:
 
 ```typescript
-// This request will succeed if the origin is whitelisted
 fetch('https://api.alternatefutures.ai/v1/sites', {
   headers: {
     'Authorization': `Bearer ${accessToken}`
@@ -132,20 +117,26 @@ fetch('https://api.alternatefutures.ai/v1/sites', {
 });
 ```
 
+::: warning
+Confirm the current CORS behavior for `api.alternatefutures.ai` before relying on it in production — enforcement details may change.
+:::
+
 ### Multi-Environment Setup
 
-Create separate applications for different environments:
+Create separate applications for different environments via the SDK:
 
-```bash
-# Development app
-acc applications create
-# Name: My App (Dev)
-# Domains: http://localhost:3000
+```typescript
+// Development app
+await af.applications().create({
+  name: 'My App (Dev)',
+  whitelistDomains: ['http://localhost:3000']
+});
 
-# Production app
-acc applications create
-# Name: My App (Prod)
-# Domains: https://myapp.com, https://www.myapp.com
+// Production app
+await af.applications().create({
+  name: 'My App (Prod)',
+  whitelistDomains: ['https://myapp.com', 'https://www.myapp.com']
+});
 ```
 
 ## Security Best Practices
