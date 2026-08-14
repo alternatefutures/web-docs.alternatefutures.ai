@@ -35,14 +35,14 @@ Migrating from Vercel works best for **static sites** and **static exports** (Ne
 
 ```bash
 # Install the Alternate Clouds CLI
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 
 # Authenticate
 acc login
 ```
 
 ::: warning CLI binary name
-Commands here use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+Commands here use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/acc` or substitute `af` for `acc`.
 :::
 
 ## Step 2: Configure Your Build
@@ -76,7 +76,7 @@ acc services create
 acc services deploy [id]
 ```
 
-These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts).
 
 ### React (Vite or Create React App)
 
@@ -169,7 +169,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -178,7 +178,7 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
+2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
 3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 5: Migrate Environment Variables

@@ -13,7 +13,7 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you still 
 | Feature | Fleek | Alternate Futures |
 |---------|-------|-------------------|
 | **CLI command** | `fleek` | `acc` |
-| **Package name** | `@fleekxyz/cli` | `@alternatefutures/cli` |
+| **Package name** | `@fleekxyz/cli` | `@alternatefutures/acc` |
 | **SDK package** | `@fleekxyz/sdk` | `@alternatefutures/sdk` |
 | **Config file** | `fleek.json` | `af.config.json` |
 | **Token env var** | `FLEEK_TOKEN` | `AF_TOKEN` |
@@ -36,12 +36,12 @@ Fleek has pivoted away from Web3 hosting to focus on AI inference. If you still 
 
 3. **Install the Alternate Clouds CLI:**
    ```bash
-   npm install -g @alternatefutures/cli
+   npm install -g @alternatefutures/acc
    acc login
    ```
 
    ::: warning CLI binary name
-   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/acc` or substitute `af` for `acc`.
    :::
 
 ## Step 1: Migrate Your Site
@@ -68,7 +68,7 @@ acc services deploy [id]
 acc deployments
 ```
 
-Deploys run through `acc services`; the full set of registered top-level commands (`login`, `logout`, `projects`, `services`, `deployments`, `billing`, `ssh`) is defined in [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+Deploys run through `acc services`; the full set of registered top-level commands (`login`, `logout`, `projects`, `services`, `deployments`, `billing`, `ssh`) is defined in [the acc CLI command set](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts).
 
 If you keep an `af.config.json` in your project, here is how a `fleek.json` maps onto it:
 
@@ -95,7 +95,7 @@ If you keep an `af.config.json` in your project, here is how a `fleek.json` maps
 }
 ```
 
-> **What this maps to in code:** these fields are the [`af.config` schema (sites: slug/distDir/buildCommand)](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+> **What this maps to in code:** these fields are the [`af.config` schema (sites: slug/distDir/buildCommand)](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts).
 
 ### From Fleek SDK to AF SDK
 
@@ -129,7 +129,7 @@ const [result] = await af.ipfs().addFromPath('./dist');
 console.log('CID:', result.cid.toString());
 ```
 
-The import path and environment variable names change. Note one API difference: `af.ipfs().add()` takes an in-memory `{ path, content }` file, while `af.ipfs().addFromPath('./dist')` uploads a directory and returns a `UploadResult[]` — see the [IPFS client (add / addFromPath)](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
+The import path and environment variable names change. Note one API difference: `af.ipfs().add()` takes an in-memory `{ path, content }` file, while `af.ipfs().addFromPath('./dist')` uploads a directory and returns a `UploadResult[]` — see the [IPFS client (add / addFromPath)](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts).
 
 ## Step 2: Migrate IPFS Content
 
@@ -201,7 +201,7 @@ See the [Custom Domains guide](./custom-domains.md) for full details.
 **New (Alternate Futures):**
 ```yaml
 - name: Deploy to Alternate Futures
-  run: npx @alternatefutures/cli services deploy
+  run: npx @alternatefutures/acc services deploy
   env:
     AF_TOKEN: ${{ secrets.AF_TOKEN }}
     AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -244,7 +244,7 @@ Beyond replacing Fleek's functionality, Alternate Futures provides additional fe
 
 Make sure you are installing the correct package:
 ```bash
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ### CIDs differ after re-uploading

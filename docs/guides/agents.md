@@ -9,7 +9,7 @@ Alternate Clouds agents are **chat agents**: a named agent with a system prompt,
 :::
 
 ::: tip What this maps to in code
-The [Agent GraphQL type and mutations](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) define the real surface: `Agent { id name slug description avatar systemPrompt model status }`, `CreateAgentInput { name, slug, description, systemPrompt, model, functionId }`, and the mutations `createAgent`, `createChat`, `sendMessage`, `deleteChat`.
+The [Agent GraphQL type and mutations](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts) define the real surface: `Agent { id name slug description avatar systemPrompt model status }`, `CreateAgentInput { name, slug, description, systemPrompt, model, functionId }`, and the mutations `createAgent`, `createChat`, `sendMessage`, `deleteChat`.
 :::
 
 ## What a chat agent is

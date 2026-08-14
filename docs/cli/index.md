@@ -22,15 +22,15 @@ Install the CLI globally using your preferred package manager:
 ::: code-group
 
 ```bash [npm]
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ```bash [pnpm]
-pnpm add -g @alternatefutures/cli
+pnpm add -g @alternatefutures/acc
 ```
 
 ```bash [yarn]
-yarn global add @alternatefutures/cli
+yarn global add @alternatefutures/acc
 ```
 
 :::
@@ -65,13 +65,20 @@ acc deployments list
 | Command | Description |
 |---------|-------------|
 | `acc login` / `acc logout` | Authenticate or end your CLI session |
+| `acc whoami` | Show your identity and active project — [whoami.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/whoami.ts) |
 | `acc projects` | Create, list, switch, rename, and delete projects |
 | `acc services` | Create, deploy, inspect, and manage services |
 | `acc deployments` | List and filter deployments |
+| `acc regions` | List regions with availability and pricing — [regions/index.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/regions/index.ts) |
+| `acc templates` | Browse and inspect deployable templates |
 | `acc ssh` | Open a shell into a running service |
+| `acc cp` | Copy a file to/from a deployment (`<serviceId>:<path>`) — [cp/index.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/cp/index.ts) |
+| `acc chat` | End-to-end encrypted chat with services and agents — [chat/index.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/chat/index.ts) |
 | `acc billing` | View your credit balance |
+| `acc pat` | Create and manage personal access tokens |
+| `acc version` | Print the CLI version |
 
-> **What this maps to in code:** command registration lives in [command registration (cli.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). `templates` and `pat` are also registered but hidden from top-level help.
+> **What this maps to in code:** command registration lives in [command registration (cli.ts)](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts). All groups above are surfaced in top-level help; `version` is a hidden alias for `acc --version`.
 
 ## Getting Help
 
@@ -103,7 +110,7 @@ export AF_PROJECT_ID="your-project-id"
 | `AF_PROJECT_ID` | Default project ID for commands |
 | `AF_ORG_ID` | Default organization ID |
 
-> **What this maps to in code:** these are the only variables the CLI reads — see [CLI environment variables (secrets.ts)](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
+> **What this maps to in code:** these are the only variables the CLI reads — see [CLI environment variables (secrets.ts)](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts).
 
 ## Configuration File
 
@@ -123,7 +130,7 @@ The CLI reads deployment configuration from an `af.config` file in your project 
 
 Create the file manually in your project root.
 
-> **What this maps to in code:** the schema (`AlternateFuturesRootConfig` with a `sites[]` array and an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+> **What this maps to in code:** the schema (`AlternateFuturesRootConfig` with a `sites[]` array and an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts).
 
 ## Documentation
 

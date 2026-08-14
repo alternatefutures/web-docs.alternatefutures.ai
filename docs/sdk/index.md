@@ -78,7 +78,7 @@ const sites = await af.sites().list();
 
 ## SDK Clients
 
-> **What this maps to in code:** every accessor below is defined on [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) — `sites()`, `storage()`, `ipfs()`, `ipns()`, `ens()`, `functions()`, `projects()`, `applications()`, `privateGateways()`, `user()`, `billing()`, plus `observability()` and `getVersion()`.
+> **What this maps to in code:** every accessor below is defined on [`AlternateFuturesSdk`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/AlternateFuturesSdk.ts) — `sites()`, `storage()`, `ipfs()`, `ipns()`, `ens()`, `functions()`, `projects()`, `applications()`, `privateGateways()`, `user()`, `billing()`, plus `observability()` and `getVersion()`.
 
 | Client | Method | Description |
 |--------|--------|-------------|
@@ -145,7 +145,7 @@ const token = await accessTokenService.getAccessToken();
 
 ### Deploy a Site
 
-> **What this maps to in code:** [`af.ipfs()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts) exposes `add(file)`, `addAll()`, and `addFromPath(path)`, each returning `UploadResult { cid, size, path }`.
+> **What this maps to in code:** [`af.ipfs()`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts) exposes `add(file)`, `addAll()`, and `addFromPath(path)`, each returning `UploadResult { cid, size, path }`.
 
 ```typescript
 // Create a new site
@@ -176,7 +176,7 @@ await af.storage().delete({ cid: 'bafybei...' });
 
 ### Work with IPNS
 
-> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) — `createRecord`, `createRecordForSite`, `publishRecord`, `listRecords`, `getRecord`, `deleteRecord`.
+> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipns.ts) — `createRecord`, `createRecordForSite`, `publishRecord`, `listRecords`, `getRecord`, `deleteRecord`.
 
 ```typescript
 // Create an IPNS record for a site
@@ -194,7 +194,7 @@ const records = await af.ipns().listRecords();
 
 ### Custom Domains
 
-> **What this maps to in code:** [`af.domains()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/domains.ts) — `createCustomDomain`, `verifyCustomDomain`, `listDomainsForSite`.
+> **What this maps to in code:** [`af.domains()`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/domains.ts) — `createCustomDomain`, `verifyCustomDomain`, `listDomainsForSite`.
 
 ```typescript
 // Add a custom domain to a site

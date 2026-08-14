@@ -1,10 +1,10 @@
 ---
-description: Install and configure the Alternate Futures CLI on macOS, Linux, or Windows with npm, pnpm, or yarn.
+description: Install and configure the Alternate Clouds CLI (acc) on macOS, Linux, or Windows with npm, pnpm, or yarn.
 ---
 
 # CLI Installation
 
-Complete guide to installing and configuring the Alternate Futures CLI.
+Complete guide to installing and configuring the Alternate Clouds CLI (`acc`).
 
 ## Requirements
 
@@ -17,7 +17,7 @@ Check your Node.js version:
 node --version  # Should be v18.18.2 or higher
 ```
 
-> **What this maps to in code:** the engine range and package name are declared in [package.json engines / bin](https://github.com/alternatefutures/cloud-cli/blob/main/package.json).
+> **What this maps to in code:** the engine range and package name are declared in [package.json engines / bin](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/package.json).
 
 ## Installation
 
@@ -26,15 +26,15 @@ Install the CLI globally using your preferred package manager:
 ::: code-group
 
 ```bash [npm]
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ```bash [pnpm]
-pnpm add -g @alternatefutures/cli
+pnpm add -g @alternatefutures/acc
 ```
 
 ```bash [yarn]
-yarn global add @alternatefutures/cli
+yarn global add @alternatefutures/acc
 ```
 
 :::
@@ -51,7 +51,7 @@ You should see the version number displayed. If you see "command not found", try
 
 1. Restart your terminal
 2. Check that npm's global bin directory is in your PATH
-3. Run `npm list -g @alternatefutures/cli` to confirm installation
+3. Run `npm list -g @alternatefutures/acc` to confirm installation
 
 ## Authentication
 
@@ -120,7 +120,7 @@ Create a config file in your project root. The CLI accepts `af.config.ts`, `af.c
 }
 ```
 
-> **What this maps to in code:** the schema (a top-level `sites[]` array, plus an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+> **What this maps to in code:** the schema (a top-level `sites[]` array, plus an optional `functions[]` block) is defined in [af.config type definition](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts).
 
 <!-- Removed / re-architected commands (kept for reference)
 
@@ -158,7 +158,7 @@ This creates `af.config.json`:
 | `AF_PROJECT_ID` | Default project ID | `prj_abc123` |
 | `AF_ORG_ID` | Default organization ID | `org_abc123` |
 
-> **What this maps to in code:** these are the only variables the CLI reads — see [env vars read by the CLI](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
+> **What this maps to in code:** these are the only variables the CLI reads — see [env vars read by the CLI](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts).
 
 ### Setting Environment Variables
 
@@ -217,7 +217,7 @@ jobs:
         run: npm run build
 
       - name: Install AF CLI
-        run: npm install -g @alternatefutures/cli
+        run: npm install -g @alternatefutures/acc
 
       - name: Deploy
         run: acc services deploy <service-id>
@@ -248,7 +248,7 @@ deploy:
   script:
     - npm ci
     - npm run build
-    - npm install -g @alternatefutures/cli
+    - npm install -g @alternatefutures/acc
     - acc services deploy <service-id>
   variables:
     AF_TOKEN: $AF_TOKEN
@@ -264,15 +264,15 @@ Keep your CLI up to date:
 ::: code-group
 
 ```bash [npm]
-npm update -g @alternatefutures/cli
+npm update -g @alternatefutures/acc
 ```
 
 ```bash [pnpm]
-pnpm update -g @alternatefutures/cli
+pnpm update -g @alternatefutures/acc
 ```
 
 ```bash [yarn]
-yarn global upgrade @alternatefutures/cli
+yarn global upgrade @alternatefutures/acc
 ```
 
 :::
@@ -283,8 +283,8 @@ yarn global upgrade @alternatefutures/cli
 
 - Ensure the global npm directory is in your PATH
 - Try restarting your terminal
-- Run `npm list -g @alternatefutures/cli` to confirm installation
-- Try reinstalling: `npm uninstall -g @alternatefutures/cli && npm install -g @alternatefutures/cli`
+- Run `npm list -g @alternatefutures/acc` to confirm installation
+- Try reinstalling: `npm uninstall -g @alternatefutures/acc && npm install -g @alternatefutures/acc`
 
 ### "Login failed" or browser doesn't open
 
@@ -304,12 +304,12 @@ Try installing with elevated permissions or use a Node version manager:
 
 ```bash
 # Using sudo (not recommended)
-sudo npm install -g @alternatefutures/cli
+sudo npm install -g @alternatefutures/acc
 
 # Better: Use nvm to manage Node
 nvm install 20
 nvm use 20
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ## Uninstalling
@@ -319,15 +319,15 @@ To remove the CLI:
 ::: code-group
 
 ```bash [npm]
-npm uninstall -g @alternatefutures/cli
+npm uninstall -g @alternatefutures/acc
 ```
 
 ```bash [pnpm]
-pnpm remove -g @alternatefutures/cli
+pnpm remove -g @alternatefutures/acc
 ```
 
 ```bash [yarn]
-yarn global remove @alternatefutures/cli
+yarn global remove @alternatefutures/acc
 ```
 
 :::

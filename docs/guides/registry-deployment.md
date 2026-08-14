@@ -573,4 +573,4 @@ Need help deploying?
 
 - [Discord Community](https://discord.gg/alternatefutures)
 - [Akash Discord](https://discord.gg/akash)
-- [GitHub Issues](https://github.com/alternatefutures/service-cloud-api/issues)
+- [GitHub Issues](https://github.com/alternatefutures/alternate-clouds-api/issues)

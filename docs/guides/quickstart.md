@@ -41,7 +41,7 @@ The web application is currently in development. In the meantime, you can use th
 
 ```bash [CLI]
 # Install the CLI globally
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ```bash [SDK]
@@ -140,9 +140,9 @@ Environment variables store sensitive information (like tokens) outside your cod
 ### Troubleshooting Authentication
 
 **"Command not found: acc"**
-- Make sure you installed the CLI: `npm install -g @alternatefutures/cli`
+- Make sure you installed the CLI: `npm install -g @alternatefutures/acc`
 - Try restarting your terminal
-- Check installation with `npm list -g @alternatefutures/cli`
+- Check installation with `npm list -g @alternatefutures/acc`
 
 **"Login failed" or browser doesn't open**
 - Try the API key method instead

@@ -16,7 +16,7 @@ The CLI is not installed or not in your PATH.
 
 ```bash
 # Install the CLI globally
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 
 # Verify installation
 acc --version

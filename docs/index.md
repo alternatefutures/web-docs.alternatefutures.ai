@@ -105,7 +105,7 @@ features:
 ::: code-group
 
 ```bash [CLI]
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 acc login
 ```
 
@@ -155,5 +155,5 @@ console.log('CID:', result.cid.toString());
 :::
 
 ::: tip What this maps to in code
-CLI commands are registered in [`src/cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). The SDK's `ipfs().add()` / `addFromPath()` methods live in [`src/clients/ipfs.ts`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
+CLI commands are registered in [`src/cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts). The SDK's `ipfs().add()` / `addFromPath()` methods live in [`src/clients/ipfs.ts`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts).
 :::

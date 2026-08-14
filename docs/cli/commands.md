@@ -1,5 +1,5 @@
 ---
-description: Complete reference for the Alternate Clouds CLI (acc) — authentication, projects, services, deployments, SSH, personal access tokens, templates, and billing.
+description: Complete reference for the Alternate Clouds CLI (acc) — authentication, whoami, projects, services, deployments, regions, SSH, file copy, encrypted chat, personal access tokens, templates, and billing.
 ---
 
 # CLI Commands
@@ -23,10 +23,14 @@ acc services deploy --help # Help for a single command
 | Command | Description |
 |---------|-------------|
 | [`acc login`](#acc-login) / [`acc logout`](#acc-logout) | Authenticate or end your CLI session |
+| [`acc whoami`](#acc-whoami) | Show your identity and active project (agent pre-flight) |
 | [`acc projects`](#acc-projects) | Create, list, switch, rename, and delete projects |
 | [`acc services`](#acc-services) | Create, deploy, inspect, and manage services |
 | [`acc deployments`](#acc-deployments) | List and filter deployments |
+| [`acc regions`](#acc-regions) | List regions with availability and pricing |
 | [`acc ssh`](#acc-ssh) | Open an interactive shell in a running deployment |
+| [`acc cp`](#acc-cp) | Copy files to/from a deployment |
+| [`acc chat`](#acc-chat) | End-to-end encrypted chat (auth-free) |
 | [`acc pat`](#acc-pat) | Manage personal access tokens |
 | [`acc templates`](#acc-templates) | Browse service templates |
 | [`acc billing`](#acc-billing) | View your credit balance |
@@ -48,7 +52,7 @@ acc login --email      # Email verification code (no browser)
 | `-e, --email` | Log in via email verification instead of a browser |
 | `--auth-url <url>` | Override the auth service URL (e.g. `http://localhost:3001`) |
 
-> **What this maps to in code:** the command is registered in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). Browser login runs [`login.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/login.ts); `--email` runs [`loginEmail.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/loginEmail.ts).
+> **What this maps to in code:** the command is registered in [`cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts). Browser login runs [`login.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/auth/login.ts); `--email` runs [`loginEmail.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/auth/loginEmail.ts).
 
 ### `acc logout`
 
@@ -58,7 +62,24 @@ End your CLI session and clear stored credentials.
 acc logout
 ```
 
-> **What this maps to in code:** registered in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts), handled by [`logout.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/auth/logout.ts).
+> **What this maps to in code:** registered in [`cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts), handled by [`logout.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/auth/logout.ts).
+
+### `acc whoami`
+
+Report the current identity and active project. This is an agent pre-flight check: run it before any mutating command to confirm you are authenticated, as whom, and which project is active. It exits non-zero when there is no session, so wrapping scripts and skills can branch cleanly without triggering a login redirect.
+
+```bash
+acc whoami          # Human-readable
+acc whoami --json   # Machine-readable (for agents/CI)
+```
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Machine-readable JSON output (for agents/CI) |
+
+The `--json` payload reports `authenticated` (boolean), and when signed in, a `user` object (`id`, `email`, `username`, `walletAddress`) and the active `project` (`id`, `name`, `slug`, or `null` when none is selected).
+
+> **What this maps to in code:** the command is registered in [`cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts) and handled by [`whoami.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/whoami.ts).
 
 ## Projects
 
@@ -118,7 +139,7 @@ acc projects delete
 acc projects delete prj_abc123
 ```
 
-> **What this maps to in code:** all `projects` subcommands are wired up in [`projects/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/projects/index.ts).
+> **What this maps to in code:** all `projects` subcommands are wired up in [`projects/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/projects/index.ts).
 
 ## Services
 
@@ -143,11 +164,40 @@ acc services list
 
 #### `acc services create`
 
-Create a new service from a template. Runs interactive prompts to choose the template and configure the service.
+Create a new service — from a template, a Docker image, or an empty server. With no flags it runs interactive prompts; pass flags to create non-interactively. The deploy-side flags below are shared with `acc services deploy`.
 
 ```bash
 acc services create
+acc services create --kind template --template <id> --name my-svc
+acc services create --kind docker --image nginx:latest --port 80
+acc services create --kind server --os ubuntu:24.04 --ssh-key-file ~/.ssh/id_ed25519.pub
 ```
+
+| Option | Description |
+|--------|-------------|
+| `--kind <kind>` | Service kind: `template`, `docker`, `server`, `function`, `github` |
+| `--name <name>` | Service name (skips the name prompt; must be unique in the project) |
+| `--template <id>` | Template id (for `--kind template` — skips the catalog browse) |
+| `--image <ref>` | Docker image (for `--kind docker`, e.g. `nginx:latest`) |
+| `--port <n>` | Container port (for `--kind docker`) |
+| `--os <base>` | Base OS image (for `--kind server`, e.g. `ubuntu:24.04`) |
+| `--confidential` | Deploy on a TEE (Phala) — verifiable confidential compute |
+| `--region <region>` | Curated region: `us-east`, `us-west`, `eu`, `asia` |
+| `--cpu <cores>` | Override CPU (vCPUs) |
+| `--memory <size>` | Override memory (e.g. `4Gi`) |
+| `--storage <size>` | Override storage (e.g. `20Gi`) |
+| `--gpu` / `--no-gpu` | Attach a GPU / skip GPU |
+| `--gpu-model <model>` | GPU model (e.g. `H100`, `H200`, `A100`, `RTX4090`) |
+| `--gpu-count <n>` | Number of GPUs |
+| `--spend <mode>` | Spend control: `payg`, `budget`, `stop` |
+| `--budget-total <usd>` | Budget cap (lifetime, USD) |
+| `--budget-monthly <usd>` | Budget cap (per month, USD) |
+| `--stop-hours <n>` | Auto-stop after N hours |
+| `--stop-days <n>` | Auto-stop after N days |
+| `--env <pair>` | Set required env var as `KEY=VALUE` (repeatable) |
+| `--ssh-key <pubkey>` | Break-glass OpenSSH public key (`--kind server`) |
+| `--ssh-key-file <path>` | Read the break-glass public key from a file |
+| `-y, --yes` | Skip confirmation prompts |
 
 #### `acc services info`
 
@@ -160,12 +210,34 @@ acc services info svc_abc123
 
 #### `acc services deploy`
 
-Deploy (or redeploy) a service.
+Deploy (or redeploy) a service. Pass a service ID or select interactively. Flags let you override compute, region, spend controls, and env for this deploy.
 
 ```bash
 acc services deploy
 acc services deploy svc_abc123
+acc services deploy svc_abc123 --region eu --gpu --gpu-model H100
+acc services deploy svc_abc123 --spend budget --budget-monthly 50 --yes
 ```
+
+| Option | Description |
+|--------|-------------|
+| `--region <region>` | Curated region: `us-east`, `us-west`, `eu`, `asia`. Omit for "Any (cheapest globally)" |
+| `--confidential` | Deploy on a TEE (Phala) — verifiable confidential compute |
+| `--cpu <cores>` | Override CPU (vCPUs) |
+| `--memory <size>` | Override memory (e.g. `4Gi`) |
+| `--storage <size>` | Override storage (e.g. `20Gi`) |
+| `--gpu` / `--no-gpu` | Attach a GPU / skip GPU even if the template defaults to one |
+| `--gpu-model <model>` | GPU model (`H100`, `H200`, `A100`, `RTX4090`, ...) |
+| `--gpu-count <n>` | Number of GPUs |
+| `--spend <mode>` | Spend control: `payg`, `budget`, `stop` |
+| `--budget-total <usd>` | Budget cap (lifetime, USD) |
+| `--budget-monthly <usd>` | Budget cap (per month, USD) |
+| `--stop-hours <n>` | Auto-stop after N hours |
+| `--stop-days <n>` | Auto-stop after N days |
+| `--env <pair>` | Set required env var as `KEY=VALUE` (repeatable) |
+| `--ssh-key <pubkey>` | Break-glass OpenSSH public key (raw server → Spheron; ignored on Akash/Phala) |
+| `--ssh-key-file <path>` | Read the break-glass public key from a file |
+| `-y, --yes` | Skip confirmation prompts |
 
 #### `acc services logs`
 
@@ -198,7 +270,40 @@ acc services delete
 acc services delete svc_abc123
 ```
 
-> **What this maps to in code:** every `services` subcommand — including the `deploy` path — is registered in [`services/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts); the deploy handler lives in [`services/deploy.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/deploy.ts).
+#### `acc services env`
+
+Manage a service's environment variables.
+
+```bash
+acc services env list                       # List env vars (select service interactively)
+acc services env list my-svc
+acc services env set my-svc DATABASE_URL postgres://...
+acc services env unset my-svc DATABASE_URL
+acc services env unset my-svc DATABASE_URL --yes
+```
+
+| Subcommand | Description |
+|------------|-------------|
+| `env list [service]` | List env vars for a service |
+| `env set <service> <key> <value>` | Set an env var (creates or updates) |
+| `env unset <service> <key>` | Delete an env var (`-y, --yes` skips the confirmation prompt) |
+
+#### `acc services link` / `acc services unlink`
+
+Link two services so the target's connection info is exposed to the source as environment variables. Pass the source and target, or select interactively.
+
+```bash
+acc services link api database --alias DB    # Exposes DB_* env vars on `api`
+acc services unlink api database
+acc services unlink api database --yes
+```
+
+| Option | Description |
+|--------|-------------|
+| `--alias <name>` | Alias used as the env key prefix (e.g. `DB`) — `link` only |
+| `-y, --yes` | Skip confirmation prompt — `unlink` only |
+
+> **What this maps to in code:** every `services` subcommand — including the `deploy` path, `env`, and `link`/`unlink` — is registered in [`services/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/services/index.ts); the deploy handler lives in [`services/deploy.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/services/deploy.ts).
 
 ## Deployments
 
@@ -233,7 +338,30 @@ Alias for the above; accepts the same options.
 acc deployments list --status active
 ```
 
-> **What this maps to in code:** the `deployments` group and its filtering logic are in [`deployments/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/deployments/index.ts).
+> **What this maps to in code:** the `deployments` group and its filtering logic are in [`deployments/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/deployments/index.ts).
+
+## Regions
+
+### `acc regions`
+
+List curated region buckets (`us-east`, `us-west`, `eu`, `asia`) with live provider availability and pricing — verified/online provider counts, recent bids in the last 24h, a confidence signal, and the median USD/hr price. Use it as a "what's available right now" sanity check before deploying with `--region`.
+
+```bash
+acc regions                          # Akash regions (default provider)
+acc regions --provider phala         # Phala (currently single-region)
+acc regions --gpu h100               # Median price for a specific GPU model
+```
+
+| Option | Description |
+|--------|-------------|
+| `--provider <name>` | Filter by provider: `akash` or `phala` (default: `akash`) |
+| `--gpu <model>` | Surface the median price for a specific GPU model (e.g. `h100`, `h200`, `a100`, `rtx4090`) |
+
+::: tip Deploying to a region
+Feed a region id into deploy: `acc services deploy <id> --region <region>`. Omit `--region` for "Any (cheapest globally)", today's default.
+:::
+
+> **What this maps to in code:** the `regions` command is registered in [`regions/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/regions/index.ts), with the handler in [`regions/list.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/regions/list.ts).
 
 ## SSH
 
@@ -253,7 +381,27 @@ acc ssh svc_abc123 --service worker      # For multi-service deployments
 | `--service <name>` | SDL service name, for multi-service deployments |
 | `--command <cmd>` | Command to run (default: `/bin/bash`) |
 
-> **What this maps to in code:** registered in [`ssh/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/ssh/index.ts).
+> **What this maps to in code:** registered in [`ssh/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/ssh/index.ts).
+
+## Copy Files
+
+### `acc cp`
+
+Copy a file to or from a running deployment. Mark the remote side as `<serviceId>:<path>`; the other argument is a local path. The direction is inferred from which argument carries the `<serviceId>:` prefix.
+
+```bash
+acc cp ./local.txt svc_abc123:/app/local.txt        # Upload local → deployment
+acc cp svc_abc123:/app/output.log ./output.log      # Download deployment → local
+acc cp ./data.json svc_abc123:/app/data.json --service worker   # Multi-service deployment
+```
+
+| Argument / Option | Description |
+|-------------------|-------------|
+| `<source>` | Source path — local, or `<serviceId>:<path>` for the remote side |
+| `<dest>` | Destination path — local, or `<serviceId>:<path>` for the remote side |
+| `--service <name>` | SDL service name, for multi-service deployments |
+
+> **What this maps to in code:** the `cp` command is registered in [`cp/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/cp/index.ts), with the transfer logic in [`cp/transfer.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/cp/transfer.ts).
 
 ## Personal Access Tokens
 
@@ -288,7 +436,7 @@ Delete a personal access token by ID.
 acc pat delete <personalAccessTokenId>
 ```
 
-> **What this maps to in code:** the `pat` group is defined in [`pat/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts).
+> **What this maps to in code:** the `pat` group is defined in [`pat/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/pat/index.ts).
 
 ## Templates
 
@@ -315,7 +463,7 @@ Show detailed information for a template.
 acc templates info <templateId>
 ```
 
-> **What this maps to in code:** the `templates` group is defined in [`templates/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/templates/index.ts).
+> **What this maps to in code:** the `templates` group is defined in [`templates/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/templates/index.ts).
 
 ## Billing
 
@@ -331,7 +479,95 @@ acc billing balance
 `acc billing` currently implements a single subcommand: `balance`. Additional billing commands are planned but not yet shipped.
 :::
 
-> **What this maps to in code:** the `billing` group is registered in [`billing/index.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/index.ts), with the handler in [`billing/balance.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/balance.ts).
+> **What this maps to in code:** the `billing` group is registered in [`billing/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/billing/index.ts), with the handler in [`billing/balance.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/billing/balance.ts).
+
+## Chat
+
+End-to-end encrypted chat. This client is auth-free — it talks directly to alt-chat relays and does not require `acc login`. The **room passphrase is the only thing that selects a room** (there is no room name): everyone who shares the passphrase is in the same room. Running `acc chat` with no subcommand prints help; `acc chat <target>` defaults to `join`.
+
+::: warning Prefer env vars for secrets
+Pass the passphrase via `AF_CHAT_PASSWORD` rather than `--password` — an argv passphrase is visible in `ps` and your shell history. `AF_CHAT_USERNAME` and `AF_CHAT_IDENTITY` have the same env-var equivalents.
+:::
+
+**Session options** (accepted by every `chat` subcommand):
+
+| Option | Description |
+|--------|-------------|
+| `--password <passphrase>` | Room passphrase — the only thing that selects the room. Prefer `AF_CHAT_PASSWORD` |
+| `--username <name>` | Display name (or `AF_CHAT_USERNAME`; defaults to your OS user) |
+| `--identity <file>` | Ed25519 identity file (or `AF_CHAT_IDENTITY`). Distinct files = distinct identities — give each agent its own |
+| `-p, --project <id>` | Project to resolve a bare service name against (needs `acc login`) |
+
+The optional `[target]` is a service name/slug, full URL, or host. Omit it to use `AF_CHAT_URL` or the public demo relay (`chat.alternatefutures.ai`).
+
+### `acc chat join`
+
+Open an interactive encrypted chat session (TUI). This is the default: `acc chat <target>` runs `join`.
+
+```bash
+acc chat join
+acc chat my-relay --username alice
+```
+
+### `acc chat send`
+
+Send one message to a room, then exit — no TTY required, so it fits agents and CI. The message can be passed with `--message` or piped on stdin.
+
+```bash
+acc chat send --message "deploy finished"
+echo "deploy finished" | acc chat send
+acc chat send --message "on it" --reply-to <pubkey>:<seq> --json
+```
+
+| Option | Description |
+|--------|-------------|
+| `--message <text>` | Message text (or pipe it on stdin) |
+| `--reply-to <pubkey:seq>` | Thread this as a reply (copy the `<pubkey>:<seq>` from `acc chat read --json`) |
+| `--json` | Machine-readable JSON output (for agents/CI) |
+
+### `acc chat read`
+
+Print room history and exit; add `--watch` to stay connected and stream new messages and presence.
+
+```bash
+acc chat read
+acc chat read --json
+acc chat read --watch --json    # NDJSON, one event per line
+```
+
+| Option | Description |
+|--------|-------------|
+| `--watch` | Stay connected and stream new messages + presence |
+| `--json` | JSON snapshot; with `--watch`, NDJSON one event per line |
+
+### `acc chat agent`
+
+Participate as an agent. Three modes: **driver** (prints the next addressed message as JSON, then exits — one turn), **bridge** (`--bridge`, a persistent presence that relays via inbox/outbox files — best for a live LLM agent), and **bot** (`--exec`, a self-contained headless bot).
+
+```bash
+# Driver mode — leaves each turn
+acc chat agent my-relay --username Claude --mention claude
+
+# Bridge mode — persistent presence, relays via files
+acc chat agent my-relay --username Claude --mention claude --bridge
+
+# Bot mode — external brain
+acc chat agent --mention bot --exec 'echo "pong: $AF_MSG_TEXT"'
+```
+
+| Option | Description |
+|--------|-------------|
+| `--bridge` | Persistent presence; addressed messages → inbox, lines appended to outbox → sent |
+| `--inbox <file>` | Bridge inbox file (default `~/.af-chat/<room>.in.jsonl`) |
+| `--outbox <file>` | Bridge outbox file (default `~/.af-chat/<room>.out`) |
+| `--exec <command>` | Bot mode: a command that reads the message (stdin JSON + `AF_MSG_*` env) and prints the reply |
+| `--mention <words>` | Comma-separated trigger words; reply only when a message contains one (default: your display name) |
+| `--all` | Reply to every message, not just when mentioned |
+| `--context <n>` | Recent messages of context passed to the brain (default `10`) |
+| `--timeout <ms>` | Max time for the brain to produce a reply (default `60000`) |
+| `--cooldown <ms>` | Minimum gap between replies — throttles runaway loops (default `0`) |
+
+> **What this maps to in code:** the `chat` group and all its subcommands are registered in [`chat/index.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/chat/index.ts).
 
 ## Version
 
@@ -344,7 +580,7 @@ acc version
 acc --version
 ```
 
-> **What this maps to in code:** the `version` command and `--version` flag are wired up in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+> **What this maps to in code:** the `version` command and `--version` flag are wired up in [`cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts).
 
 <!-- ROADMAP — not yet shipped. Uncomment each section as the feature ships.
 

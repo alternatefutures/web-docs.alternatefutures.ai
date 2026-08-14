@@ -37,7 +37,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Alternate Clouds
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -80,14 +80,14 @@ jobs:
 
       - name: Deploy to Staging
         if: github.ref == 'refs/heads/staging'
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN_STAGING }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_STAGING }}
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN_PROD }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID_PROD }}
@@ -123,7 +123,7 @@ deploy:
   only:
     - main
   script:
-    - npm install -g @alternatefutures/cli
+    - npm install -g @alternatefutures/acc
     - acc services deploy
   variables:
     AF_TOKEN: $AF_TOKEN
@@ -167,7 +167,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            npm install -g @alternatefutures/cli
+            npm install -g @alternatefutures/acc
             acc services deploy
 
 workflows:
@@ -201,7 +201,7 @@ Then add deployment hook:
 {
   "scripts": {
     "vercel-build": "npm run build && npm run deploy:af",
-    "deploy:af": "npx @alternatefutures/cli services deploy"
+    "deploy:af": "npx @alternatefutures/acc services deploy"
   }
 }
 ```
@@ -238,7 +238,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh 'npm install -g @alternatefutures/cli'
+                sh 'npm install -g @alternatefutures/acc'
                 sh 'acc services deploy'
             }
         }
@@ -261,7 +261,7 @@ acc services deploy <service-id>
 ```
 
 ::: tip What this maps to in code
-See the [services deploy command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts). It reads `AF_TOKEN`, `AF_PROJECT_ID`, and `AF_ORG_ID` from the environment ([secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts)). Flags such as `--name`, `--network`, `--wait`, and `--json` are not implemented.
+See the [services deploy command](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/services/index.ts). It reads `AF_TOKEN`, `AF_PROJECT_ID`, and `AF_ORG_ID` from the environment ([secrets.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts)). Flags such as `--name`, `--network`, `--wait`, and `--json` are not implemented.
 :::
 
 ## Environment Variables
@@ -272,7 +272,7 @@ The CLI reads these environment variables:
 - `AF_PROJECT_ID` - default project id
 - `AF_ORG_ID` - default organization id
 
-See [secrets.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/secrets.ts).
+See [secrets.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts).
 
 ## Best Practices
 

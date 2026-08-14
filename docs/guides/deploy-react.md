@@ -11,7 +11,7 @@ Deploy a React app to Alternate Clouds, the decentralized cloud platform from Al
 Before you begin, make sure you have:
 
 - **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
-- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/cli`
+- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/acc`
 - **Node.js 18 or later** - [Download here](https://nodejs.org/en/download)
 - **A React project** (or create one below)
 
@@ -45,7 +45,7 @@ acc services deploy
 - **Vite projects** output to `./dist` by default
 - **Create React App projects** output to `./build` by default
 
-Set `distDir` to the matching folder in your `acc.config` — it is a real field in the [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) (alongside `slug` and `buildCommand`).
+Set `distDir` to the matching folder in your `acc.config` — it is a real field in the [acc.config schema](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts) (alongside `slug` and `buildCommand`).
 :::
 
 ## Step 1: Create a New React Project
@@ -185,7 +185,7 @@ acc services deploy
 :::
 
 ::: info What this maps to in code
-`acc services deploy` is the CLI's only deploy subcommand — see [the CLI's actual command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts). `slug`, `buildCommand`, and `distDir` are real [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) fields.
+`acc services deploy` is the CLI's only deploy subcommand — see [the CLI's actual command surface](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts). `slug`, `buildCommand`, and `distDir` are real [acc.config schema](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts) fields.
 :::
 
 You should see output like:
@@ -263,7 +263,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Alternate Clouds
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
@@ -293,7 +293,7 @@ console.log('Deployed! CID:', results[0].cid);
 ```
 
 ::: info What this maps to in code
-Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
+Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
 :::
 
 ## Environment Variables

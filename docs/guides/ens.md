@@ -7,7 +7,7 @@ description: Connect your Alternate Futures sites to ENS domains for decentraliz
 Connect your Alternate Futures sites to Ethereum Name Service (ENS) domains for decentralized, human-readable URLs.
 
 ::: tip What this maps to in code
-ENS records are managed through the SDK's [`ens.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ens.ts) (`create`, `list`, `getByName`, `verify`, `delete`). The `acc` CLI does not register an `ens` command ([cli.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts)), so ENS management is SDK-only.
+ENS records are managed through the SDK's [`ens.ts` client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ens.ts) (`create`, `list`, `getByName`, `verify`, `delete`). The `acc` CLI does not register an `ens` command ([cli.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts)), so ENS management is SDK-only.
 :::
 
 ## What is ENS?

@@ -29,7 +29,7 @@ acc billing balance
 ```
 
 ::: tip What this maps to in code
-`balance` is the only subcommand defined in the [billing CLI command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/billing/index.ts). Customer, invoice, subscription, usage, and payment-method operations are available through the SDK's [billing client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/billing.ts) (`af.billing().getCustomer()`, `listInvoices()`, `listSubscriptions()`, `getCurrentUsage()`, `listPaymentMethods()`) — CLI coverage is on the roadmap.
+`balance` is the only subcommand defined in the [billing CLI command](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/billing/index.ts). Customer, invoice, subscription, usage, and payment-method operations are available through the SDK's [billing client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/billing.ts) (`af.billing().getCustomer()`, `listInvoices()`, `listSubscriptions()`, `getCurrentUsage()`, `listPaymentMethods()`) — CLI coverage is on the roadmap.
 :::
 
 ### Invoices, subscriptions, usage, and payment methods (SDK)

@@ -115,9 +115,9 @@ Configure project basics:
 ### Storage Settings
 
 ::: info What this maps to in code
-- **CLI:** [projects command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/projects/index.ts) — `list`, `create`, `update` (rename only), `switch`, `delete`.
-- **SDK:** [projects client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/projects.ts) — backup toggles via `update({ where, data: { backupStorageOnArweave, backupStorageOnFilecoin } })`.
-- **API:** [Project data model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma).
+- **CLI:** [projects command](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/projects/index.ts) — `list`, `create`, `update` (rename only), `switch`, `delete`.
+- **SDK:** [projects client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/projects.ts) — backup toggles via `update({ where, data: { backupStorageOnArweave, backupStorageOnFilecoin } })`.
+- **API:** [Project data model](https://github.com/alternatefutures/alternate-clouds-api/blob/main/prisma/schema.prisma).
 :::
 
 Backup storage is configured through the SDK. The CLI `acc projects update` only renames a project.
