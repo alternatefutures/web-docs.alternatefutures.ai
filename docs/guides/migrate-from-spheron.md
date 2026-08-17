@@ -13,7 +13,7 @@ Spheron has pivoted away from Web3 hosting to focus on GPU compute and AI infere
 | Feature | Spheron | Alternate Futures |
 |---------|---------|-------------------|
 | **CLI command** | `spheron` | `acc` |
-| **Package name** | `@spheron/cli` | `@alternatefutures/cli` |
+| **Package name** | `@spheron/cli` | `@alternatefutures/acc` |
 | **SDK package** | `@spheron/storage` | `@alternatefutures/sdk` |
 | **Config file** | `spheron.json` | `af.config.json` |
 | **Token env var** | `SPHERON_TOKEN` | `AF_TOKEN` |
@@ -41,12 +41,12 @@ If you used Spheron primarily for GPU compute, that functionality is separate fr
 
 3. **Install the Alternate Clouds CLI:**
    ```bash
-   npm install -g @alternatefutures/cli
+   npm install -g @alternatefutures/acc
    acc login
    ```
 
    ::: warning CLI binary name
-   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/cli` or substitute `af` for `acc`.
+   Commands in this guide use `acc`. If your installed version still exposes the legacy `af` binary, update to the latest `@alternatefutures/acc` or substitute `af` for `acc`.
    :::
 
 ## Step 1: Migrate Your Site
@@ -70,7 +70,7 @@ acc services create
 acc services deploy [id]
 ```
 
-These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+These are the real registered commands — see [the acc CLI command set](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts).
 
 If you keep an `af.config.json` in your project, here is how Spheron's configuration maps onto it:
 
@@ -93,7 +93,7 @@ If you keep an `af.config.json` in your project, here is how Spheron's configura
 }
 ```
 
-> **What this maps to in code:** these fields are the [`af.config` schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+> **What this maps to in code:** these fields are the [`af.config` schema](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts).
 
 ### From Spheron SDK to AF SDK
 
@@ -129,7 +129,7 @@ console.log('CID:', result.cid.toString());
 console.log('URL:', `https://ipfs.io/ipfs/${result.cid.toString()}`);
 ```
 
-> **What this maps to in code:** `addFromPath` returns a `UploadResult[]` of `{ cid, size, path }` — see the [IPFS client return shape (UploadResult)](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts).
+> **What this maps to in code:** `addFromPath` returns a `UploadResult[]` of `{ cid, size, path }` — see the [IPFS client return shape (UploadResult)](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts).
 
 ### Storage Protocol Mapping
 
@@ -253,7 +253,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
           AF_PROJECT_ID: ${{ secrets.AF_PROJECT_ID }}
@@ -262,7 +262,7 @@ jobs:
 ### Add Secrets
 
 1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**
-2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
+2. Add `AF_TOKEN` -- your personal access token (create one with [`acc pat create`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/pat/index.ts) `--name "CI/CD"`)
 3. Add `AF_PROJECT_ID` -- your project ID (find it with `acc projects list`)
 
 ## Step 5: Migrate Environment Variables
@@ -320,7 +320,7 @@ Beyond replacing Spheron's hosting functionality, Alternate Futures provides add
 
 Make sure you are installing the correct package:
 ```bash
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
 ### CIDs differ after re-uploading

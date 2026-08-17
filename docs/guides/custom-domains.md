@@ -22,9 +22,9 @@ Custom domains provide:
 - Automatic SSL/TLS certificates via Let's Encrypt
 
 ::: tip What this maps to in code
-- SDK methods live in the [`domains.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/domains.ts) (`createCustomDomain`, `verifyCustomDomain`, `provisionSsl`, `setPrimaryDomain`, `removeCustomDomain`).
-- The authoritative GraphQL surface (Domain type, mutations, `CreateDomainInput`) is in [`typeDefs.ts`](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts).
-- Verification and SSL status fields are backed by the [Prisma `Domain` model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma).
+- SDK methods live in the [`domains.ts` client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/domains.ts) (`createCustomDomain`, `verifyCustomDomain`, `provisionSsl`, `setPrimaryDomain`, `removeCustomDomain`).
+- The authoritative GraphQL surface (Domain type, mutations, `CreateDomainInput`) is in [`typeDefs.ts`](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts).
+- Verification and SSL status fields are backed by the [Prisma `Domain` model](https://github.com/alternatefutures/alternate-clouds-api/blob/main/prisma/schema.prisma).
 :::
 
 ## Adding a Custom Domain

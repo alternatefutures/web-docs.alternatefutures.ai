@@ -22,11 +22,11 @@ The Alternate Futures platform enters public beta, providing decentralized cloud
 - **Observability** - Distributed tracing, metrics, and logging for all deployments
 - **Billing** - Usage-based pricing with Stripe integration and credit system
 
-### CLI v0.2 ([`@alternatefutures/cli` package.json](https://github.com/alternatefutures/cloud-cli/blob/main/package.json))
+### CLI v0.2 ([`@alternatefutures/acc` package.json](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/package.json))
 
 **Released: February 2026**
 
-The `@alternatefutures/cli` package is now available on npm. The CLI binary is `acc`.
+The `@alternatefutures/acc` package is now available on npm. The CLI binary is `acc`.
 
 - `acc login` / `acc logout` - Interactive browser-based authentication
 - `acc projects` - Manage projects and organizations
@@ -38,13 +38,13 @@ The `@alternatefutures/cli` package is now available on npm. The CLI binary is `
 - JSON output mode for scripting and CI/CD integration
 - Environment variable support (`AF_TOKEN`, `AF_PROJECT_ID`)
 
-See the full [command registration in `src/cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts).
+See the full [command registration in `src/cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts).
 
 ```bash
-npm install -g @alternatefutures/cli
+npm install -g @alternatefutures/acc
 ```
 
-### SDK v0.2 ([`@alternatefutures/sdk` package.json](https://github.com/alternatefutures/package-cloud-sdk/blob/main/package.json))
+### SDK v0.2 ([`@alternatefutures/sdk` package.json](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/package.json))
 
 **Released: February 2026**
 

@@ -286,7 +286,7 @@ my-project/
 └── deploy.sh         # Deployment script
 ```
 
-The CLI resolves configuration in order `af.config.ts` > `af.config.js` > `af.config.json` — see [getConfiguration.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/getConfiguration.ts).
+The CLI resolves configuration in order `af.config.ts` > `af.config.js` > `af.config.json` — see [getConfiguration.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/getConfiguration.ts).
 
 ## Next Steps
 

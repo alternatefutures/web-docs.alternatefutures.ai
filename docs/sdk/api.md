@@ -51,7 +51,7 @@ const sites = await af.sites().list();
 const storage = await af.storage().list();
 ```
 
-**Methods:** (source: [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts))
+**Methods:** (source: [`AlternateFuturesSdk`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/AlternateFuturesSdk.ts))
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -170,7 +170,7 @@ const token = await accessTokenService.getAccessToken();
 
 ## Sites & Deployments
 
-> **What this maps to in code:** [`Site` type and the sites client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/sites.ts) — `get({ id })`, `getBySlug({ slug })`, `list`, `create`, `delete`, `createCustomIpfsDeployment`, `getDeployment`.
+> **What this maps to in code:** [`Site` type and the sites client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/sites.ts) — `get({ id })`, `getBySlug({ slug })`, `list`, `create`, `delete`, `createCustomIpfsDeployment`, `getDeployment`.
 
 ### Site
 
@@ -437,7 +437,7 @@ type AFFunctionStatus = "ACTIVE" | "INACTIVE";
 
 ## Billing
 
-> **What this maps to in code:** [`BillingClient`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/billing.ts) — `getCustomer`, `getActiveSubscription`, `listSubscriptions`, `getCurrentUsage`, `listInvoices`.
+> **What this maps to in code:** [`BillingClient`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/billing.ts) — `getCustomer`, `getActiveSubscription`, `listSubscriptions`, `getCurrentUsage`, `listInvoices`.
 
 ### Customer
 
@@ -693,7 +693,7 @@ try {
 
 ## TypeScript Support
 
-All of these are re-exported from the SDK's [public entry point](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/index.ts). Import types directly from the SDK:
+All of these are re-exported from the SDK's [public entry point](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/index.ts). Import types directly from the SDK:
 
 ```typescript
 import {

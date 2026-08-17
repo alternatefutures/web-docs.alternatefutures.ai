@@ -11,7 +11,7 @@ Deploy a Next.js app to Alternate Clouds, the decentralized cloud platform from 
 Before you begin, make sure you have:
 
 - **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
-- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/cli`
+- **The Alternate Clouds CLI (`acc`) installed** - `npm install -g @alternatefutures/acc`
 - **Node.js 18 or later** - [Download here](https://nodejs.org/en/download)
 - **A Next.js project** (or create one below)
 
@@ -35,7 +35,7 @@ Next.js static export outputs to `./out` by default. Set `distDir` to `out` in y
 :::
 
 ::: info What this maps to in code
-These are the commands the CLI actually registers — see [the CLI's actual command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts) (`login`, `logout`, `projects`, `services`, `deployments`, `ssh`, `billing`). Deploy lives at `acc services deploy [id]`.
+These are the commands the CLI actually registers — see [the CLI's actual command surface](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts) (`login`, `logout`, `projects`, `services`, `deployments`, `ssh`, `billing`). Deploy lives at `acc services deploy [id]`.
 :::
 
 ## Step 1: Create a New Next.js Project
@@ -162,7 +162,7 @@ acc services deploy
 ```
 
 ::: info What this maps to in code
-`slug`, `buildCommand`, and `distDir` are real fields in the [acc.config schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts).
+`slug`, `buildCommand`, and `distDir` are real fields in the [acc.config schema](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts).
 :::
 
 You should see output like:
@@ -216,7 +216,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Alternate Clouds
-        run: npx @alternatefutures/cli services deploy
+        run: npx @alternatefutures/acc services deploy
         env:
           AF_TOKEN: ${{ secrets.AF_TOKEN }}
 ```
@@ -246,7 +246,7 @@ console.log('Deployed! CID:', results[0].cid);
 ```
 
 ::: info What this maps to in code
-Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
+Signatures and the `UploadResult` shape (`{ cid, size, path }`) come from [the SDK IPFS client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts): `add(file: IpfsFile)` for a single file, `addFromPath(path)` for a directory.
 :::
 
 ## Common Issues

@@ -101,7 +101,7 @@ acc pat delete <token-id>
 ```
 
 ::: tip What this maps to in code
-See the [pat CLI command](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/pat/index.ts). `create` takes only `--name`; there are no `--expires` or `--permissions` flags yet.
+See the [pat CLI command](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/pat/index.ts). `create` takes only `--name`; there are no `--expires` or `--permissions` flags yet.
 :::
 
 ## Managing API Keys
@@ -216,7 +216,7 @@ If you have 500 active keys:
 **Tips to manage your keys:**
 - Delete unused or expired keys to stay organized
 - Use expiration dates for temporary access
-- Monitor your limits via the [`apiKeyRateLimit` query](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts):
+- Monitor your limits via the [`apiKeyRateLimit` query](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts):
   ```graphql
   query {
     apiKeyRateLimit {

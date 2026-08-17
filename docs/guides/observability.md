@@ -99,7 +99,7 @@ That's it! Your application is now sending traces, metrics, and logs to the Alte
 ## Instrumentation Setup
 
 ::: tip What this maps to in code
-`initInstrumentation` and `withSpan` are real exports of the [SDK instrumentation module](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/instrumentation/index.ts), available via the `@alternatefutures/sdk/instrumentation` subpath.
+`initInstrumentation` and `withSpan` are real exports of the [SDK instrumentation module](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/instrumentation/index.ts), available via the `@alternatefutures/sdk/instrumentation` subpath.
 :::
 
 ### Node.js Auto-Instrumentation
@@ -255,7 +255,7 @@ logger.emit({
 ### Using the SDK
 
 ::: tip What this maps to in code
-Every method below (`queryTraces`, `getTrace`, `queryLogs`, `queryMetrics`, `getServices`, `getSettings`, `updateSettings`, `getUsage`) is defined in the [observability SDK client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/observability.ts).
+Every method below (`queryTraces`, `getTrace`, `queryLogs`, `queryMetrics`, `getServices`, `getSettings`, `updateSettings`, `getUsage`) is defined in the [observability SDK client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/observability.ts).
 :::
 
 ::: code-group
@@ -385,7 +385,7 @@ services.forEach(service => {
 ### Querying via GraphQL
 
 ::: info CLI support is on the roadmap
-There is no `acc observability` command yet. Query observability data through the SDK (`af.observability()`) or the GraphQL API. The relevant types (`ObservabilitySettings`, `TelemetryUsageSummary`) and operations (`observabilitySettings`, `telemetryUsage`, `updateObservabilitySettings`) are defined in the [observability GraphQL schema](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts).
+There is no `acc observability` command yet. Query observability data through the SDK (`af.observability()`) or the GraphQL API. The relevant types (`ObservabilitySettings`, `TelemetryUsageSummary`) and operations (`observabilitySettings`, `telemetryUsage`, `updateObservabilitySettings`) are defined in the [observability GraphQL schema](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts).
 :::
 
 <!-- Fabricated `acc observability ...` CLI code-group removed: no such command exists. -->

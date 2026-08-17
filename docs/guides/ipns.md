@@ -7,7 +7,7 @@ description: Create mutable pointers to IPFS content with IPNS on Alternate Futu
 Use IPNS to create mutable pointers to your IPFS content, enabling dynamic updates without changing URLs.
 
 ::: tip What this maps to in code
-IPNS is managed entirely through the SDK's [`ipns.ts` client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) (`createRecordForSite`, `listRecords`, `publishRecord`, `resolveName`, `deleteRecord`). The `acc` CLI does not register an `ipns` command ([cli.ts](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts)), so all examples below use the SDK.
+IPNS is managed entirely through the SDK's [`ipns.ts` client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipns.ts) (`createRecordForSite`, `listRecords`, `publishRecord`, `resolveName`, `deleteRecord`). The `acc` CLI does not register an `ipns` command ([cli.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts)), so all examples below use the SDK.
 :::
 
 ## What is IPNS?

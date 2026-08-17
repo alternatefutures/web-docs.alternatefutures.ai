@@ -60,7 +60,7 @@ acc deployments
 acc deployments --all
 ```
 
-> **What this maps to in code:** the CLI command surface is defined in [`cli.ts`](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts); the [`services` command (deploy/create/list)](https://github.com/alternatefutures/cloud-cli/blob/main/src/commands/services/index.ts) implements `acc services deploy [id]`. There is no `sites` command and no `--network` flag — storage network selection is not a CLI option.
+> **What this maps to in code:** the CLI command surface is defined in [`cli.ts`](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts); the [`services` command (deploy/create/list)](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/commands/services/index.ts) implements `acc services deploy [id]`. There is no `sites` command and no `--network` flag — storage network selection is not a CLI option.
 
 ## Storage Networks
 
@@ -355,7 +355,7 @@ export default {
 };
 ```
 
-> **What this maps to in code:** the [af.config site configuration schema](https://github.com/alternatefutures/cloud-cli/blob/main/src/utils/configuration/types.ts) defines the supported keys — `slug`, `distDir`, and optional `buildCommand`. There is no `output`, `command`, or `environment` (env-var injection) support today.
+> **What this maps to in code:** the [af.config site configuration schema](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/utils/configuration/types.ts) defines the supported keys — `slug`, `distDir`, and optional `buildCommand`. There is no `output`, `command`, or `environment` (env-var injection) support today.
 
 ## Custom Domains
 

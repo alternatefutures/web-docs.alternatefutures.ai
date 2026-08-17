@@ -49,7 +49,7 @@ console.log('Sites:', sites);
 
 ### Browser
 
-> **What this maps to in code:** [`StaticAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/StaticAccessTokenService.ts) takes a single `accessToken` option.
+> **What this maps to in code:** [`StaticAccessTokenService`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/libs/AccessTokenService/StaticAccessTokenService.ts) takes a single `accessToken` option.
 
 ```typescript
 import { AlternateFuturesSdk, StaticAccessTokenService } from '@alternatefutures/sdk';
@@ -78,7 +78,7 @@ for (const site of sites) {
 
 ### Upload to IPFS
 
-> **What this maps to in code:** [`af.ipfs().add`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipfs.ts) takes an `IpfsFile` object `{ content, path? }`; use `addFromPath(path)` to upload from the filesystem.
+> **What this maps to in code:** [`af.ipfs().add`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipfs.ts) takes an `IpfsFile` object `{ content, path? }`; use `addFromPath(path)` to upload from the filesystem.
 
 ```typescript
 // Node.js only - upload a file from a path
@@ -120,7 +120,7 @@ const domain = await af.domains().createCustomDomain({
 
 ### Create IPNS Records
 
-> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/ipns.ts) — `createRecordForSite`, `publishRecord`, `listRecords`.
+> **What this maps to in code:** [`af.ipns()`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/ipns.ts) — `createRecordForSite`, `publishRecord`, `listRecords`.
 
 ```typescript
 // Create an IPNS record for a site

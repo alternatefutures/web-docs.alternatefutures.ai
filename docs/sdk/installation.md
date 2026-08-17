@@ -76,7 +76,7 @@ The SDK supports multiple authentication approaches. Choose the one that fits yo
 
 Best for: Server-side applications, scripts, CI/CD pipelines.
 
-> **What this maps to in code:** [`PersonalAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts) — `personalAccessToken` is required; `projectId` is optional.
+> **What this maps to in code:** [`PersonalAccessTokenService`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts) — `personalAccessToken` is required; `projectId` is optional.
 
 ```typescript
 import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
@@ -117,7 +117,7 @@ const af = new AlternateFuturesSdk({
 
 Best for: Building applications that authenticate users via Alternate Futures.
 
-> **What this maps to in code:** [`ApplicationAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/ApplicationAccessTokenService.ts). Browser only — it reads `window.location.origin` and requires an auth-apps URL (via `authAppsServiceUrl` or the `SDK__AUTH_APPS_URL` env var), or the constructor throws.
+> **What this maps to in code:** [`ApplicationAccessTokenService`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/libs/AccessTokenService/ApplicationAccessTokenService.ts). Browser only — it reads `window.location.origin` and requires an auth-apps URL (via `authAppsServiceUrl` or the `SDK__AUTH_APPS_URL` env var), or the constructor throws.
 
 ```typescript
 import { AlternateFuturesSdk, ApplicationAccessTokenService } from '@alternatefutures/sdk';
@@ -275,7 +275,7 @@ main().catch(console.error);
 
 ## Custom Configuration
 
-> **What this maps to in code:** the full option list lives in [`AlternateFuturesSdk`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) as `AlternateFuturesSdkOptions`.
+> **What this maps to in code:** the full option list lives in [`AlternateFuturesSdk`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/AlternateFuturesSdk.ts) as `AlternateFuturesSdkOptions`.
 
 ### Custom API Endpoints
 

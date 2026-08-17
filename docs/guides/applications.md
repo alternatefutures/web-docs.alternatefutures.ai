@@ -15,8 +15,8 @@ Applications are OAuth 2.0 applications that can authenticate users and access t
 - **Whitelist Domains** - Allowed domains for CORS and OAuth redirects
 
 ::: info What this maps to in code
-- **SDK:** [applications client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/applications.ts) — `create({ name, whitelistDomains }) → clientId`, `list`, `update`, `delete`.
-- **API:** [`Application` GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) — `clientId`, `whitelistDomains`.
+- **SDK:** [applications client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/applications.ts) — `create({ name, whitelistDomains }) → clientId`, `list`, `update`, `delete`.
+- **API:** [`Application` GraphQL type](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts) — `clientId`, `whitelistDomains`.
 :::
 
 ::: tip CLI

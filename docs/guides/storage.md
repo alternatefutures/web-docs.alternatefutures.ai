@@ -35,7 +35,7 @@ console.log('Directory CID:', dirResult.pin.cid);
 console.log('Size:', dirResult.pin.size);
 ```
 
-> **What this maps to in code:** upload/list/get/delete are implemented in [`StorageClient`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/storage.ts); authentication uses [`PersonalAccessTokenService`](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts). The [CLI command surface](https://github.com/alternatefutures/cloud-cli/blob/main/src/cli.ts) does not include storage commands.
+> **What this maps to in code:** upload/list/get/delete are implemented in [`StorageClient`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/storage.ts); authentication uses [`PersonalAccessTokenService`](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/libs/AccessTokenService/PersonalAccessTokenService.ts). The [CLI command surface](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/cli.ts) does not include storage commands.
 
 ## Storage Networks
 

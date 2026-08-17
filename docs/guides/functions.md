@@ -25,8 +25,8 @@ Functions run in a JavaScript/TypeScript runtime with:
 - An optional SGX (Software Guard Extensions) deployment flag for workloads that need extra isolation
 
 ::: info What this maps to in code
-- **SDK:** [functions client](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/functions.ts) — `create`, `deploy`, `list`, `listDeployments`, `update`, `delete`.
-- **API:** [`AFFunction` data model](https://github.com/alternatefutures/service-cloud-api/blob/main/prisma/schema.prisma) and [`AFFunction` GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) — exposes `invokeUrl`, `routes`, `status`.
+- **SDK:** [functions client](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/functions.ts) — `create`, `deploy`, `list`, `listDeployments`, `update`, `delete`.
+- **API:** [`AFFunction` data model](https://github.com/alternatefutures/alternate-clouds-api/blob/main/prisma/schema.prisma) and [`AFFunction` GraphQL type](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts) — exposes `invokeUrl`, `routes`, `status`.
 :::
 
 ::: tip CLI

@@ -10,7 +10,7 @@ A private gateway is a dedicated IPFS endpoint you own and map to a custom domai
 
 Private Gateways are dedicated IPFS gateway endpoints you own and manage. Each gateway has a `name`, a `slug`, and an associated DNS `zone`, and can be mapped to a custom domain for branded access to your IPFS content.
 
-> **What this maps to in code:** the gateway fields exposed by the API are defined on the [PrivateGateway GraphQL type](https://github.com/alternatefutures/service-cloud-api/blob/main/src/schema/typeDefs.ts) (`name`, `slug`, `zone`).
+> **What this maps to in code:** the gateway fields exposed by the API are defined on the [PrivateGateway GraphQL type](https://github.com/alternatefutures/alternate-clouds-api/blob/main/src/schema/typeDefs.ts) (`name`, `slug`, `zone`).
 
 ## Why Use Private Gateways?
 
@@ -53,7 +53,7 @@ console.log('Gateway created:', gateway.name);
 console.log('Gateway slug:', gateway.slug);
 ```
 
-> **What this maps to in code:** the [AlternateFuturesSdk constructor](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/AlternateFuturesSdk.ts) requires `accessTokenService` and exposes the `privateGateways()` accessor; the [PrivateGatewayClient](https://github.com/alternatefutures/package-cloud-sdk/blob/main/src/clients/privateGateway.ts) implements `create({ name, zoneId })`, `list()`, `get({ id })`, `getBySlug({ slug })`, `update({ id, name })`, and `delete({ id })`.
+> **What this maps to in code:** the [AlternateFuturesSdk constructor](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/AlternateFuturesSdk.ts) requires `accessTokenService` and exposes the `privateGateways()` accessor; the [PrivateGatewayClient](https://github.com/alternatefutures/alternate-clouds-sdk/blob/main/src/clients/privateGateway.ts) implements `create({ name, zoneId })`, `list()`, `get({ id })`, `getBySlug({ slug })`, `update({ id, name })`, and `delete({ id })`.
 
 ## Listing Gateways
 
