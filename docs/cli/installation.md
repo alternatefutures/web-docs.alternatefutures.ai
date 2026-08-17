@@ -158,7 +158,7 @@ This creates `af.config.json`:
 | `AF_PROJECT_ID` | Default project ID | `prj_abc123` |
 | `AF_ORG_ID` | Default organization ID | `org_abc123` |
 
-> **What this maps to in code:** these are the only variables the CLI reads — see [env vars read by the CLI](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts).
+> **What this maps to in code:** these are the core auth/config variables, read via [secrets.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts). The `chat` commands additionally read `AF_CHAT_*` (password/username/identity/url) — see the [Chat commands](/cli/commands#chat).
 
 ### Setting Environment Variables
 

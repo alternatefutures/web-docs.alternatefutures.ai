@@ -30,10 +30,10 @@ acc services deploy --help # Help for a single command
 | [`acc regions`](#acc-regions) | List regions with availability and pricing |
 | [`acc ssh`](#acc-ssh) | Open an interactive shell in a running deployment |
 | [`acc cp`](#acc-cp) | Copy files to/from a deployment |
-| [`acc chat`](#acc-chat) | End-to-end encrypted chat (auth-free) |
-| [`acc pat`](#acc-pat) | Manage personal access tokens |
-| [`acc templates`](#acc-templates) | Browse service templates |
-| [`acc billing`](#acc-billing) | View your credit balance |
+| [`acc chat`](#chat) | End-to-end encrypted chat (auth-free) |
+| [`acc pat`](#personal-access-tokens) | Manage personal access tokens |
+| [`acc templates`](#templates) | Browse service templates |
+| [`acc billing`](#billing) | View your credit balance |
 | [`acc version`](#acc-version) | Print the installed CLI version |
 
 ## Authentication

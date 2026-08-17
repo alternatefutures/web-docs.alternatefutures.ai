@@ -110,7 +110,7 @@ export AF_PROJECT_ID="your-project-id"
 | `AF_PROJECT_ID` | Default project ID for commands |
 | `AF_ORG_ID` | Default organization ID |
 
-> **What this maps to in code:** these are the only variables the CLI reads — see [CLI environment variables (secrets.ts)](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts).
+> **What this maps to in code:** these are the core auth/config variables, read via [secrets.ts](https://github.com/alternatefutures/alternate-clouds-cli/blob/main/src/secrets.ts). The `chat` commands additionally read `AF_CHAT_PASSWORD`, `AF_CHAT_USERNAME`, `AF_CHAT_IDENTITY`, and `AF_CHAT_URL` — see [Chat](/cli/commands#chat).
 
 ## Configuration File
 
