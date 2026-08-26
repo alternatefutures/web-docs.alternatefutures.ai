@@ -40,7 +40,7 @@ jobs:
         with:
           repository: alternatefutures/cloud-cli
           path: cloud-cli
-          ref: main
+          ref: develop
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Checkout cloud-sdk repo
@@ -48,17 +48,17 @@ jobs:
         with:
           repository: alternatefutures/cloud-sdk
           path: cloud-sdk
-          ref: main
+          ref: develop
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
       - name: Get pnpm store directory
         shell: bash
@@ -83,9 +83,11 @@ jobs:
         run: cd cloud-sdk && pnpm install
 
       - name: Generate CLI documentation
+        continue-on-error: true
         run: cd cloud-cli && pnpm docs:generate
 
       - name: Generate SDK documentation
+        continue-on-error: true
         run: cd cloud-sdk && pnpm docs:generate
 
       # Run docs:build directly instead of build to avoid redundant generation

@@ -44,5 +44,6 @@
     "radix-vue": "^1.9.17",
     "reka-ui": "^2.6.1",
     "tailwind-merge": "^3.4.0"
-  }
+  },
+  "packageManager": "pnpm@10.12.1"
 }
