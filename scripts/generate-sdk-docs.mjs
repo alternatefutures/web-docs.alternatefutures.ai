@@ -12,7 +12,7 @@
  * api.mdx then stays as-is); exits 1 only on a real generation failure.
  */
 import { execSync } from 'child_process';
-import { existsSync, readFileSync, writeFileSync, readdirSync, statSync, rmSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync, rmSync, mkdirSync } from 'fs';
 import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
@@ -46,10 +46,64 @@ if (!entry) {
   process.exit(1);
 }
 
+// TypeDoc reads the SDK's tsconfig.json, which `extends` "@tsconfig/node16" — a
+// devDependency. CI checks the SDK out WITHOUT installing (static parse only), so
+// the extends target is missing and TS fails with TS6053 before any docs are
+// built (--skipErrorChecking only covers type errors, not config errors). When
+// the base config is not resolvable, write a self-contained copy of the tsconfig
+// (same compilerOptions, absolute paths, emit options dropped) and use that.
+function tsconfigForTypedoc() {
+  const sdkTsconfigPath = join(SDK_REPO, 'tsconfig.json');
+  if (!existsSync(sdkTsconfigPath)) return null;
+  let cfg;
+  try {
+    cfg = JSON.parse(readFileSync(sdkTsconfigPath, 'utf8'));
+  } catch {
+    return null; // JSONC or similar: let TypeDoc read it as-is
+  }
+  const ext = cfg.extends;
+  const isPackage = typeof ext === 'string' && !ext.startsWith('.') && !ext.startsWith('/');
+  if (!isPackage) return null;
+  const pkgName = ext.startsWith('@') ? ext.split('/').slice(0, 2).join('/') : ext.split('/')[0];
+  if (existsSync(join(SDK_REPO, 'node_modules', pkgName))) return null; // installed: use real config
+  console.warn(`⚠️  ${ext} not installed in the SDK checkout - using a self-contained tsconfig.`);
+  const co = { ...(cfg.compilerOptions ?? {}) };
+  for (const k of ['declaration', 'emitDeclarationOnly', 'outDir', 'rootDir', 'sourceMap', 'incremental', 'tsBuildInfoFile']) delete co[k];
+  co.baseUrl = resolve(SDK_REPO, co.baseUrl ?? '.');
+  co.skipLibCheck = true;
+  const abs = (arr, dflt) => (arr ?? dflt).map((g) => join(SDK_REPO, g));
+  const out = {
+    compilerOptions: co,
+    include: abs(cfg.include, ['src/**/*.ts']),
+    exclude: abs(cfg.exclude, ['**/node_modules']),
+  };
+  mkdirSync(TMP, { recursive: true });
+  const p = join(TMP, 'tsconfig.json');
+  writeFileSync(p, JSON.stringify(out, null, 2));
+  return p;
+}
+const tsconfigArg = (() => { const p = tsconfigForTypedoc(); return p ? `--tsconfig ${JSON.stringify(p)} ` : ''; })();
+
+// src/index.ts re-exports only the *types* from src/clients/*, so with it as the
+// sole entry point TypeDoc omits every client class ("ApplicationsClient ... is
+// referenced by AlternateFuturesSdk.applications but not included"). Add the
+// client modules as entry points so their methods are documented.
+const clientsDir = join(dirname(entry), 'clients');
+const clientEntries = existsSync(clientsDir)
+  ? readdirSync(clientsDir)
+      .filter((f) => f.endsWith('.ts') && !/\.(test|spec)\.ts$/.test(f))
+      .map((f) => join(clientsDir, f))
+      .sort()
+  : [];
+const entryArgs = [entry, ...clientEntries].map((e) => JSON.stringify(e)).join(' ');
+
 console.log(`📖 Running TypeDoc on ${entry} ...`);
 execSync(
-  `npx --yes typedoc@0.26 --plugin typedoc-plugin-markdown --skipErrorChecking ` +
-    `--out ${JSON.stringify(TMP)} --readme none ${JSON.stringify(entry)}`,
+  // `-p` both packages: `npx typedoc --plugin x` installs only typedoc, then fails
+  // with ERR_MODULE_NOT_FOUND for the plugin. 4.2.x is the plugin line that peers
+  // on typedoc 0.26 (4.3+ needs 0.27).
+  `npx --yes -p typedoc@0.26 -p typedoc-plugin-markdown@4.2 typedoc --plugin typedoc-plugin-markdown --skipErrorChecking ` +
+    `${tsconfigArg}--out ${JSON.stringify(TMP)} --readme none ${entryArgs}`,
   { cwd: SDK_REPO, stdio: 'inherit' },
 );
 
@@ -66,7 +120,9 @@ function walk(dir, out = []) {
 const escapeMdx = (line) => {
   const parts = line.split(/(`+[^`]*`+)/g);
   return parts
-    .map((part, i) => (i % 2 === 1 ? part : part.replace(/\{/g, '\\{').replace(/</g, '\\<')))
+    // typedoc-plugin-markdown already emits `\<` / `\{`; escaping those again gives
+    // `\\<`, which MDX reads as a literal backslash + a JSX tag and fails to compile.
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/(?<!\\)\{/g, '\\{').replace(/(?<!\\)</g, '\\<')))
     .join('');
 };
 

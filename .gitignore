@@ -35,3 +35,7 @@ pnpm-debug.log*
 .temp/
 .cache/
 .vercel
+
+# Sibling repos checked out by CI (af-deploy-common.yml) to feed the generators
+alternate-clouds-cli/
+alternate-clouds-sdk/
