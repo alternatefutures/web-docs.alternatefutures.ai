@@ -58,9 +58,10 @@ jobs:
         with:
           node-version: '22'
 
+      # Version comes from package.json `packageManager` (pnpm@10.x). Passing
+      # `version:` here too makes action-setup@v4 fail with
+      # "Multiple versions of pnpm specified" (runs 34120434578, 34124739136).
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         shell: bash
