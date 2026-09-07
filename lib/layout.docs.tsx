@@ -1,5 +1,5 @@
 import type { DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
-import { SidebarPageItem, SidebarSectionHeader } from '@/components/sidebar-parts';
+import { SidebarFolderNode, SidebarPageItem, SidebarSectionHeader } from '@/components/sidebar-parts';
 import { baseOptions } from './layout.shared';
 import { source } from './source';
 
@@ -13,6 +13,7 @@ export function docsLayoutProps(): Omit<DocsLayoutProps, 'children'> {
       components: {
         Separator: SidebarSectionHeader,
         Item: SidebarPageItem,
+        Folder: SidebarFolderNode,
       },
     },
   };
