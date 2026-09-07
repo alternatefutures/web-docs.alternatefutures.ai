@@ -1,18 +1,17 @@
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { source } from '@/lib/source';
-import { baseOptions } from '@/lib/layout.shared';
+import { docsLayoutProps } from '@/lib/layout.docs';
 import BrandGuideContent from './brand-guide-content';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Brand Guide',
+  title: 'Brand guide',
   description:
     'The complete visual identity reference for Alternate Futures - colors, typography, geometric elements, logo usage, voice, and guidelines.',
 };
 
 export default function BrandGuidePage() {
   return (
-    <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+    <DocsLayout {...docsLayoutProps()}>
       <main className="brand-guide-page">
         <BrandGuideContent />
       </main>

@@ -1,5 +1,6 @@
 {
-  "title": "CLI",
+  "title": "CLI (acc)",
+  "description": "The acc command line interface: install, sign in, and the full command reference.",
   "defaultOpen": true,
   "pages": ["index", "installation", "commands"]
 }

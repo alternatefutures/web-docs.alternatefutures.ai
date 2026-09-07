@@ -1,13 +1,32 @@
 {
+  "title": "Alternate Futures Docs",
+  "description": "Documentation hub for Alternate Futures products. Alternate Clouds is the decentralized cloud platform: deploy containers, AI agents, GPU and confidential workloads from the web app, the acc CLI, or the SDK.",
   "pages": [
+    "---[AlternateFutures]Alternate Futures---",
     "index",
-    "---Alternate Clouds---",
-    "guides",
+    "[Brand guide](/brand-guide)",
+    "changelog",
+    "---[Cloud]Alternate Clouds---",
+    "---Start here---",
+    "guides/index",
+    "guides/quickstart",
+    "guides/authentication",
+    "ai-agents",
+    "---Guides---",
+    "guides/projects",
+    "guides/billing",
+    "guides/custom-domains",
+    "guides/api-keys",
+    "troubleshooting",
+    "guides/glossary",
+    "---Reference---",
     "cli",
     "sdk",
-    "---Company---",
-    "[Brand Guide](/brand-guide)",
-    "changelog",
-    "troubleshooting"
+    "---Self-hosting---",
+    "guides/decentralized-registry",
+    "guides/registry-architecture",
+    "guides/registry-deployment",
+    "---Archive---",
+    "legacy"
   ]
 }

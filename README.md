@@ -13,9 +13,12 @@ itself via `sites deploy`.
   (`scripts/generate-cli-docs.mjs` → `content/docs/cli/commands.mdx`)
 - **SDK reference** - AUTO-GENERATED from `alternate-clouds-sdk` via TypeDoc
   (`scripts/generate-sdk-docs.mjs` → `content/docs/sdk/api.mdx`)
-- **Agent-readable** - `/llms.txt` (index), `/llms-full.txt` (everything),
-  and a raw-markdown endpoint per page (`/llms.mdx/<path>/content.md`);
-  every page has a Copy Markdown button
+- **Agent-readable** - `/llms.txt` (platform context + index), `/llms-full.txt`
+  (everything), a raw-markdown endpoint per page (`/llms.mdx/<path>/content.md`),
+  and a **Copy for AI** button on every page that copies the page plus the
+  platform context block from `lib/agent-context.ts`. Human guide: `/ai-agents`.
+- **Style guide** - `STYLE.md` (Diátaxis groups, sentence-case titles, voice,
+  agent-facing rules). Read before writing a page.
 
 ## Development
 

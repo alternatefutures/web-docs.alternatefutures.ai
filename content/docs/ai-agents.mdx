@@ -1,0 +1,72 @@
+---
+title: "Docs for AI agents"
+description: "How AI agents and LLM tools should read these docs and operate Alternate Clouds: llms.txt, Markdown endpoints, the Copy for AI button, the agent plugin, and the non-interactive CLI contract."
+---
+
+This site is built to be read by models as well as people. Use this page to
+point any agent (Claude, ChatGPT, Cursor, Codex, or your own) at the right
+resources so it can act on the platform without guessing.
+
+## Give an agent this site
+
+| Resource | URL | Use it for |
+|---|---|---|
+| Index | [`/llms.txt`](/llms.txt) | A map of every page with one-line descriptions, preceded by the platform facts below. Start here. |
+| Everything | [`/llms-full.txt`](/llms-full.txt) | All pages in one Markdown file, for large-context models or for building an index. |
+| One page | `/llms.mdx/<path>/content.md` | The Markdown behind any page. Example: [`/llms.mdx/cli/commands/content.md`](/llms.mdx/cli/commands/content.md). |
+
+Every page also has two buttons at the top right:
+
+- **Copy for AI** copies the page as Markdown and appends the platform context
+  block shown below, so the agent knows where the app, the CLI, and the rest of
+  the docs live without a second lookup. Paste it into any chat.
+- **Open in** opens the page in Claude, ChatGPT, or Cursor with a prompt that
+  points at the Markdown endpoint, or copies just the page.
+
+## Install the agent plugin
+
+For agents that work on your machine (Claude Code, Cursor, Codex), install the
+skills plugin. It bundles the `acc` reference and task skills: first-time setup,
+deploy a Docker app, deploy from a template, deploy a server, troubleshoot a
+deployment.
+
+```bash
+git clone https://github.com/alternatefutures/alternate-clouds-skills ~/.alternate-skills
+bash ~/.alternate-skills/install.sh
+```
+
+The installer detects which agents you have and links each skill into place.
+
+## Let an agent run the CLI
+
+`acc` works without a terminal prompt when it has a token and a project:
+
+```bash
+export AF_TOKEN="<personal access token>"   # acc pat create --name my-agent
+export AF_PROJECT_ID="<project id>"         # acc projects list
+acc whoami --json                           # pre-flight: exits non-zero when not signed in
+acc services create --kind docker --image nginx:latest --port 80 -y
+```
+
+- Add `-y` to any command that would ask for confirmation.
+- Use `--json` where a command offers it for machine-readable output.
+- Without a TTY, commands that would prompt exit non-zero instead of hanging.
+- Give each agent its own token so you can revoke it on its own. See
+  [Access tokens](/guides/api-keys).
+- `acc <command> --help` prints the options for any command. The full list is in
+  the [command reference](/cli/commands).
+
+## Platform context block
+
+This is the text **Copy for AI** appends to every page. Put it in a system
+prompt, a `CLAUDE.md`, or an `AGENTS.md` when you want an agent to know the
+platform before it reads anything else.
+
+<AgentContext />
+
+## What is not machine-operable yet
+
+- Signing up and adding a payment method happen in the web app.
+- Composite (multi-service) templates deploy from the web app only.
+- Pages in the Archive section describe the retired `af` CLI. Agents should
+  not run those commands.

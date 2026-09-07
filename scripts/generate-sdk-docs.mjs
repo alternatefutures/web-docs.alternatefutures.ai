@@ -85,7 +85,7 @@ for (const file of walk(TMP).sort()) {
 }
 
 const header = `---
-title: "SDK API Reference"
+title: "SDK API reference"
 description: "TypeScript SDK API reference, auto-generated from ${pkg.name}@${pkg.version}."
 ---
 

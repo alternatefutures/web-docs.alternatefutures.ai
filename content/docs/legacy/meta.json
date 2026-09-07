@@ -1,0 +1,27 @@
+{
+  "title": "Retired af CLI guides",
+  "description": "Guides written for the retired af CLI and its sites, storage, and functions workflow. Kept for reference; these commands do not exist in acc.",
+  "defaultOpen": false,
+  "pages": [
+    "index",
+    "../guides/sites",
+    "../guides/functions",
+    "../guides/agents",
+    "../guides/storage",
+    "../guides/observability",
+    "../guides/applications",
+    "../guides/gateways",
+    "../guides/ipns",
+    "../guides/ens",
+    "../guides/cicd",
+    "../guides/best-practices",
+    "../guides/deploy-nextjs",
+    "../guides/deploy-react",
+    "../guides/deploy-astro",
+    "../guides/migrate-from-fleek",
+    "../guides/migrate-from-netlify",
+    "../guides/migrate-from-spheron",
+    "../guides/migrate-from-vercel",
+    "../guides/dashboard"
+  ]
+}

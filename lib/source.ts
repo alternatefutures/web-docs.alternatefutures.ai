@@ -2,6 +2,7 @@ import { loader } from 'fumadocs-core/source';
 import { docsContentRoute, docsRoute } from './shared';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
+import { resolveIcon } from './icons';
 
 const docs = defineDocs({
   dir: 'content/docs',
@@ -16,11 +17,28 @@ const docs = defineDocs({
   },
 });
 
+// Turns the `[Name]` icon tokens in meta.json into elements (see lib/icons.tsx).
+function replaceIcon<T extends { icon?: unknown }>(node: T): T {
+  if (node.icon === undefined || typeof node.icon === 'string') {
+    node.icon = resolveIcon(node.icon as string | undefined);
+  }
+  return node;
+}
+
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
-  plugins: [],
+  plugins: [
+    {
+      name: 'af:icons',
+      transformPageTree: {
+        file: replaceIcon,
+        folder: replaceIcon,
+        separator: replaceIcon,
+      },
+    },
+  ],
 });
 
 export function getPageMarkdownUrl(page: (typeof source)['$inferPage']) {

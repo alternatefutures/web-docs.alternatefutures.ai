@@ -1,20 +1,20 @@
 ---
 title: "Projects"
-description: "Projects are the top-level organizational unit in Alternate Futures, containing all your sites, functions, storage, and other resources."
+description: "Projects group your services, deployments, domains, and team members. Create and switch projects from the web app or the acc CLI."
 ---
 
-Projects are the top-level organizational unit in Alternate Futures, containing all your sites, functions, storage, and other resources.
+Projects are the top-level organizational unit in Alternate Clouds. Every
+service belongs to exactly one project, and the CLI always acts on your active
+project.
 
-## What are Projects?
+## What is a project?
 
 A project is a workspace that groups related resources:
 
-- **Sites** - Static sites and deployments
-- **Functions** - Serverless edge functions
-- **Storage** - IPFS pins and files
-- **Domains** - Custom domains and DNS
-- **Gateways** - Private IPFS gateways
-- **Team Members** - Collaborators and permissions
+- **Services** - Containers, templates, and GPU workloads you have deployed
+- **Deployments** - The release history of each service
+- **Domains** - Custom domains pointed at your services
+- **Members** - The people who can see and manage the project
 
 ## Creating a Project
 
@@ -475,10 +475,8 @@ acc projects list
 # Check you have permissions
 ```
 
-## Next Steps
+## Next steps
 
-- [Sites](./sites.md) - Deploy sites to your project
-- [Functions](./functions.md) - Create edge functions
-- [Storage](./storage.md) - Manage project storage
-- [API Keys](./api-keys.md) - Create project API keys
-- [Team Management](./team.md) - Add team members (coming soon)
+- [Quick start](/guides/quickstart) - Deploy your first service
+- [Access tokens](/guides/api-keys) - Tokens for CI and agents
+- [Billing and usage](/guides/billing) - Credits, budgets, and plans

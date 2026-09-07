@@ -1,5 +1,6 @@
 {
-  "title": "SDK",
+  "title": "SDK (TypeScript)",
+  "description": "The @alternatefutures/sdk package for programmatic access.",
   "defaultOpen": true,
   "pages": ["index", "installation", "quickstart", "api"]
 }

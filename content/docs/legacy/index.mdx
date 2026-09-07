@@ -1,0 +1,29 @@
+---
+title: "Retired af CLI guides"
+description: "What happened to the af CLI, which guides in this section still apply, and where the current equivalents live."
+---
+
+<Callout type="warn" title="Read this first">
+The guides in this section were written for the retired `af` command line tool
+and its sites, storage, functions, and IPFS workflow. The current CLI is `acc`.
+It deploys compute services (containers, templates, GPU and confidential
+workloads) and does not include the `af sites`, `af storage`, `af functions`,
+`af ipns`, `af ens`, or `af gateways` commands. Commands on these pages will not
+work with `acc`.
+</Callout>
+
+## What to use instead
+
+| You want to | Use |
+|---|---|
+| Deploy a container or an app from a template | [Quick start](/guides/quickstart) and `acc services create` |
+| Point a domain at a service | [Custom domains](/guides/custom-domains) |
+| Automate deploys from CI or an agent | [Docs for AI agents](/ai-agents) and [Access tokens](/guides/api-keys) |
+| Host a static site | Not available in `acc` yet. Deploy the site inside a container (for example an `nginx` image that serves your build output). |
+| Store files on IPFS or Arweave | Not available in `acc`. The self-hosted [decentralized container registry](/guides/decentralized-registry) covers image storage on IPFS. |
+
+## Why these pages are still here
+
+They document product surface that is planned to return, and people still land
+on them from older tutorials. Each page carries a banner. Nothing in this
+section is used by the search index for "how do I" answers about `acc`.
