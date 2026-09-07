@@ -18,7 +18,7 @@ export const gitConfig = {
 
 // Platform facts referenced from several places (agent context, pages).
 export const platform = {
-  appUrl: 'https://app.alternatefutures.ai',
+  appUrl: 'https://clouds.alternatefutures.ai',
   cliPackage: '@alternatefutures/acc',
   sdkPackage: '@alternatefutures/sdk',
   skillsRepo: 'https://github.com/alternatefutures/alternate-clouds-skills',
