@@ -1,25 +1,23 @@
-name: ⚡️ Deploy Documentation (Develop)
+name: 📚 Docs build (Develop)
+
+# Build check + stale-reference PR for `develop`. Deployment is done by Vercel
+# (git integration on main), not by this workflow. See af-deploy-common.yml.
+
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 on:
   workflow_dispatch:
   push:
     branches:
       - develop
-  # Trigger from CLI/SDK repo updates
-  repository_dispatch:
-    types: [docs-update-develop]
 
 jobs:
-  deploy-to-develop:
-    permissions:
-      contents: read
+  build-docs:
     uses: ./.github/workflows/af-deploy-common.yml
     with:
       environment: develop
       branch: develop
-      network: ipfs
     secrets:
-      af_api_key: ${{ secrets.AF_API_KEY }}
       gh_pat: ${{ secrets.GH_PAT }}

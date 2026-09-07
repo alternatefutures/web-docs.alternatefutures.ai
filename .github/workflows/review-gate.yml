@@ -1,5 +1,22 @@
-# Review Gate DISABLED for now (commented out by request across all repos).
-# Restore by uncommenting the lines below or via git history.
+# Review Gate is DISABLED (by request, across all repos).
+#
+# This small valid header exists because a comments-only workflow file makes
+# GitHub report "This run likely failed because of a workflow file issue" on
+# EVERY push. The stub only runs on manual dispatch and deliberately does not
+# post the "Quinn-first, then Senku + Lain" status that main's branch protection
+# still lists as a required check. To re-enable: delete this header, uncomment
+# the original workflow below (or restore it from git history).
+name: Review Gate (disabled)
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Review Gate is disabled. The original workflow is kept commented out in this file."
+
+# ---------------------------- original workflow -----------------------------
 # name: Review Gate
 # 
 # on:
@@ -94,10 +111,10 @@
 #               failures.length === 0
 #                 ? `All gates passed. PR is mergeable per review policy.`
 #                 : `**Blocked:**
-` + failures.map(f => `- ${f}`).join('
-'),
+# ` + failures.map(f => `- ${f}`).join('
+# '),
 #             ].join('
-');
+# ');
 # 
 #             await core.summary.addRaw(summary).write();
 # 

@@ -5,8 +5,8 @@
 # Alternate Clouds Documentation
 
 Documentation site for the Alternate Clouds platform (docs.alternatefutures.ai).
-Built with **Fumadocs** (Next.js, static export), deployed to the platform
-itself via `sites deploy`.
+Built with **Fumadocs** (Next.js, static export), deployed by Vercel from the
+`main` branch (git integration; `vercel.json` serves `out/` as a static site).
 
 - **Guides** - platform usage guides and tutorials (`content/docs/guides`)
 - **CLI reference** - AUTO-GENERATED from the `alternate-clouds-cli` source
@@ -46,14 +46,20 @@ public/             # Static assets (logos, icons)
 
 ## Deployment
 
-Pushes to `develop`/`staging`/`main` deploy via
-`.github/workflows/af-deploy-*.yml` → shared `af-deploy-common.yml`, which
-checks out the CLI/SDK repos, regenerates the references, builds, and runs
-`sites deploy` (currently via the legacy `af` CLI - `acc` has no `sites`
-command yet).
+**Vercel deploys `main`** on every push (`vercel.json`: `framework: null`,
+build `pnpm run build`, output `out/`). Vercel runs only the Next.js build, so
+the live site shows the **committed** CLI/SDK reference files.
 
-A CLI release also triggers a docs rebuild: `alternate-clouds-cli`'s
-`npm-publish.yml` sends `repository_dispatch: docs-update` to this repo.
+Pushes to `develop`/`staging`/`main` also run
+`.github/workflows/af-deploy-*.yml` → shared `af-deploy-common.yml`, a build
+check that checks out the CLI/SDK repos, regenerates the references, builds,
+uploads `out/` as an artifact and, when the committed references are stale,
+opens a pull request with the regenerated files. Merging that PR updates the
+live reference. See `.github/workflows/README.md`.
+
+A CLI release triggers the same check: `alternate-clouds-cli`'s
+`npm-publish.yml` sends `repository_dispatch: docs-update` to this repo
+(needs the `GH_PAT` secret in the CLI repo).
 
 ## Rules
 

@@ -1,40 +1,47 @@
-name: ⚡️ Deploy Documentation (Common)
-permissions:
-  contents: read
+name: 📚 Docs build (Common)
+
+# Reusable build check for the docs site. It does NOT deploy: docs.alternatefutures.ai
+# is deployed by Vercel from the `main` branch (git integration; vercel.json
+# `framework: null` serves the static export in out/). Vercel runs only
+# `pnpm run build`, so the live site always shows the COMMITTED CLI/SDK reference.
+# This workflow regenerates those references from the source repos and, when the
+# committed copy is stale, opens a pull request with the regenerated files —
+# merging that PR is what updates the live reference.
+#
+# History: until 2026-09-08 this workflow ended with `npm i -g @alternatefutures/cli
+# && af sites deploy`. That package is frozen at 0.3.0 and has no `sites` command,
+# so the step printed the CLI help and exited 0 without deploying anything
+# (issue #33; run 34127305643 was a false green).
 
 on:
   workflow_call:
     inputs:
       environment:
+        description: Label for the artifact and PR branch (production | staging | develop)
         required: true
         type: string
       branch:
+        description: Docs branch to build and, on drift, target with the PR
         required: true
         type: string
-      network:
-        required: false
-        type: string
-        default: ipfs
     secrets:
-      af_api_key:
-        required: true
       gh_pat:
+        description: Token that can read alternatefutures/alternate-clouds-cli (private)
         required: false
-
-env:
-  TARGET_ENVIRONMENT: ${{ inputs.environment }}
-  AF_API_KEY: ${{ secrets.af_api_key }}
 
 jobs:
-  deploy-to-alternate-futures:
+  build-docs:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    permissions:
+      contents: write        # push the bot branch with regenerated references
+      pull-requests: write   # open/update the "regenerate references" PR
     steps:
       - name: Checkout docs repo
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.branch }}
 
+      # Private repo: needs gh_pat. github.token only works inside this repo.
       - name: Checkout alternate-clouds-cli repo
         uses: actions/checkout@v4
         with:
@@ -79,8 +86,9 @@ jobs:
       - name: Install dependencies (docs)
         run: pnpm install
 
-      # Both generators parse the checked-out source repos statically —
-      # no install/build of the CLI or SDK is needed.
+      # Both generators parse the checked-out source repos statically — no
+      # install/build of the CLI or SDK is needed (the SDK generator writes its
+      # own tsconfig when the SDK's `extends` target is not installed).
       - name: Generate CLI documentation
         run: pnpm generate:cli
         env:
@@ -92,19 +100,67 @@ jobs:
         env:
           AF_SDK_REPO: ${{ github.workspace }}/alternate-clouds-sdk
 
+      # Builds with the REGENERATED references, so a PR below never proposes
+      # MDX that does not compile.
       - name: Build (Next.js static export)
         run: pnpm build
 
-      # DEPLOY IS KNOWN-BROKEN (issue #33): this path has not worked since
-      # 2025-12-29 — the live site is a manual Vercel deploy. `acc` has no
-      # `sites` command; the legacy `af` CLI is abandoned at 0.3.0 and needs an
-      # AF CI token nobody has minted. Options per PR #34: mint a token for this
-      # path, or replace with an SDK-based script (storage.uploadDirectory +
-      # sites.createCustomIpfsDeployment). Until then Vercel serves the site
-      # (vercel.json is updated for the Next.js build).
-      - name: Install Alternate Futures CLI (legacy af, for sites deploy)
-        run: npm install -g @alternatefutures/cli
+      - name: Upload built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site-${{ inputs.environment }}
+          path: out/
+          retention-days: 7
 
-      # CLI reads af.config.json for site slug and distDir (out/)
-      - name: Deploy to Alternate Futures
-        run: af sites deploy
+      - name: Detect stale committed references
+        id: drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILES="content/docs/cli/commands.mdx content/docs/sdk/api.mdx"
+          CHANGED="$(git status --porcelain -- $FILES | awk '{print $2}')"
+          CLI_SHA="$(git -C alternate-clouds-cli rev-parse --short HEAD)"
+          SDK_SHA="$(git -C alternate-clouds-sdk rev-parse --short HEAD)"
+          {
+            echo "cli_sha=$CLI_SHA"
+            echo "sdk_sha=$SDK_SHA"
+          } >> "$GITHUB_OUTPUT"
+          if [ -z "$CHANGED" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Committed CLI/SDK references match the source repos (cli@$CLI_SHA, sdk@$SDK_SHA)." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Generated references are stale::$(echo $CHANGED | tr '\n' ' ') differ from the source repos; a PR with the regenerated files is opened/updated below."
+            {
+              echo "## ⚠️ Committed references are stale"
+              echo
+              echo "Regenerated from alternate-clouds-cli@$CLI_SHA (main) and alternate-clouds-sdk@$SDK_SHA (develop):"
+              echo
+              for f in $CHANGED; do echo "- \`$f\`"; done
+              echo
+              echo "A pull request with these files is opened/updated on branch \`bot/regenerate-references-${{ inputs.branch }}\`. Merging it updates the live site (Vercel deploys \`main\`)."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Idempotent: reuses the same branch/PR while drift persists; the PR is
+      # closed and its branch deleted automatically once the base catches up.
+      - name: Open or update PR with regenerated references
+        if: steps.drift.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          base: ${{ inputs.branch }}
+          branch: bot/regenerate-references-${{ inputs.branch }}
+          delete-branch: true
+          add-paths: |
+            content/docs/cli/commands.mdx
+            content/docs/sdk/api.mdx
+          commit-message: "docs: regenerate CLI/SDK references"
+          title: "docs: regenerate CLI/SDK references"
+          body: |
+            Automated by `📚 Docs build` — the committed generated references no longer match the source repos.
+
+            - `alternate-clouds-cli` @ `${{ steps.drift.outputs.cli_sha }}` (main) → `content/docs/cli/commands.mdx`
+            - `alternate-clouds-sdk` @ `${{ steps.drift.outputs.sdk_sha }}` (develop) → `content/docs/sdk/api.mdx`
+
+            Triggered by `${{ github.event_name }}` on `${{ inputs.branch }}` (run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
+            Merging deploys the update via Vercel. Do not edit these files by hand — rerun the generators instead.
