@@ -7,6 +7,52 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
+/* ── Alternate Futures theme ───────────────────────────────────────────────
+   One accent carries the active sidebar item, the table of contents, links,
+   and focus rings. Values come from the brand guide (/brand-guide):
+   Brand Blue #000AFF is the interactive color on light backgrounds; Medium
+   Blue #A5B2FF is named as the dark-mode primary interactive color. Pure
+   #000AFF on near-black is ~2.4:1 contrast, so it is never used for text in
+   dark mode. Ground is pulled toward black so the accent reads. */
+:root {
+  --color-fd-primary: #000aff;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-ring: #000aff;
+}
+
+.dark {
+  --color-fd-primary: #a5b2ff;
+  --color-fd-primary-foreground: #0000af;
+  --color-fd-ring: #a5b2ff;
+  --color-fd-background: hsl(0 0% 4.5%);
+  --color-fd-card: hsl(0 0% 6%);
+  --color-fd-popover: hsl(0 0% 9%);
+  --color-fd-muted: hsl(0 0% 10%);
+  --color-fd-secondary: hsl(0 0% 10%);
+  --color-fd-border: hsla(0 0% 45% / 0.22);
+}
+
+/* neutral.css lifts the sidebar's muted tokens; keep them in step with the darker ground. */
+.dark #nd-sidebar {
+  --color-fd-muted: hsl(0 0% 11%);
+  --color-fd-secondary: hsl(0 0% 13%);
+}
+
+/* Table of contents label, same small caps as the sidebar group labels. */
+#toc-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Prose: quieter body copy, headings at full strength, links in the accent. */
+.prose {
+  --tw-prose-body: color-mix(in oklab, var(--color-fd-foreground) 78%, transparent);
+  --tw-prose-headings: var(--color-fd-foreground);
+  --tw-prose-links: var(--color-fd-primary);
+}
+
 html {
   scrollbar-gutter: stable;
 }

@@ -28,12 +28,13 @@ import { cn } from '@/lib/cn';
  * active marker (-8px) lands exactly on the line.
  */
 
-/* One row style for pages and folder rows. */
+/* One row style for pages and folder rows. Active = accent text, no pill
+   (the accent alone carries state, same as the table of contents). */
 const ROW = cn(
   'relative flex flex-row items-center gap-2 rounded-md px-2 py-1.5 text-start text-[0.8125rem] leading-5 text-fd-muted-foreground wrap-anywhere transition-colors',
   '[&_svg]:size-4 [&_svg]:shrink-0',
-  'hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none',
-  'data-[active=true]:bg-fd-primary/10 data-[active=true]:text-fd-primary data-[active=true]:font-medium data-[active=true]:hover:transition-colors',
+  'hover:text-fd-foreground hover:transition-none',
+  'data-[active=true]:text-fd-primary data-[active=true]:font-medium data-[active=true]:hover:text-fd-primary data-[active=true]:hover:transition-colors',
 );
 
 /* Nested pages start at 28px (depth 1); deeper levels step by 12px. */
