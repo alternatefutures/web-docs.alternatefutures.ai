@@ -21,7 +21,6 @@
     "../guides/migrate-from-fleek",
     "../guides/migrate-from-netlify",
     "../guides/migrate-from-spheron",
-    "../guides/migrate-from-vercel",
-    "../guides/dashboard"
+    "../guides/migrate-from-vercel"
   ]
 }

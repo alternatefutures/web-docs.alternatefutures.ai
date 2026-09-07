@@ -1,0 +1,88 @@
+---
+title: "How billing works"
+description: "Why Alternate Clouds bills a subscription plus prepaid credits, what the trial includes, how usage is metered, and what happens when credits run low."
+---
+
+This page explains the billing model. For the steps (top up, change plan, set a
+budget), see [Manage billing and credits](/guides/billing).
+
+## Two parts: a plan and a wallet
+
+Billing is per organization and has two parts.
+
+- **Subscription.** A monthly or yearly plan, priced per seat. It is the base
+  fee for the platform and sets the markup applied to your usage.
+- **Credit wallet.** Prepaid credits in US dollars. Everything you run is
+  metered and paid from this wallet while it runs.
+
+The split keeps the fixed part predictable and the variable part prepaid: you
+can never be surprised by a bill larger than what you put in the wallet.
+
+## Trial and signup credit
+
+- Every new account starts a **14-day trial**. No card is needed, and you can
+  deploy during the trial.
+- When the trial ends you have a short grace period of three days to choose a
+  plan. After that you cannot deploy until you subscribe.
+- Signing up with a verified email adds a **one-time signup credit** to your
+  wallet. If you signed up with a wallet address, you receive it when you add
+  and verify an email in **Account settings**.
+
+## What usage costs
+
+Usage is billed at what the provider charges plus your plan's markup. Yearly
+plans carry a lower markup than monthly plans, and each line on your usage page
+shows both the raw cost and what you were charged.
+
+- Compute is metered per hour of running time for each service. GPU and
+  confidential (TEE) services are priced by the provider the same way.
+- Prices differ by region and by GPU model. `acc regions` shows current
+  availability and pricing before you deploy.
+- Closing a service stops its charges. A service that is failed or closed does
+  not bill.
+
+## Paying
+
+- **Subscriptions** are paid by card, or funded from your credit wallet if you
+  prefer not to use a card.
+- **Credits** are topped up by card in the web app, or with a stablecoin
+  transfer (USDC, USDT, or DAI on Base, Ethereum, Arbitrum, Optimism, or
+  Polygon) from the web app or the CLI.
+
+## When the wallet runs low
+
+Two server-side safeguards protect the shared wallet:
+
+1. **Before a deploy**, the platform checks that your balance covers at least
+   one hour of everything you would then be running (and at least one dollar).
+   If not, the deploy is refused and you are asked to top up.
+2. **While services run**, if the balance falls below roughly one hour of total
+   spend, services are **suspended** one at a time until the rest are covered.
+   Suspended services are not deleted. They **resume automatically** after a
+   topup.
+
+## Spend controls per service
+
+Each service can carry its own limit, set when you create or deploy it and
+enforced by the platform rather than by your local machine:
+
+| Mode | What it does | Flags |
+|---|---|---|
+| **Pay as you go** | No limit. The default. | `--spend payg` |
+| **Budget cap** | Stops the service when its total or monthly spend reaches the cap. A monthly cap that the projected cost already exceeds is refused before launch. | `--budget-total <usd>`, `--budget-monthly <usd>` |
+| **Auto stop** | Stops the service after a fixed runtime. The full projected cost is reserved from your balance up front. | `--stop-hours <n>`, `--stop-days <n>` |
+
+When a service stops, the reason is recorded: budget exceeded, runtime expired,
+balance low, or manual stop.
+
+## Who can see billing
+
+Owners and admins of an organization see the **Billing** page in the web app:
+usage, payments, invoices, plans, and the credits wallet. Members can deploy
+but do not see billing.
+
+## Next steps
+
+- [Manage billing and credits](/guides/billing)
+- [Accounts, organizations, and projects](/guides/account-model)
+- [Command reference: billing](/cli/commands#billing)

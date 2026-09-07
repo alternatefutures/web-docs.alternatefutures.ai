@@ -1,370 +1,193 @@
 ---
-title: "Troubleshooting"
-description: "Solutions for common issues with Alternate Futures deployments, DNS, builds, IPFS pinning, and SSL certificates."
+title: "Troubleshoot common problems"
+description: "Fixes for the problems people hit most with the acc CLI, sign-in, stuck or failed deployments, suspended services, and billing on Alternate Clouds."
 ---
 
+This page shows how to fix the problems people hit most. Each entry names the
+symptom, the usual cause, and the commands that resolve it. For the reasoning
+behind statuses and suspensions, read [How billing works](/guides/how-billing-works).
 
-Solutions for common issues when deploying and managing sites on Alternate Futures.
+## CLI and sign-in
 
-## Deployment Errors
+### `command not found: acc`
 
-### "Command not found: af"
-
-The CLI is not installed or not in your PATH.
-
-**Fix:**
+The CLI is not installed, or npm's global bin directory is not on your `PATH`.
 
 ```bash
-# Install the CLI globally
 npm install -g @alternatefutures/acc
-
-# Verify installation
 acc --version
-
-# If still not found, check your npm global bin directory
-npm config get prefix
 ```
 
-If the global bin directory is not in your PATH, add it:
+If the second command still fails, add npm's global bin directory to your
+`PATH`:
 
 ```bash
-# macOS/Linux
 export PATH="$(npm config get prefix)/bin:$PATH"
-
-# Add to your shell profile for persistence
-echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.bashrc
 ```
+
+### `acc login` cannot open a browser
+
+You are on a server or in a container. Use the email code flow instead:
+
+```bash
+acc login --email
+acc whoami
+```
+
+### The CLI prints its help instead of running a command
+
+You ran a command that does not exist in `acc`, most often one from an old
+tutorial written for the retired `af` CLI (`af sites deploy`, `af storage`,
+`af functions`). See [Retired af CLI guides](/legacy) for what replaced each
+one, and [Command reference](/cli/commands) for the current commands.
 
 ### "Authentication failed" or "Invalid token"
 
-Your session has expired or your token is incorrect.
-
-**Fix:**
+Your stored login expired, or `AF_TOKEN` holds a bad value.
 
 ```bash
-# Re-authenticate interactively
-acc login
+acc logout && acc login          # interactive machines
+echo -n "$AF_TOKEN" | wc -c      # CI: a copied token must have no trailing whitespace
+acc pat create --name ci-runner  # issue a fresh token if needed
+```
 
-# Or verify your token
-echo $AF_TOKEN
+### Commands act on the wrong project
 
-# Generate a new Personal Access Token
-acc pat create --name "New Token"
+The CLI uses your active project, or `AF_PROJECT_ID` if it is set.
+
+```bash
+acc whoami                       # shows the active project
+acc projects switch <id>         # change it
+acc services list -p <id>        # or name the project for one command
+```
+
+## Deployments
+
+### The deployment stays in a waiting or creating state
+
+A deployment waits for a provider to offer capacity. Most start within a few
+minutes. One that makes no progress for about 25 minutes is marked failed
+automatically, and you are not charged for it.
+
+If it happens repeatedly, the request is hard to place:
+
+```bash
+acc regions                      # availability and price per region
+acc regions --gpu h100           # for a specific GPU model
+```
+
+Then deploy again with a different region, smaller resources, or a different
+GPU model:
+
+```bash
+acc services deploy <id> --region us-west
+acc services deploy <id> --gpu-model a100 --gpu-count 1
+```
+
+### The deployment fails right away
+
+Check the log and the deployment list:
+
+```bash
+acc services logs <id> --tail 200
+acc deployments --service <id> --status failed
 ```
 
 Common causes:
-- Token was copied with extra whitespace
-- Token has expired
-- Token does not have the required permissions
-- Environment variable `AF_TOKEN` is not set
 
-### "No files found to deploy"
+- **The image cannot be pulled.** The image name or tag is wrong, or the image
+  is private. Images on GitHub Container Registry are private by default; make
+  the package public in its GitHub settings.
+- **The wrong port.** Pass the port your container listens on with `--port`.
+- **A required environment variable is missing.** Templates list the variables
+  they need. Set them with `--env KEY=VALUE` when you deploy, or afterwards:
 
-The output directory is empty or does not exist.
+  ```bash
+  acc services env set <service> KEY VALUE
+  acc services deploy <service>
+  ```
 
-**Fix:**
+### A new image version does not show up after redeploying
 
-```bash
-# Verify the directory exists and has files
-ls -la ./dist
+Providers cache images by tag. A moving tag such as `latest` or `main` keeps
+serving the cached build, and the platform refuses those two tags when you
+change a service's image. Push a versioned tag (`myimage:1.4.2`) and deploy
+that.
 
-# Make sure you ran the build command first
-npm run build
+### The CLI refuses a template
 
-# Check your af.config.json for the correct output directory
-cat af.config.json
-```
+Templates that start several services at once deploy from the web app only.
+Open **Deploy** at [app.alternatefutures.ai](https://app.alternatefutures.ai)
+and choose the template there.
 
-### "Deployment timed out"
+### The URL does not respond
 
-The upload took too long, usually due to a large deployment or slow connection.
-
-**Fix:**
-
-```bash
-# Try deploying again (network issues are often temporary)
-acc services deploy
-
-# For large deployments, check your file count and total size
-du -sh ./dist
-find ./dist -type f | wc -l
-```
-
-Tips for large deployments:
-- Remove unnecessary files (source maps, test files, documentation)
-- Optimize images before deploying
-- Check for accidentally included `node_modules` or `.git` directories
-
-### "Deployment failed: file too large"
-
-Individual files exceed the size limit for the selected storage network.
-
-**Fix:**
-
-- IPFS has a per-file limit of approximately 1GB
-- Compress large assets (images, videos) before deploying
-- Consider using Filecoin for very large files
-- Split large datasets into smaller chunks
-
-## DNS Issues
-
-### "Custom domain not resolving"
-
-Your domain is not pointing to your deployment.
-
-**Fix:**
-
-1. Verify your DNS records are correct:
-
-| Record Type | Name | Expected Value |
-|-------------|------|----------------|
-| CNAME | `www` | Your AF gateway URL |
-| TXT | `_dnslink` | `dnslink=/ipfs/<your-cid>` |
-
-2. Check DNS propagation (can take up to 48 hours):
+The URL (`https://<slug>-app.alternatefutures.ai`) answers once the deployment
+is active and the container is listening on the port you exposed.
 
 ```bash
-# Check DNS records
-dig your-domain.com CNAME
-dig _dnslink.your-domain.com TXT
-
-# Or use an online tool
-# https://www.whatsmydns.net/
+acc services info <id>           # status and URL
+acc services logs <id> --tail 100
+acc ssh <id>                     # a shell inside the running container
 ```
 
-3. Common mistakes:
-   - Using `A` record instead of `CNAME` for the domain
-   - Missing the `_dnslink` prefix on the TXT record
-   - DNS proxy (e.g., Cloudflare orange cloud) interfering with resolution
+## Suspended services and billing
 
-### "DNS_PROBE_FINISHED_NXDOMAIN"
+### A service shows as suspended
 
-The domain does not exist or nameservers are not configured.
-
-**Fix:**
-
-- Verify you own the domain and it has not expired
-- Check that your domain registrar has the correct nameservers set
-- If using Cloudflare, make sure the domain is active in your Cloudflare dashboard
-- Wait for nameserver changes to propagate (up to 48 hours)
-
-### "ERR_NAME_NOT_RESOLVED" after changing DNS
-
-DNS changes have not propagated yet.
-
-**Fix:**
-
-- Wait 15-30 minutes for most DNS providers
-- Full global propagation can take up to 48 hours
-- Clear your local DNS cache:
+Your organization's credit wallet dropped below about one hour of total
+spend, so services were paused to protect the balance. Nothing was deleted.
 
 ```bash
-# macOS
-sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
-
-# Linux
-sudo systemd-resolve --flush-caches
-
-# Windows
-ipconfig /flushdns
+acc billing balance
+acc billing topup --crypto --amount 25   # or top up by card in the web app
 ```
 
-### "DNSLink not updating after new deployment"
+Suspended services resume on their own after the topup. To stop paying for
+one instead, run `acc services close <id>`.
 
-The `_dnslink` TXT record still points to the old CID.
+### A deploy is refused for insufficient balance
 
-**Fix:**
+Before every deploy the platform checks that the wallet covers at least one
+hour of everything you would then be running. Top up, or close services you
+no longer need, then deploy again.
 
-- Update the `_dnslink` TXT record with the new CID from your latest deployment
-- If using IPNS, the record updates automatically (see [IPNS Records](./guides/ipns.md))
-- Consider setting up IPNS for automatic DNS updates on each deployment
+### A service stopped on its own
 
-## Build Failures
-
-### "Build command failed with exit code 1"
-
-Your project's build command encountered an error.
-
-**Fix:**
+It reached a spend control you set: a total or monthly budget cap, or an
+auto-stop timer. `acc services info <id>` shows the stop reason. Deploy again
+with a higher cap, or with none:
 
 ```bash
-# Run the build command locally to see the full error output
-npm run build
-
-# Common fixes:
-# 1. Install missing dependencies
-npm install
-
-# 2. Fix TypeScript errors
-npx tsc --noEmit
-
-# 3. Check for missing environment variables
-# Some frameworks require env vars at build time
+acc services deploy <id> --spend payg
 ```
 
-### "Out of memory during build"
+### You cannot deploy after the trial
 
-The build process ran out of memory, common with large projects.
+The 14-day trial has ended and the three-day grace period has passed. An owner
+or admin needs to choose a plan under **Billing** in the web app.
 
-**Fix:**
+### You cannot see Billing or Members in the web app
 
-```bash
-# Increase Node.js memory limit
-NODE_OPTIONS="--max-old-space-size=4096" npm run build
+Those pages are shown to owners and admins only. Ask an owner to change your
+role or to do the task for you.
 
-# For CI/CD, add this to your workflow
-env:
-  NODE_OPTIONS: "--max-old-space-size=4096"
-```
+### You cannot invite people
 
-### "Module not found" errors
+Invitations require an active paid subscription on the organization. Choose a
+plan first; see [Manage billing and credits](/guides/billing).
 
-A dependency is missing or not installed correctly.
+### A card topup is not offered in the CLI
 
-**Fix:**
+Card payments are web only. Open **Billing** in the web app. The CLI supports
+stablecoin topups with `acc billing topup --crypto`.
 
-```bash
-# Remove node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
+## Custom domains
 
-# If using pnpm
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
-```
+Custom domains are in early access. See [Custom domains](/guides/custom-domains)
+for the current state and the DNS records to use.
 
-### Framework-specific build issues
+## Still stuck
 
-| Framework | Common Issue | Fix |
-|-----------|-------------|-----|
-| **Next.js** | Image optimization with static export | Add `images: { unoptimized: true }` to `next.config.js` |
-| **Next.js** | `getServerSideProps` with static export | Replace with `getStaticProps` or client-side fetching |
-| **React/Vite** | Assets not found | Set `base: './'` in `vite.config.ts` |
-| **Astro** | SSR pages in static build | Remove `output: 'server'` from `astro.config.mjs` |
-| **Vue** | Public path issues | Set `publicPath: './'` in `vue.config.js` |
-
-## IPFS Pinning Issues
-
-### "CID not found" or "504 Gateway Timeout"
-
-The content is not pinned or the IPFS gateway cannot find it.
-
-**Fix:**
-
-```bash
-# Verify the deployment status
-acc services list
-
-# Re-pin the content
-acc services deploy
-```
-
-Common causes:
-- Content was unpinned (free tier has storage limits)
-- Gateway is temporarily unavailable
-- CID was generated but upload did not complete
-
-### "Content loads slowly on IPFS"
-
-First-time loads on IPFS can be slow because content needs to be discovered on the network.
-
-**Fix:**
-
-- Use a dedicated IPFS gateway for faster access
-- Set up a [Private Gateway](./guides/gateways.md) for production sites
-- Use IPNS with DNSLink for better caching
-- Optimize your build output size (compress images, minify code)
-
-### "Old content still showing after redeployment"
-
-IPFS content is immutable. A new deployment creates a new CID, but DNS or gateway caches may still serve the old content.
-
-**Fix:**
-
-1. Verify the new CID is different from the old one
-2. Update your `_dnslink` TXT record with the new CID
-3. Clear gateway caches:
-
-```bash
-# If using a custom domain with DNSLink
-dig _dnslink.your-domain.com TXT
-# Verify it shows the new CID
-```
-
-4. Wait for DNS TTL to expire (check your TTL setting, lower values update faster)
-
-### "IPFS pinning quota exceeded"
-
-You have reached the storage limit for your plan.
-
-**Fix:**
-
-- Remove old deployments that are no longer needed: `acc services delete <service-id>`
-- Upgrade your plan for more storage
-- Use Filecoin for large files (cheaper per GB)
-- Check your current usage: `acc billing usage`
-
-## SSL Certificate Problems
-
-### "SSL certificate error" or "NET::ERR_CERT_AUTHORITY_INVALID"
-
-The SSL certificate for your custom domain is not valid or not provisioned.
-
-**Fix:**
-
-1. Verify your DNS records are correct (SSL provisioning requires proper DNS)
-2. Wait up to 24 hours for certificate provisioning after adding a custom domain
-3. Make sure you are not using a self-signed certificate
-4. If using Cloudflare:
-   - Set SSL mode to "Full (strict)" if using AF's SSL
-   - Or set to "Flexible" if Cloudflare handles SSL termination
-
-### "Mixed content" warnings
-
-Your site loads over HTTPS but some resources use HTTP.
-
-**Fix:**
-
-- Update all resource URLs to use `https://` or protocol-relative `//`
-- Use relative paths for local assets (e.g., `./images/logo.png` instead of `http://...`)
-- Add a Content Security Policy header to block mixed content:
-
-```html
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-```
-
-### "SSL certificate expired"
-
-The SSL certificate has expired and not been auto-renewed.
-
-**Fix:**
-
-- Verify your DNS records are still correct
-- Contact support if auto-renewal failed
-- Manually trigger certificate renewal through the dashboard or CLI
-
-### "ERR_SSL_VERSION_OR_CIPHER_MISMATCH"
-
-The client and server cannot agree on an SSL/TLS version or cipher.
-
-**Fix:**
-
-- This usually indicates the SSL certificate is not properly configured for your domain
-- Verify your domain's A/CNAME records point to the correct AF gateway
-- If using Cloudflare, ensure the SSL/TLS settings are compatible
-
-## Getting More Help
-
-If your issue is not listed here:
-
-1. **Check the logs** - Run your build and deploy commands with verbose output
-2. **Search existing issues** - [GitHub Issues](https://github.com/alternatefutures/alternatefutures/issues)
-3. **Open a new issue** - Include your error message, CLI version (`acc --version`), and steps to reproduce
-4. **Community** - Join our [Discord](https://discord.gg/alternatefutures) for real-time help
-
-When reporting an issue, please include:
-- Your operating system and Node.js version
-- The AF CLI version (`acc --version`)
-- The full error message and stack trace
-- Steps to reproduce the problem
-- Your framework and its version
+Run the failing command with `--debug` and keep the output, along with
+`acc --version` and the service id, when you ask for help.

@@ -1,41 +1,38 @@
 ---
-title: "Access tokens (API keys)"
-description: "Personal access tokens (PATs) for programmatic access to Alternate Clouds from the CLI, SDK, CI, and agents."
+title: "Create and use access tokens"
+description: "Create a personal access token with acc pat, use it from CI, scripts, agents, and the SDK, and revoke it when it is no longer needed."
 ---
 
-Programmatic access uses **personal access tokens** (PATs). A PAT authenticates
-as you and works everywhere the CLI and SDK do.
+This page shows how to create and use a personal access token (PAT). A token
+authenticates as you and works everywhere the CLI and SDK do, without a
+browser.
 
-## Creating a Token
+## Create a token
 
 ```bash
 acc pat create --name ci-runner
 ```
 
-Approve the request in the browser when prompted, then copy the token -
-it is shown only once.
+The token is printed once. Copy it now; it cannot be shown again. If you omit
+`--name`, the CLI asks for one.
 
-## Managing Tokens
+Create one token per machine or pipeline, named after where it runs, so you
+can revoke each one on its own.
 
-```bash
-acc pat list                 # see all your tokens
-acc pat delete <tokenId>     # revoke one
-```
+## Use a token
 
-Create one token per machine or pipeline so you can revoke them individually
-without breaking everything else.
-
-## Using a Token
-
-### CLI (CI, agents)
+### CLI, CI, and agents
 
 ```bash
-export AF_TOKEN="your-personal-access-token"
-export AF_PROJECT_ID="your-project-id"
+export AF_TOKEN="..."        # the token you copied
+export AF_PROJECT_ID="..."   # from acc projects list
 
-acc whoami --json    # verify: machine-readable identity check
+acc whoami --json            # confirms the identity and project
 acc services list
 ```
+
+With both variables set, every command runs without prompts. Add `-y` to
+commands that ask for confirmation.
 
 ### SDK
 
@@ -50,16 +47,29 @@ const af = new AlternateFuturesSdk({
 });
 ```
 
-## Security Best Practices
+## List and revoke tokens
 
-- Store tokens in a secrets manager or CI secret store - never in source
-  control.
-- Name tokens after where they run (`--name github-actions-prod`) so stale
-  ones are easy to spot and revoke.
-- Revoke immediately if a token may have leaked: `acc pat delete <tokenId>`.
-- Prefer one token per environment; rotate periodically.
+```bash
+acc pat list                 # names, ids, and expiry dates
+acc pat delete <tokenId>     # revoke one
+```
+
+Revoke a token immediately if it may have leaked, then create a new one.
 
 <Callout type="info">
-Web-based token management is rolling out in the dashboard. Until it reaches
-your account, the CLI commands above are the way to manage tokens.
+Token management in the web app is not available yet. Use the commands above.
 </Callout>
+
+## Keep tokens safe
+
+- Store tokens in a secrets manager or your CI's secret store, never in source
+  control.
+- Give each pipeline its own token and rotate them periodically.
+- The CLI keeps your own login in `~/.alternate-futures/` with owner-only
+  permissions; `acc logout` clears it.
+
+## Next steps
+
+- [Manage projects](/guides/projects)
+- [Docs for AI agents](/ai-agents)
+- [Sign in and accounts](/guides/authentication)

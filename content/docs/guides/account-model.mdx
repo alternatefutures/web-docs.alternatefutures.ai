@@ -1,0 +1,96 @@
+---
+title: "Accounts, organizations, and projects"
+description: "How an Alternate Clouds account is organized: organizations own billing and members, projects group services, and every service has deployments."
+---
+
+This page explains how the pieces of an account fit together. For the steps,
+see [Manage projects](/guides/projects) and [Manage billing and credits](/guides/billing).
+
+## The hierarchy
+
+```
+You (sign in with email or wallet)
+└── Organization        billing, credits, members, roles
+    └── Project         a workspace for related services
+        └── Service     one deployed thing: a container, a template, a GPU job
+            └── Deployment   one release of that service
+```
+
+Everything you pay for or share belongs to an **organization**, never to you
+directly. Projects sort the work inside it.
+
+## Organizations
+
+An organization owns the subscription, the credit wallet, and the list of
+people who can use it.
+
+- **Your personal organization** is created when you sign up. It cannot be
+  renamed or deleted.
+- **Team organizations** are ones you create to work with other people. You
+  can belong to several and switch between them in the web app.
+- Inviting people requires an active paid subscription on that organization.
+
+### Roles
+
+| Role | Can do |
+|---|---|
+| **Owner** | Everything: billing, members, settings, deploy, and delete the organization. |
+| **Admin** | Deploy, and add or remove members. No billing access. |
+| **Member** | Deploy and view. |
+
+Owners and admins see every project. A member can be given access to all
+projects or only to the ones you pick when you invite them. The **Members**,
+**Billing**, and **Settings** pages in the web app are visible to owners and
+admins only.
+
+## Projects
+
+A project is a folder for services that belong together: one application, one
+customer, or one environment such as staging and production.
+
+- Every service lives in exactly one project.
+- The CLI always acts on one **active project**. `acc whoami` shows which, and
+  `acc projects switch` changes it. In scripts, set `AF_PROJECT_ID` instead.
+- Deleting a project deletes all of its services.
+
+## Services
+
+A service is the thing you deploy. It is created from a template, a Docker
+image, or as an empty server, and it carries its settings:
+
+- **Where and how it runs:** region (`us-east`, `us-west`, `eu`, `asia`, or
+  Any), CPU, memory, storage, an optional GPU, and whether it runs
+  confidentially inside a trusted execution environment (TEE).
+- **Configuration:** environment variables, and links to other services in the
+  same project so they can find each other.
+- **Spend controls:** pay as you go, a budget cap, or an auto-stop timer.
+- **Its URL:** `https://<slug>-app.alternatefutures.ai`, assigned when the
+  first deployment comes up.
+
+## Deployments
+
+A deployment is one release of a service. Deploying again creates a new
+deployment rather than changing the old one, so each service has a history.
+
+A deployment moves through stages: it is created, waits for a provider to
+offer capacity, is handed to that provider, starts its containers, and becomes
+**active**. If it stops, it is **closed** (you closed it), **suspended** (your
+organization ran out of credits, and it resumes on topup), or **failed**. The
+[troubleshooting](/troubleshooting) page covers what to do in each case.
+
+## Where to find each piece
+
+| Piece | Web app | CLI |
+|---|---|---|
+| Organization | Organization switcher, **Settings**, **Members**, **Billing** | `acc billing balance`, `--org` on topups |
+| Project | **Projects** | `acc projects list`, `acc projects switch` |
+| Service | Project page, **Deploy** | `acc services list`, `acc services info` |
+| Deployment | **Deployments** | `acc deployments`, `acc services logs` |
+| Your sign-in methods | **Account settings** | `acc login`, `acc whoami` |
+
+## Next steps
+
+- [Manage projects](/guides/projects)
+- [How billing works](/guides/how-billing-works)
+- [Web app overview](/guides/dashboard)
+- [Quick start](/guides/quickstart)

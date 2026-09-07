@@ -1,79 +1,58 @@
 ---
-title: "Dashboard overview"
-description: "The Alternate Futures web dashboard is currently under development. For now, please use the CLI or SDK to manage your infrastructure."
+title: "Web app overview"
+description: "What each part of the Alternate Clouds web app does: Overview, Projects, Deployments, Members, Billing, Settings, Deploy, and Account settings."
 ---
 
-<Callout type="warn" title="Web App Under Development">
-The Alternate Futures web dashboard is currently under development. For now, please use the [CLI](../cli/) or [SDK](../sdk/) to manage your infrastructure.
+This page explains what you find where in the web app at
+[app.alternatefutures.ai](https://app.alternatefutures.ai). It is the same
+platform the `acc` CLI and the SDK drive, so anything you create here shows up
+there and the other way round.
+
+## Organizations first
+
+The web app always shows one organization at a time. Use the switcher at the
+top of the sidebar to move between your personal organization and any teams
+you belong to. Billing, members, and settings belong to the organization; see
+[Accounts, organizations, and projects](/guides/account-model).
+
+## The sidebar
+
+| Page | What it shows | Who sees it |
+|---|---|---|
+| **Overview** | Running services and current spend at a glance. | Everyone |
+| **Projects** | Your projects and the services inside each one. Create a project here. | Everyone |
+| **Deployments** | Every deployment across the organization, with live progress while one is coming up. | Everyone |
+| **Members** | Who belongs to the organization, their role, and which projects a member can access. Invitations are sent from here. | Owners and admins |
+| **Billing** | Usage, payments, invoices, plans, and the credits wallet. | Owners and admins |
+| **Settings** | Organization name and details. | Owners and admins |
+
+## Deploy
+
+**Deploy** is where a new service starts. Choose a template from the catalog
+(AI agents, databases, inference servers, and more), or bring a Docker image.
+The form asks for the same things the CLI asks for: project, region, resources,
+required environment variables, and a spend control. Multi-service templates
+can only be deployed from the web app.
+
+## A service's page
+
+Open a service from its project to see its status, public URL, logs, and
+environment variables, and to redeploy or close it.
+
+## Account settings
+
+Your own account, separate from any organization: the sign-in methods linked
+to it (email, wallet, phone), and your profile. Add a verified email here to
+collect the signup credit if you signed up with a wallet.
+
+<Callout type="info" title="Early access">
+Custom domains and token management pages are not shown in the web app yet.
+Manage tokens with `acc pat` and see [Custom domains](/guides/custom-domains)
+for the current state of domains.
 </Callout>
 
-\<!--
-## Dashboard Layout (Coming Soon)
+## Next steps
 
-The Alternate Futures dashboard will be your central hub for managing agents, sites, storage, and billing.
-
-### Top Navigation Bar
-
-- **Dashboard** - Quick stats overview
-- **Agents** - Manage AI agents
-- **Sites** - Manage deployments
-- **Storage** - View and manage decentralized storage
-- **API Keys** - Generate and manage API keys
-- **Billing** - Usage tracking and payment
-- **Support** - Help center and documentation
-
-### Quick Actions
-
-The dashboard will display cards for common actions:
-
-- **Deploy Site** - Quick site deployment
-- **Create Agent** - Launch new AI agent
-- **View Storage** - Storage analytics
-- **Generate API Key** - Create new key
-
-### Stats Overview
-
-Real-time statistics:
-
-- **Active Agents** - Number of running agents
-- **Total Sites** - Deployed sites count
-- **Storage Used** - Total storage across networks
-- **Monthly Spend** - Current billing period costs
-
-## Key Features
-
-### Theme Toggle
-
-Switch between light and dark mode using the theme toggle in the top-right corner.
-
-### Search
-
-Use the global search to quickly find:
-- Agents by name or ID
-- Sites by name or URL
-- Storage items by CID
-- Documentation
-
-### Notifications
-
-Bell icon shows:
-- Deployment status updates
-- Agent alerts
-- Billing notifications
-- System announcements
-
-## Navigation Tips
-
-- Use the sidebar for quick access to all sections
-- The breadcrumb trail shows your current location
-- Most pages have filters and search capabilities
-- Click on cards/items for detailed views
--->
-
-## Current Options
-
-Until the web dashboard is available, you can manage your infrastructure using:
-
-- **[CLI Documentation](../cli/)** - Command-line interface for all operations
-- **[SDK Documentation](../sdk/)** - Programmatic API access
-- **[Quick Start Guide](./quickstart.md)** - Get started with CLI/SDK
+- [Quick start](/guides/quickstart)
+- [Accounts, organizations, and projects](/guides/account-model)
+- [Manage billing and credits](/guides/billing)

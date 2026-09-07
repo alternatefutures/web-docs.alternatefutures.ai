@@ -1,98 +1,107 @@
 ---
-title: "Billing and usage"
-description: "How billing works on Alternate Clouds - subscription plus prepaid credits, budgets, topups (card or crypto), and the acc billing commands."
+title: "Manage billing and credits"
+description: "Check your balance, top up credits by card or stablecoin, choose a plan, set spend controls on a service, and get suspended services running again."
 ---
 
-Alternate Clouds billing has two parts:
+This page shows how to do the billing tasks. To understand the model behind
+them, read [How billing works](/guides/how-billing-works) first.
 
-- **Subscription** - your plan (billed via Stripe, or funded from your credit
-  wallet).
-- **Credit wallet** - prepaid credits (USD) that pay for what you actually run.
-  Compute usage is metered and debited from the wallet as services run.
+You need to be an owner or admin of the organization for the web app tasks.
+The CLI commands work for anyone who can deploy.
 
-## Plans and Trial
-
-| Plan | Price |
-|------|-------|
-| Monthly | $25 / seat / month |
-| Yearly | $240 / seat / year ($20/mo equivalent) |
-
-- Every new account starts a **14-day trial** - no credit card required.
-- Signing up with a verified email grants a **$5 signup credit** (wallet-only
-  signups can claim it later by verifying an email in Account Settings).
-- Inviting team members requires an active paid subscription.
-- Subscriptions can be paid by card or funded from your credit wallet.
-
-## Billing Dashboard
-
-Organization owners and admins can manage billing at
-**app.alternatefutures.ai → Billing**:
-
-- **Usage** - what your services are consuming and costing
-- **Payments** - payment history and credit topups
-- **Invoices** - past invoices
-- **Plans** - view and change your subscription
-- **Credits wallet** - balance and topup (card or crypto)
-
-## CLI Commands
-
-### Check your balance
+## Check your balance
 
 ```bash
 acc billing balance
 ```
 
-### Top up credits
+In the web app, open **Billing** and look at **Credits wallet**.
+
+## Top up credits
+
+### By card
+
+Card payments are web only. Open **Billing**, choose **Credits wallet**, then
+**Top up**, and pay with a card or a saved method. Credits appear as soon as
+the payment succeeds.
+
+### By stablecoin
+
+From the web app, choose the crypto option on the same **Top up** screen. From
+the CLI:
 
 ```bash
-# Card topup opens the browser checkout
-acc billing topup --amount 25
+acc billing topup --crypto --amount 25
+```
 
-# Crypto topup (defaults: chain base, token USDC)
-acc billing topup --crypto --amount 25 --refund-address <your-address>
+The CLI prints a deposit address and waits for the transfer to confirm. It asks
+for a refund address if you do not pass one; that address receives the
+difference if the amount you send does not match the quote exactly.
+
+| Option | Description |
+|--------|-------------|
+| `--amount <usd>` | Amount in US dollars |
+| `--chain <chain>` | `base` (default), `ethereum`, `arbitrum`, `optimism`, or `polygon` |
+| `--token <token>` | `USDC` (default), `USDT`, or `DAI` |
+| `--refund-address <address>` | Where to send any difference between the transfer and the quote |
+| `--org <idOrSlug>` | Organization to credit, if you belong to more than one |
+| `--no-wait` | Print the deposit address and exit without waiting |
+
+## Choose or change a plan
+
+Open **Billing**, then **Plans**.
+
+| Plan | Price |
+|------|-------|
+| Monthly | $25 per seat per month |
+| Yearly | $240 per seat per year |
+
+Pay by card, or select the option to fund the subscription from your credit
+wallet. Your 14-day trial continues until it ends; subscribing early does not
+shorten it.
+
+## Set spend controls on a service
+
+Add a limit when you create or deploy a service. Without one, the service pays
+as you go.
+
+```bash
+# Stop the service once it has spent $20 in a month
+acc services create --kind docker --image nginx:1.27 --port 80 --budget-monthly 20
+
+# Stop the service after eight hours
+acc services deploy --stop-hours 8
 ```
 
 | Option | Description |
 |--------|-------------|
-| `--crypto` | Pay with crypto instead of card |
-| `--amount <usd>` | Topup amount in USD |
-| `--chain <chain>` | Chain for crypto topup (default: `base`) |
-| `--token <token>` | Token for crypto topup (default: `USDC`) |
-| `--refund-address <address>` | Refund address for over/under payments |
-| `--org <idOrSlug>` | Top up a specific organization |
-| `--no-wait` | Don't wait for confirmation |
+| `--spend <mode>` | `payg`, `budget`, or `stop` |
+| `--budget-total <usd>` | Lifetime cap for this service |
+| `--budget-monthly <usd>` | Monthly cap for this service |
+| `--stop-hours <n>`, `--stop-days <n>` | Auto-stop timer |
 
-After a topup, deployments that were suspended for insufficient credits are
-resumed automatically.
+## Get suspended services running again
 
-## Budgets and Spend Controls
-
-Set spend limits per service when creating or deploying:
+Services are suspended when the wallet cannot cover their next hour. Top up,
+and they resume on their own. To stop paying for a service instead:
 
 ```bash
-acc services create --kind docker --image nginx:latest \
-  --budget-monthly 20        # cap this service at $20/month
-
-acc services deploy --stop-hours 8   # auto-stop after 8 hours
+acc services close <serviceId>
 ```
 
-| Option | Description |
-|--------|-------------|
-| `--spend <mode>` | Spend control mode |
-| `--budget-total <usd>` | Lifetime budget cap |
-| `--budget-monthly <usd>` | Monthly budget cap |
-| `--stop-hours <n>` / `--stop-days <n>` | Auto-stop timer |
+`acc services list` shows what is running now; `acc deployments --all` includes
+closed and old deployments.
 
-## What happens when credits run out
+## See usage and invoices
 
-Services are suspended when your wallet cannot cover further usage. Top up to
-resume them automatically, or close services you no longer need:
+Open **Billing** in the web app:
 
-```bash
-acc services close
-```
+- **Usage** lists what each service consumed and what it cost.
+- **Payments** lists topups and subscription payments.
+- **Invoices** holds past invoices.
 
-<Callout type="info">
-Usage is billed hourly per running service. Check `acc services list` for what
-is currently running and `acc billing balance` for your remaining credits.
-</Callout>
+## Next steps
+
+- [How billing works](/guides/how-billing-works)
+- [Troubleshoot common problems](/troubleshooting)
+- [Command reference: billing](/cli/commands#billing)
