@@ -99,10 +99,9 @@ export default function BrandGuideContent() {
       </div>
 
       <p>
-        This is the authoritative visual identity reference for all Alternate Futures properties. Every
-        public-facing design -- documentation, marketing, social media, pitch materials, and product UI -- must
-        adhere to these specifications. The Figma source of truth is{' '}
-        <a href="https://www.figma.com/design/wmHC1PQgGehvppFrQnJwW0/AF-Branding-2026">AF-Branding-2026</a>.
+        This is the visual identity reference for all Alternate Futures properties. Every public-facing
+        design, from documentation and marketing to social media, pitch materials, and product UI, follows
+        these specifications.
       </p>
 
       {/* ============================================ */}
