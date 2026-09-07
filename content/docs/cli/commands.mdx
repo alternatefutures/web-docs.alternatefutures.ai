@@ -98,7 +98,7 @@ Create a new service (from a template, Docker image, or empty server)
 | `--image <ref>` | Docker image (for --kind docker — e.g. nginx:latest) |
 | `--port <n>` | Container port (for --kind docker) |
 | `--os <base>` | Base OS image (for --kind server — e.g. ubuntu:24.04) |
-| `--confidential` | Deploy on a TEE: verifiable confidential compute. |
+| `--confidential` | Deploy on a TEE (Phala) — verifiable confidential compute. |
 | `--region <region>` | Curated region: us-east \| us-west \| eu \| asia. |
 | `--cpu <cores>` | Override CPU (vCPUs). |
 | `--memory <size>` | Override memory (e.g. 4Gi). |
@@ -124,7 +124,7 @@ Deploy (or redeploy) a service
 | Option | Description |
 |--------|-------------|
 | `--region <region>` | Curated region: us-east \| us-west \| eu \| asia. Omit for "Any (cheapest globally)". |
-| `--confidential` | Deploy on a TEE: verifiable confidential compute. |
+| `--confidential` | Deploy on a TEE (Phala) — verifiable confidential compute. |
 | `--cpu <cores>` | Override CPU (vCPUs). |
 | `--memory <size>` | Override memory (e.g. 4Gi). |
 | `--storage <size>` | Override storage (e.g. 20Gi). |
@@ -138,7 +138,7 @@ Deploy (or redeploy) a service
 | `--stop-hours <n>` | Auto-stop after N hours. |
 | `--stop-days <n>` | Auto-stop after N days. |
 | `--env <pair>` | Set required env var as KEY=VALUE. Repeatable. |
-| `--ssh-key <pubkey>` | Break-glass OpenSSH public key (raw servers only). Ignored for container and confidential deploys. |
+| `--ssh-key <pubkey>` | Break-glass OpenSSH public key (raw server → Spheron). Ignored on Akash/Phala. |
 | `--ssh-key-file <path>` | Read the break-glass public key from a file (e.g. ~/.ssh/id_ed25519.pub). |
 | `-y, --yes` | Skip confirmation prompts. |
 
@@ -262,7 +262,7 @@ Copy a file to/from a deployment. Mark the remote side as \<serviceId>:\<path>.
 
 ### `acc attest <serviceId>`
 
-Fetch the TEE attestation report for a confidential deployment
+Fetch the TEE attestation report for a Phala deployment
 
 | Option | Description |
 |--------|-------------|
