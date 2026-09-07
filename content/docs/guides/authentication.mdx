@@ -1,0 +1,95 @@
+---
+title: "Authentication"
+description: "Sign in to Alternate Clouds with email, SMS, or a Web3 wallet - and authenticate the CLI and SDK with personal access tokens."
+---
+
+Sign in at [app.alternatefutures.ai](https://app.alternatefutures.ai). The same
+form handles sign-up and sign-in - your account is created on first successful
+verification.
+
+## Authentication Methods
+
+### Email Code
+
+Passwordless authentication via email:
+
+1. Enter your email address
+2. Receive a 6-digit verification code in your inbox
+3. Enter the code to sign in
+
+### SMS Code
+
+<Callout type="info" title="Coming soon">
+SMS sign-in is built but not yet enabled in production. Use email or a wallet
+for now.
+</Callout>
+
+### Web3 Wallets
+
+Sign in with an Ethereum wallet using the "Sign in with Ethereum" (SIWE)
+standard:
+
+- **Browser extension wallets** (MetaMask, Coinbase Wallet, Rainbow, and any
+  other EIP-6963 wallet installed in your browser)
+- **WalletConnect** for mobile and remote wallets
+
+You'll be asked to sign a one-time challenge message - no transaction, no gas.
+
+## Restricted Access
+
+If sign-in ever tells you access is restricted for your email or wallet, submit
+the **Request Access** form shown on the page and you'll be notified when your
+account is approved. (Signup is currently open; this only applies when access
+control is enabled.)
+
+## Account Linking
+
+Manage your sign-in methods under **Account Settings** - you can link multiple
+methods (email, phone, wallet) to one account and sign in with any of them.
+
+## CLI Authentication
+
+```bash
+acc login          # browser flow: approve the CLI from your signed-in web session
+acc login --email  # email code flow, no browser needed
+acc whoami         # verify
+```
+
+## API Authentication (CI, agents, SDK)
+
+For programmatic access, create a personal access token:
+
+```bash
+acc pat create --name ci-runner
+acc pat list
+acc pat delete <tokenId>
+```
+
+**CLI:**
+```bash
+export AF_TOKEN="your-personal-access-token"
+export AF_PROJECT_ID="your-project-id"
+acc services list
+```
+
+**SDK:**
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
+});
+```
+
+## Security Best Practices
+
+- Treat personal access tokens like passwords - store them in a secrets
+  manager, never in source control.
+- Create one token per machine or pipeline (`acc pat create --name <where>`)
+  so you can revoke them individually.
+- Revoke tokens you no longer use: `acc pat delete <tokenId>`.
+- The CLI stores its token in `~/.alternate-futures/` with owner-only file
+  permissions; `acc logout` clears it.

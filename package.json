@@ -1,16 +1,16 @@
 {
   "name": "@alternatefutures/docs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Documentation for Alternate Futures platform",
   "type": "module",
+  "private": true,
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "generate:cli": "node scripts/generate-cli-docs.js",
-    "generate:sdk": "node scripts/generate-sdk-docs.js",
-    "generate:all": "npm run generate:cli && npm run generate:sdk",
-    "build": "npm run generate:all && npm run docs:build"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "serve out",
+    "types:check": "next typegen && tsc --noEmit",
+    "generate:cli": "node scripts/generate-cli-docs.mjs",
+    "generate:sdk": "node scripts/generate-sdk-docs.mjs"
   },
   "keywords": [
     "alternate-futures",
@@ -21,28 +21,31 @@
   ],
   "author": "Alternate Futures",
   "license": "MIT",
+  "packageManager": "pnpm@10.28.2",
   "pnpm": {
     "overrides": {
       "esbuild": ">=0.25.0"
     }
   },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "autoprefixer": "^10.4.23",
-    "markdown-it-container": "^4.0.0",
-    "postcss": "^8.5.6",
-    "shadcn-vue": "^2.4.3",
-    "tailwindcss": "^4.1.18",
-    "typedoc": "^0.25.7",
-    "typedoc-plugin-markdown": "^4.0.3",
-    "vitepress": "^1.0.0"
-  },
   "dependencies": {
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-vue-next": "^0.562.0",
-    "radix-vue": "^1.9.17",
-    "reka-ui": "^2.6.1",
-    "tailwind-merge": "^3.4.0"
+    "cn": "^0.2.4",
+    "fumadocs-core": "16.15.8",
+    "fumadocs-mdx": "15.4.0",
+    "fumadocs-ui": "npm:@fumadocs/base-ui@16.15.8",
+    "lucide-react": "^1.39.0",
+    "next": "16.3.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "postcss": "^8.5.26",
+    "serve": "^14.2.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }

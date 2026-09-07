@@ -2,9 +2,12 @@
 node_modules/
 .pnpm-store/
 
-# Build output
-docs/.vitepress/dist
-docs/.vitepress/cache
+# Build output (Next.js / Fumadocs)
+.next/
+out/
+.source/
+next-env.d.ts
+tsconfig.tsbuildinfo
 
 # Environment
 .env

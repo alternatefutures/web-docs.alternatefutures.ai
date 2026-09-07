@@ -1,0 +1,698 @@
+/* ===== BRAND GUIDE PAGE STYLES ===== */
+/* Ported 1:1 from docs/.vitepress/theme (inline <style> block in docs/brand-guide.md).
+   None of these rules used --vp-c-* variables in the source, so no substitution
+   was needed here (see the "base prose" section below for the few new rules that
+   DO borrow literal values from docs/.vitepress/theme/custom.css). */
+
+/* Hero banner */
+.brand-hero {
+  background: #000AFF;
+  border-radius: 16px;
+  padding: 48px 40px;
+  margin: -8px 0 40px 0;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+.brand-hero h1 {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+  border: none !important;
+}
+.brand-hero .subtitle {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  opacity: 0.85;
+  margin: 0;
+}
+.brand-hero .deco-star {
+  position: absolute;
+  opacity: 0.18;
+  pointer-events: none;
+}
+.brand-hero .deco-star-1 { top: 16px; right: 24px; width: 48px; }
+.brand-hero .deco-star-2 { bottom: 20px; right: 100px; width: 24px; }
+.brand-hero .deco-star-3 { top: 40px; right: 140px; width: 32px; }
+.brand-hero .deco-ring { position: absolute; bottom: -20px; left: -20px; width: 96px; opacity: 0.1; pointer-events: none; }
+.brand-hero .deco-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+.brand-hero .deco-wave img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Section headers with geometric accent */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 48px 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #000AFF;
+}
+.section-header img {
+  width: 28px;
+  height: 28px;
+  opacity: 0.6;
+}
+.section-header h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+/* Color palette grid */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 24px 0 32px 0;
+}
+.color-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: #fff;
+  cursor: pointer;
+}
+.color-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.color-swatch {
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 14px;
+  position: relative;
+}
+.color-swatch .copied-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.color-info {
+  padding: 14px;
+}
+.color-info .color-name {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+.color-info .color-hex {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+.color-info .color-rgb,
+.color-info .color-hsl {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: #888;
+  line-height: 1.5;
+}
+.color-info .color-usage {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 8px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Dark mode color cards */
+.dark .color-card {
+  background: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark .color-info .color-name { color: #e0e0e0; }
+.dark .color-info .color-hex { color: #aaa; }
+.dark .color-info .color-rgb,
+.dark .color-info .color-hsl { color: #777; }
+.dark .color-info .color-usage { color: #999; }
+
+/* Typography specimens */
+.type-specimen {
+  background: #F9F5EE;
+  border-radius: 12px;
+  padding: 32px;
+  margin: 16px 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.dark .type-specimen {
+  background: #141414;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.type-specimen .font-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #888;
+  margin-bottom: 12px;
+}
+.type-specimen .sample-display {
+  font-size: 2.5rem;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  color: #0A0A0A;
+}
+.dark .type-specimen .sample-display { color: #F9F5EE; }
+.type-specimen .sample-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #333;
+  margin-bottom: 8px;
+}
+.dark .type-specimen .sample-body { color: #ccc; }
+.type-specimen .sample-small {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #666;
+}
+.dark .type-specimen .sample-small { color: #999; }
+.type-specimen .sample-code {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #333;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.dark .type-specimen .sample-code {
+  background: rgba(255, 255, 255, 0.04);
+  color: #A5B2FF;
+}
+
+/* Size scale */
+.type-scale {
+  margin: 16px 0;
+}
+.type-scale-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.dark .type-scale-row { border-color: rgba(255, 255, 255, 0.05); }
+.type-scale-row .scale-label {
+  flex: 0 0 80px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #999;
+}
+.type-scale-row .scale-sample {
+  flex: 1;
+  color: #1a1a1a;
+}
+.dark .type-scale-row .scale-sample { color: #e0e0e0; }
+
+/* Geometric elements gallery */
+.elements-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+  margin: 24px 0 32px 0;
+}
+.element-card {
+  background: #F9F5EE;
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.element-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+.dark .element-card {
+  background: #141414;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.element-card img {
+  max-width: 64px;
+  max-height: 64px;
+  margin: 0 auto 12px;
+  display: block;
+}
+.element-card .element-name {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  color: #888;
+  word-break: break-all;
+}
+
+/* Wave gallery (full-width) */
+.wave-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 24px 0 32px 0;
+}
+.wave-card {
+  background: #F9F5EE;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.wave-card.dark-bg {
+  background: #0000AF;
+}
+.wave-card img {
+  width: 100%;
+  display: block;
+}
+.wave-card .wave-label {
+  padding: 8px 16px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #888;
+}
+.wave-card.dark-bg .wave-label { color: rgba(255, 255, 255, 0.6); }
+.dark .wave-card { background: #141414; border-color: rgba(255, 255, 255, 0.08); }
+
+/* Decorative compositions */
+.composition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 24px 0 32px 0;
+}
+.composition-card {
+  background: #F9F5EE;
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.dark .composition-card {
+  background: #141414;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.composition-card img {
+  max-width: 120px;
+  max-height: 140px;
+  margin: 0 auto 12px;
+  display: block;
+}
+.composition-card .comp-name {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+/* Logo usage section */
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin: 24px 0 32px 0;
+}
+.logo-card {
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+}
+.logo-card img {
+  max-width: 200px;
+  max-height: 80px;
+  margin-bottom: 12px;
+}
+.logo-card .logo-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #888;
+  margin-top: 8px;
+}
+
+/* Do/Don't section */
+.dodont-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 24px 0 32px 0;
+}
+.dodont-card {
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid;
+}
+.dodont-card.do-card {
+  border-color: #000AFF;
+  background: rgba(0, 10, 255, 0.03);
+}
+.dodont-card.dont-card {
+  border-color: #BE4200;
+  background: rgba(190, 66, 0, 0.03);
+}
+.dark .dodont-card.do-card {
+  background: rgba(0, 10, 255, 0.08);
+}
+.dark .dodont-card.dont-card {
+  background: rgba(190, 66, 0, 0.08);
+}
+.dodont-card .dodont-label {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dodont-card.do-card .dodont-label { color: #000AFF; }
+.dodont-card.dont-card .dodont-label { color: #BE4200; }
+.dodont-card .dodont-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #333;
+}
+.dark .dodont-card .dodont-text { color: #ccc; }
+
+/* Brand voice cards */
+.voice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 24px 0 32px 0;
+}
+.voice-card {
+  background: #F9F5EE;
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 4px solid #000AFF;
+}
+.dark .voice-card {
+  background: #141414;
+}
+.voice-card .voice-trait {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #000AFF;
+  margin-bottom: 6px;
+}
+.dark .voice-card .voice-trait { color: #A5B2FF; }
+.voice-card .voice-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #555;
+}
+.dark .voice-card .voice-desc { color: #aaa; }
+
+/* Spacing and clear space diagrams */
+.clearspace-demo {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+.clearspace-box {
+  border: 2px dashed rgba(0, 10, 255, 0.3);
+  padding: 40px 60px;
+  border-radius: 8px;
+  position: relative;
+  background: rgba(0, 10, 255, 0.02);
+}
+.clearspace-box img {
+  display: block;
+}
+.clearspace-box .cs-label {
+  position: absolute;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  color: #000AFF;
+  opacity: 0.6;
+}
+.clearspace-box .cs-top { top: 12px; left: 50%; transform: translateX(-50%); }
+.clearspace-box .cs-right { right: 12px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+.clearspace-box .cs-bottom { bottom: 12px; left: 50%; transform: translateX(-50%); }
+.clearspace-box .cs-left { left: 12px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+
+/* Color combination examples */
+.combo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0 32px 0;
+}
+.combo-card {
+  border-radius: 12px;
+  overflow: hidden;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  position: relative;
+}
+.combo-card .combo-label {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .brand-hero { padding: 32px 24px; }
+  .brand-hero h1 { font-size: 1.8rem; }
+  .color-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .elements-gallery { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .dodont-grid { grid-template-columns: 1fr; }
+  .logo-grid { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   BASE PROSE STYLES (new, page-scoped)
+   The VitePress source relied on the theme's site-wide `.vp-doc` rules
+   (custom.css) for plain headings/paragraphs/tables/links/code/hr between
+   the brand-* blocks above. This Fumadocs page renders standalone (no
+   DocsBody/prose wrapper), so those site-wide rules were intentionally
+   NOT copied here (per the porting brief). The rules below are new and
+   exist only so bare markdown-equivalent elements aren't unstyled; values
+   are taken from the brand page's own established palette (Brand Blue /
+   Medium Blue for links, matching the page's own "Dark Mode Palette"
+   table) rather than invented from scratch.
+   ===================================================================== */
+.brand-guide-content h2 {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin: 0;
+}
+.brand-guide-content h3 {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 40px 0 16px 0;
+}
+.brand-guide-content p {
+  line-height: 1.7;
+  margin: 16px 0;
+}
+.brand-guide-content ul {
+  line-height: 1.7;
+  margin: 16px 0;
+  padding-left: 1.4em;
+}
+.brand-guide-content li {
+  margin: 6px 0;
+}
+.brand-guide-content a {
+  color: #000AFF;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 10, 255, 0.3);
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+.brand-guide-content a:hover {
+  text-decoration-color: #000AFF;
+}
+.dark .brand-guide-content a {
+  color: #A5B2FF;
+  text-decoration-color: rgba(165, 178, 255, 0.4);
+}
+.dark .brand-guide-content a:hover {
+  text-decoration-color: #A5B2FF;
+}
+.brand-guide-content :not(pre) > code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.dark .brand-guide-content :not(pre) > code {
+  background: rgba(255, 255, 255, 0.08);
+}
+.brand-guide-content pre {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+  line-height: 1.7;
+  font-size: 0.9rem;
+}
+.dark .brand-guide-content pre {
+  background: rgba(255, 255, 255, 0.04);
+}
+.brand-guide-content pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.brand-guide-content hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 40px 0;
+}
+.dark .brand-guide-content hr {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.brand-guide-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 32px 0;
+  font-size: 0.9rem;
+}
+.brand-guide-content th,
+.brand-guide-content td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  vertical-align: top;
+}
+.brand-guide-content th {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.03);
+}
+.dark .brand-guide-content th,
+.dark .brand-guide-content td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.dark .brand-guide-content th {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Compliance checklist (source used GFM "- [ ]" task-list syntax) */
+.brand-guide-content .checklist {
+  list-style: none;
+  padding-left: 0;
+}
+.brand-guide-content .checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.brand-guide-content .checklist input[type='checkbox'] {
+  margin-top: 5px;
+  flex: none;
+}
+
+/* Warning / danger callouts standing in for the VitePress `::: warning` /
+   `::: danger` custom containers. Colors are the literal light+dark values
+   already defined for --vp-c-warning-* / --vp-c-danger-* in
+   docs/.vitepress/theme/custom.css (that file's site-wide `.custom-block`
+   rules were not copied, only the color values). */
+.brand-callout {
+  border-radius: 8px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 16px 20px;
+  margin: 24px 0;
+}
+.brand-callout-title {
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.brand-callout p {
+  margin: 0;
+}
+.brand-callout ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.brand-callout-warning {
+  border-color: #BE4200;
+  background-color: #FFC7AA;
+  color: #000000;
+}
+.brand-callout-warning .brand-callout-title { color: #BE4200; }
+.brand-callout-warning code { background: rgba(0, 0, 0, 0.1); }
+.dark .brand-callout-warning {
+  border-color: #FF8A5B;
+  background-color: #3A2410;
+  color: #FFFFFF;
+}
+.dark .brand-callout-warning .brand-callout-title { color: #FF8A5B; }
+.dark .brand-callout-warning code { background: rgba(255, 255, 255, 0.12); }
+
+.brand-callout-danger {
+  border-color: #801F00;
+  background-color: #BF3100;
+  color: #FFFFFF;
+}
+.brand-callout-danger .brand-callout-title { color: #FFFFFF; }
+.brand-callout-danger code { background: rgba(255, 255, 255, 0.18); }
+.dark .brand-callout-danger {
+  border-color: #FF5B3D;
+  background-color: #3A1008;
+  color: #FFFFFF;
+}
+.dark .brand-callout-danger .brand-callout-title { color: #FF5B3D; }
+.dark .brand-callout-danger code { background: rgba(255, 255, 255, 0.12); }
+
+/* Page container — the brand guide renders standalone (outside DocsBody),
+   so it needs its own centering and edge padding. */
+.brand-guide-page {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+@media (min-width: 768px) {
+  .brand-guide-page {
+    padding: 3rem 2.5rem 6rem;
+  }
+}

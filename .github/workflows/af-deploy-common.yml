@@ -35,30 +35,32 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: Checkout cloud-cli repo
+      - name: Checkout alternate-clouds-cli repo
         uses: actions/checkout@v4
         with:
-          repository: alternatefutures/cloud-cli
-          path: cloud-cli
+          repository: alternatefutures/alternate-clouds-cli
+          path: alternate-clouds-cli
           ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
-      - name: Checkout cloud-sdk repo
+      # SDK default branch is develop; main has been stale since 2025-12-29 and
+      # carries observability.ts, which breaks TypeDoc (see PR #34 / issue #33).
+      - name: Checkout alternate-clouds-sdk repo
         uses: actions/checkout@v4
         with:
-          repository: alternatefutures/cloud-sdk
-          path: cloud-sdk
-          ref: main
+          repository: alternatefutures/alternate-clouds-sdk
+          path: alternate-clouds-sdk
+          ref: develop
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
       - name: Get pnpm store directory
         shell: bash
@@ -76,27 +78,32 @@ jobs:
       - name: Install dependencies (docs)
         run: pnpm install
 
-      - name: Install dependencies (CLI)
-        run: cd cloud-cli && pnpm install
-
-      - name: Install dependencies (SDK)
-        run: cd cloud-sdk && pnpm install
-
+      # Both generators parse the checked-out source repos statically —
+      # no install/build of the CLI or SDK is needed.
       - name: Generate CLI documentation
-        run: cd cloud-cli && pnpm docs:generate
+        run: pnpm generate:cli
+        env:
+          AF_CLI_REPO: ${{ github.workspace }}/alternate-clouds-cli
 
       - name: Generate SDK documentation
-        run: cd cloud-sdk && pnpm docs:generate
+        continue-on-error: true
+        run: pnpm generate:sdk
+        env:
+          AF_SDK_REPO: ${{ github.workspace }}/alternate-clouds-sdk
 
-      # Run docs:build directly instead of build to avoid redundant generation
-      # The docs repo's build script runs generate:all which uses local paths
-      # that don't work in CI (looks for ../../package-cloud-cli)
-      - name: Build with VitePress
-        run: pnpm run docs:build
+      - name: Build (Next.js static export)
+        run: pnpm build
 
-      - name: Install Alternate Futures CLI
+      # DEPLOY IS KNOWN-BROKEN (issue #33): this path has not worked since
+      # 2025-12-29 — the live site is a manual Vercel deploy. `acc` has no
+      # `sites` command; the legacy `af` CLI is abandoned at 0.3.0 and needs an
+      # AF CI token nobody has minted. Options per PR #34: mint a token for this
+      # path, or replace with an SDK-based script (storage.uploadDirectory +
+      # sites.createCustomIpfsDeployment). Until then Vercel serves the site
+      # (vercel.json is updated for the Next.js build).
+      - name: Install Alternate Futures CLI (legacy af, for sites deploy)
         run: npm install -g @alternatefutures/cli
 
-      # CLI reads from af.config.json for site slug and distDir
+      # CLI reads af.config.json for site slug and distDir (out/)
       - name: Deploy to Alternate Futures
         run: af sites deploy

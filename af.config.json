@@ -2,8 +2,8 @@
   "sites": [
     {
       "slug": "alternatefutures-docs",
-      "distDir": "docs/.vitepress/dist",
-      "buildCommand": "pnpm run docs:build"
+      "distDir": "out",
+      "buildCommand": "pnpm run build"
     }
   ]
 }

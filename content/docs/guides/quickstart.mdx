@@ -1,0 +1,110 @@
+---
+title: "Quick Start Guide"
+description: "Deploy your first service to decentralized infrastructure with the acc CLI in minutes."
+---
+
+Get started with Alternate Clouds in minutes. This guide walks you through
+installing the CLI, authenticating, and deploying your first service to
+decentralized compute.
+
+## What You'll Learn
+
+By the end of this guide, you'll have:
+- Installed the `acc` CLI
+- Authenticated with the platform
+- Deployed your first service (a container) to decentralized infrastructure
+- Checked its logs and URL
+
+**Time to complete:** 5-10 minutes
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **An Alternate Clouds account** - [Sign up here](https://app.alternatefutures.ai)
+  - Sign in with email or an Ethereum wallet; your account is created on first
+    successful verification.
+  - New accounts start a 14-day trial - free, no credit card required.
+- **Node.js 18.18.2 or later** - [Download here](https://nodejs.org/en/download) if you don't have it
+  - Check your version with `node --version`
+
+## Step 1: Install the CLI
+
+```bash
+npm install -g @alternatefutures/acc
+acc --version
+```
+
+## Step 2: Log in
+
+```bash
+acc login
+```
+
+This opens the browser so you can approve the CLI session. On a headless
+machine use `acc login --email` instead.
+
+Verify:
+
+```bash
+acc whoami
+```
+
+## Step 3: Create a project
+
+Services live inside projects.
+
+```bash
+acc projects create --name hello-clouds
+acc projects list
+```
+
+## Step 4: Deploy your first service
+
+The fastest first deploy is a plain container:
+
+```bash
+acc services create --kind docker --image nginx:latest --port 80 --name hello-web -y
+```
+
+Or start from the template catalog (AI agents, databases, and more):
+
+```bash
+acc templates list
+acc services create --kind template --template <template-id> -y
+```
+
+Want verifiable confidential compute? Add `--confidential` to deploy on a TEE.
+
+## Step 5: Watch it come up
+
+```bash
+acc services list          # status and URL
+acc services info          # full details for a service
+acc services logs --tail 100
+```
+
+Once the service is running, `acc services list` shows its public URL
+(`https://<slug>-app.alternatefutures.ai`).
+
+## Step 6: Manage it
+
+```bash
+acc services deploy        # redeploy after changes
+acc services env set <service> KEY VALUE
+acc ssh <serviceId>        # shell into the running container
+acc services close         # stop billing for it
+```
+
+## Where to go next
+
+- [CLI command reference](/cli/commands) - every command and flag
+- [Projects](/guides/projects) - organize services and teams
+- [Billing](/guides/billing) - credits, topups, and budgets
+- [Authentication](/guides/authentication) - all sign-in methods
+
+<Callout type="info" title="For AI agents">
+Automating this? Use `acc pat create` for a token, export `AF_TOKEN` and
+`AF_PROJECT_ID`, and every command above works non-interactively (add `-y`).
+Machine-readable docs: [/llms.txt](/llms.txt).
+</Callout>

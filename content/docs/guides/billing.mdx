@@ -1,0 +1,98 @@
+---
+title: "Billing & Usage"
+description: "How billing works on Alternate Clouds - subscription plus prepaid credits, budgets, topups (card or crypto), and the acc billing commands."
+---
+
+Alternate Clouds billing has two parts:
+
+- **Subscription** - your plan (billed via Stripe, or funded from your credit
+  wallet).
+- **Credit wallet** - prepaid credits (USD) that pay for what you actually run.
+  Compute usage is metered and debited from the wallet as services run.
+
+## Plans and Trial
+
+| Plan | Price |
+|------|-------|
+| Monthly | $25 / seat / month |
+| Yearly | $240 / seat / year ($20/mo equivalent) |
+
+- Every new account starts a **14-day trial** - no credit card required.
+- Signing up with a verified email grants a **$5 signup credit** (wallet-only
+  signups can claim it later by verifying an email in Account Settings).
+- Inviting team members requires an active paid subscription.
+- Subscriptions can be paid by card or funded from your credit wallet.
+
+## Billing Dashboard
+
+Organization owners and admins can manage billing at
+**app.alternatefutures.ai → Billing**:
+
+- **Usage** - what your services are consuming and costing
+- **Payments** - payment history and credit topups
+- **Invoices** - past invoices
+- **Plans** - view and change your subscription
+- **Credits wallet** - balance and topup (card or crypto)
+
+## CLI Commands
+
+### Check your balance
+
+```bash
+acc billing balance
+```
+
+### Top up credits
+
+```bash
+# Card topup opens the browser checkout
+acc billing topup --amount 25
+
+# Crypto topup (defaults: chain base, token USDC)
+acc billing topup --crypto --amount 25 --refund-address <your-address>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--crypto` | Pay with crypto instead of card |
+| `--amount <usd>` | Topup amount in USD |
+| `--chain <chain>` | Chain for crypto topup (default: `base`) |
+| `--token <token>` | Token for crypto topup (default: `USDC`) |
+| `--refund-address <address>` | Refund address for over/under payments |
+| `--org <idOrSlug>` | Top up a specific organization |
+| `--no-wait` | Don't wait for confirmation |
+
+After a topup, deployments that were suspended for insufficient credits are
+resumed automatically.
+
+## Budgets and Spend Controls
+
+Set spend limits per service when creating or deploying:
+
+```bash
+acc services create --kind docker --image nginx:latest \
+  --budget-monthly 20        # cap this service at $20/month
+
+acc services deploy --stop-hours 8   # auto-stop after 8 hours
+```
+
+| Option | Description |
+|--------|-------------|
+| `--spend <mode>` | Spend control mode |
+| `--budget-total <usd>` | Lifetime budget cap |
+| `--budget-monthly <usd>` | Monthly budget cap |
+| `--stop-hours <n>` / `--stop-days <n>` | Auto-stop timer |
+
+## What happens when credits run out
+
+Services are suspended when your wallet cannot cover further usage. Top up to
+resume them automatically, or close services you no longer need:
+
+```bash
+acc services close
+```
+
+<Callout type="info">
+Usage is billed hourly per running service. Check `acc services list` for what
+is currently running and `acc billing balance` for your remaining credits.
+</Callout>

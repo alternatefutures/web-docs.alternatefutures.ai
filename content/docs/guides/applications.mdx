@@ -1,0 +1,195 @@
+---
+title: "Applications"
+description: "Applications in Alternate Futures allow you to create OAuth applications and manage whitelisted domains for CORS and authentication purposes."
+---
+
+<Callout type="warn" title="Legacy guide - retired af CLI">
+This page was written for the retired `af` CLI and the sites/storage workflow.
+The current CLI is `acc` (compute services), which does not include these
+commands yet. Commands on this page will not work with `acc`. Kept for
+reference while this functionality is rebuilt.
+</Callout>
+
+Applications in Alternate Futures allow you to create OAuth applications and manage whitelisted domains for CORS and authentication purposes.
+
+## What are Applications?
+
+Applications are OAuth 2.0 applications that can authenticate users and access the Alternate Futures API on their behalf. Each application has:
+
+- **Client ID** - Public identifier for your application
+- **Name** - Human-readable application name
+- **Whitelist Domains** - Allowed domains for CORS and OAuth redirects
+
+## Creating an Application
+
+<Tabs items={["CLI","SDK"]}>
+<Tab value="CLI">
+
+```bash
+# Create a new application
+af applications create
+
+# You'll be prompted for:
+# - Application name
+# - Whitelist domains (comma-separated)
+```
+
+</Tab>
+<Tab value="SDK">
+
+```typescript
+import { AlternateFuturesSdk } from '@alternatefutures/sdk/node';
+
+const af = new AlternateFuturesSdk({
+  personalAccessToken: process.env.AF_TOKEN
+});
+
+// Create an application
+const app = await af.applications().create({
+  name: 'My Web App',
+  whitelistDomains: ['https://myapp.com', 'https://staging.myapp.com']
+});
+
+console.log('Client ID:', app.clientId);
+```
+
+</Tab>
+</Tabs>
+
+
+## Listing Applications
+
+<Tabs items={["CLI","SDK"]}>
+<Tab value="CLI">
+
+```bash
+# List all applications
+af applications list
+```
+
+</Tab>
+<Tab value="SDK">
+
+```typescript
+// List all applications
+const applications = await af.applications().list();
+
+applications.forEach(app => {
+  console.log(`${app.name} (${app.clientId})`);
+  console.log(`Domains: ${app.whitelistDomains.join(', ')}`);
+});
+```
+
+</Tab>
+</Tabs>
+
+
+## Updating an Application
+
+<Tabs items={["CLI","SDK"]}>
+<Tab value="CLI">
+
+```bash
+# Update an application
+af applications update
+
+# You'll be prompted to:
+# 1. Select the application
+# 2. Update name and/or whitelist domains
+```
+
+</Tab>
+<Tab value="SDK">
+
+```typescript
+// Update application
+await af.applications().update({
+  id: 'app-id',
+  name: 'Updated Name',
+  whitelistDomains: ['https://newdomain.com']
+});
+```
+
+</Tab>
+</Tabs>
+
+
+## Deleting an Application
+
+<Tabs items={["CLI","SDK"]}>
+<Tab value="CLI">
+
+```bash
+# Delete an application
+af applications delete
+
+# You'll be prompted to select which application to delete
+```
+
+</Tab>
+<Tab value="SDK">
+
+```typescript
+// Delete an application
+await af.applications().delete({ id: 'app-id' });
+```
+
+</Tab>
+</Tabs>
+
+
+## Use Cases
+
+### Web Application Authentication
+
+Use applications to authenticate users in your web application:
+
+1. Create an application with your production and staging domains whitelisted
+2. Use the Client ID in your OAuth flow
+3. Users can sign in with their Alternate Futures account
+4. Your application receives an access token to make API calls
+
+### CORS Configuration
+
+Whitelist domains are automatically allowed for CORS requests:
+
+```typescript
+// This request will succeed if the origin is whitelisted
+fetch('https://api.alternatefutures.ai/v1/sites', {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`
+  }
+});
+```
+
+### Multi-Environment Setup
+
+Create separate applications for different environments:
+
+```bash
+# Development app
+af applications create
+# Name: My App (Dev)
+# Domains: http://localhost:3000
+
+# Production app
+af applications create
+# Name: My App (Prod)
+# Domains: https://myapp.com, https://www.myapp.com
+```
+
+## Security Best Practices
+
+<Callout type="warn" title="Security">
+- Only whitelist domains you control
+- Use HTTPS for all production domains
+- Create separate applications for different environments
+- Regularly audit your whitelist domains
+- Delete unused applications
+</Callout>
+
+## Next Steps
+
+- [Authentication](./authentication.md) - Set up authentication methods
+- [API Keys](./api-keys.md) - Generate API keys for server-side access
+- [CLI Commands](../cli/commands.md) - Complete CLI reference

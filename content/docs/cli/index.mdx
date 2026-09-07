@@ -1,0 +1,64 @@
+---
+title: "CLI Overview"
+description: "acc is the Alternate Clouds command line interface for deploying and managing services on decentralized infrastructure."
+---
+
+`acc` is the unified command line interface to Alternate Clouds - deploy AI
+agents, containers, and confidential workloads to decentralized infrastructure
+(Akash, Phala TEE, GPU providers) from your terminal.
+
+## Install
+
+```bash
+npm install -g @alternatefutures/acc
+acc --version
+```
+
+Requires Node.js 18.18.2 or later.
+
+## Log in
+
+```bash
+acc login          # opens the browser to authorize the CLI
+acc login --email  # email verification, no browser required
+acc whoami         # verify who you are and your active project
+```
+
+## Command groups
+
+| Group | Commands | What it does |
+|-------|----------|--------------|
+| Account | `login`, `logout`, `whoami` | Authentication and identity |
+| Compute | `projects`, `services`, `deployments`, `regions`, `templates`, `ssh`, `cp`, `attest` | Create, deploy, and manage services |
+| Chat | `chat join`, `chat send`, `chat read`, `chat agent` | End-to-end-encrypted rooms, including agent bridges |
+| Billing | `billing balance`, `billing topup`, `pat` | Credits, topups, personal access tokens |
+
+See the [full command reference](/cli/commands) - it is auto-generated from the
+CLI source, so it always matches the released CLI.
+
+## A 60-second deploy
+
+```bash
+acc login
+acc projects create --name my-project
+acc services create --kind docker --image nginx:latest --port 80 -y
+acc services list
+acc services logs
+```
+
+## For agents and CI
+
+Every command works non-interactively with environment variables:
+
+```bash
+export AF_TOKEN=<personal-access-token>   # from `acc pat create`
+export AF_PROJECT_ID=<project-id>
+acc whoami --json                          # machine-readable pre-flight check
+acc services deploy -y
+```
+
+<Callout type="info" title="Machine-readable docs">
+This entire docs site is available as plain markdown for AI agents: fetch
+[/llms.txt](/llms.txt) for an index or `/llms-full.txt` for everything in one
+file. Every page also has a Copy Markdown button.
+</Callout>

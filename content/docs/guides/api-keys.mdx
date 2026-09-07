@@ -1,0 +1,65 @@
+---
+title: "API Keys"
+description: "Personal access tokens (PATs) for programmatic access to Alternate Clouds from the CLI, SDK, CI, and agents."
+---
+
+Programmatic access uses **personal access tokens** (PATs). A PAT authenticates
+as you and works everywhere the CLI and SDK do.
+
+## Creating a Token
+
+```bash
+acc pat create --name ci-runner
+```
+
+Approve the request in the browser when prompted, then copy the token -
+it is shown only once.
+
+## Managing Tokens
+
+```bash
+acc pat list                 # see all your tokens
+acc pat delete <tokenId>     # revoke one
+```
+
+Create one token per machine or pipeline so you can revoke them individually
+without breaking everything else.
+
+## Using a Token
+
+### CLI (CI, agents)
+
+```bash
+export AF_TOKEN="your-personal-access-token"
+export AF_PROJECT_ID="your-project-id"
+
+acc whoami --json    # verify: machine-readable identity check
+acc services list
+```
+
+### SDK
+
+```typescript
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+
+const af = new AlternateFuturesSdk({
+  accessTokenService: new PersonalAccessTokenService({
+    personalAccessToken: process.env.AF_TOKEN,
+    projectId: process.env.AF_PROJECT_ID,
+  }),
+});
+```
+
+## Security Best Practices
+
+- Store tokens in a secrets manager or CI secret store - never in source
+  control.
+- Name tokens after where they run (`--name github-actions-prod`) so stale
+  ones are easy to spot and revoke.
+- Revoke immediately if a token may have leaked: `acc pat delete <tokenId>`.
+- Prefer one token per environment; rotate periodically.
+
+<Callout type="info">
+Web-based token management is rolling out in the dashboard. Until it reaches
+your account, the CLI commands above are the way to manage tokens.
+</Callout>

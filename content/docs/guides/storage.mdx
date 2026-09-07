@@ -1,0 +1,160 @@
+---
+title: "Storage Management"
+description: "The web interface for storage management is currently in development. Use the CLI or SDK to manage your decentralized storage."
+---
+
+<Callout type="warn" title="Legacy guide - retired af CLI">
+This page was written for the retired `af` CLI and the sites/storage workflow.
+The current CLI is `acc` (compute services), which does not include these
+commands yet. Commands on this page will not work with `acc`. Kept for
+reference while this functionality is rebuilt.
+</Callout>
+
+<Callout type="warn" title="Web App Coming Soon">
+The web interface for storage management is currently in development. Use the [CLI](../cli/) or [SDK](../sdk/) to manage your decentralized storage.
+</Callout>
+
+Manage decentralized storage across IPFS, Filecoin, and Arweave.
+
+## Storage Dashboard
+
+<Callout type="warn" title="Coming Soon">
+The Storage Dashboard will be available once the web app launches.
+</Callout>
+
+View all your stored content in one place:
+
+- **Storage Items** - Files, sites, and agent data
+- **Network Distribution** - Storage by network (IPFS, Filecoin, Arweave)
+- **Total Size** - Aggregate storage usage
+- **Monthly Cost** - Current storage costs
+
+## Storage Networks
+
+### IPFS
+
+**Content-addressed storage with pinning:**
+
+- Files identified by CID (Content Identifier)
+- Pinned via Pinata, Web3.Storage, or Lighthouse
+- Fast retrieval via global gateways
+- Mutable pointers via IPNS
+
+**Use cases:**
+- Website hosting
+- Dynamic content
+- Frequently updated files
+
+### Filecoin
+
+**Decentralized storage marketplace:**
+
+- Storage deals with miners
+- Cryptographic proof of storage
+- IPFS-compatible CIDs
+- Cost-effective for large datasets
+
+**Use cases:**
+- Data archival
+- Backup storage
+- Large file storage
+
+### Arweave
+
+**Permanent, immutable storage:**
+
+- Pay once, store forever
+- Blockweave data structure
+- Built-in content delivery
+- Immutable by design
+
+**Use cases:**
+- NFT metadata
+- Legal documents
+- Historical records
+- Permanent websites
+
+## Managing Storage Items
+
+<Callout type="warn" title="Coming Soon">
+Web interface for managing storage items is in development. Use CLI/SDK for now.
+</Callout>
+
+### View Details
+
+Click on any storage item to see:
+
+- **CID/Transaction ID** - Unique identifier
+- **Size** - File size
+- **Network** - Storage network
+- **Created** - Upload date
+- **Last Accessed** - Last retrieval time
+- **URL** - Public access link
+- **Pinned** - Pin status (IPFS only)
+
+### Actions
+
+- **Pin/Unpin** (IPFS) - Control pinning status
+- **Copy CID** - Copy content identifier
+- **Open in Gateway** - View in browser
+- **Download** - Download file
+- **Delete** - Remove from storage
+
+### Filtering
+
+Filter storage items by:
+
+- **Network** - IPFS, Filecoin, Arweave
+- **Type** - Site, Agent, File
+- **Size** - Size ranges
+- **Date** - Upload date
+
+### Search
+
+Search storage by:
+- File name
+- CID or transaction ID
+- Type or network
+
+## Pinning Management (IPFS)
+
+### What is Pinning?
+
+Pinning keeps content available on IPFS by ensuring at least one node stores and serves it.
+
+### Pin Providers
+
+We integrate with multiple pinning services:
+
+- **Pinata** - Fast, reliable pinning
+- **Web3.Storage** - Free tier available
+- **Lighthouse** - Filecoin-backed pinning
+
+### Pin Status
+
+- **Pinned** - Content is actively pinned
+- **Unpinned** - Content may become unavailable
+- **Pinning** - Pin operation in progress
+- **Failed** - Pin operation failed
+
+## Storage Analytics
+
+### Usage Over Time
+
+Track storage growth:
+- Daily/weekly/monthly charts
+- Network breakdown
+- Cost trends
+
+### Cost Analysis
+
+Understand storage costs:
+- Cost by network
+- Cost by project
+- Cost projections
+
+## Next Steps
+
+- [Deploying Sites](./sites.md) - Deploy sites to storage networks
+- [Billing](./billing.md) - Understand storage costs
+- [Best Practices](./best-practices.md) - Optimize storage usage

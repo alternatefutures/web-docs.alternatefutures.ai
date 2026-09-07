@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -16,13 +16,13 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the docs
-RUN pnpm run docs:build
+RUN pnpm run build
 
 # Production stage - serve with nginx
 FROM nginx:alpine
 
 # Copy built docs to nginx
-COPY --from=builder /app/docs/.vitepress/dist /usr/share/nginx/html
+COPY --from=builder /app/out /usr/share/nginx/html
 
 # Custom nginx config for SPA routing
 RUN echo 'server { \

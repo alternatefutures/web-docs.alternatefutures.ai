@@ -1,0 +1,68 @@
+---
+title: "Installing the CLI"
+description: "Install the acc command line interface with npm, verify it, and authenticate."
+---
+
+## Requirements
+
+- Node.js **18.18.2 or later** (`node --version`)
+- npm (bundled with Node.js)
+
+## Install
+
+```bash
+npm install -g @alternatefutures/acc
+```
+
+Verify the installation:
+
+```bash
+acc --version
+acc --help
+```
+
+<Callout type="warn" title="Renamed from af">
+The CLI was renamed from `af` to `acc` in 2026. If you have the old
+`@alternatefutures/cli` package installed, remove it with
+`npm uninstall -g @alternatefutures/cli` to avoid confusion - the old `af`
+binary no longer matches the current platform.
+</Callout>
+
+## Authenticate
+
+```bash
+acc login          # browser flow: approves this CLI session from the web app
+acc login --email  # email code flow, no browser needed
+```
+
+Confirm you are logged in:
+
+```bash
+acc whoami
+```
+
+## Non-interactive use (CI, agents)
+
+Create a personal access token and export it instead of logging in:
+
+```bash
+acc pat create --name ci-runner
+export AF_TOKEN=<token>
+export AF_PROJECT_ID=<project-id>
+acc whoami --json
+```
+
+## Updating
+
+```bash
+npm update -g @alternatefutures/acc
+```
+
+## Troubleshooting
+
+- `command not found: acc` - your global npm bin directory is not on `PATH`.
+  Run `npm bin -g` and add that directory to your shell profile.
+- Login loops or auth errors - run `acc logout` then `acc login` again; check
+  `acc whoami` afterwards.
+- Corporate proxies - the CLI talks HTTPS to `alternatefutures.ai` hosts; make
+  sure they are reachable.
