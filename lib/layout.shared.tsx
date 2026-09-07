@@ -7,8 +7,8 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       // Parent-company brand: Alternate Futures owns the docs hub chrome;
       // products (Alternate Clouds, Printshot, ...) are sections inside it.
-      // Per the brand guide: brand-blue logo on light, off-white (#F9F5EE) on
-      // dark. The SVGs are var(--fill-0)-driven but load as <img>, which can't
+      // Docs chrome: black logo on light, off-white (#F9F5EE) on dark (og,
+      // 2026-09-08). The SVGs are var(--fill-0)-driven but load as <img>, which can't
       // read page CSS vars — so each theme gets its own asset. Never use CSS
       // invert() on brand assets (inverted blue = yellow).
       // Responsive logo per the brand book's two forms — never combined:

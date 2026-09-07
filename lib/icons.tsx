@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 
 /**
  * Icons referenced from content/docs/meta.json as `---[Name]Label---`.
- * Brand marks follow the brand book: brand-blue on light, off-white on dark,
- * as separate assets (public/*.svg, public/*-dark.svg). Never CSS-filter or
- * invert a brand asset (inverted blue = yellow).
+ * Brand marks in the docs chrome: black on light, off-white (#F9F5EE) on dark
+ * (og, 2026-09-08), as separate assets (public/*.svg, public/*-dark.svg).
+ * Never CSS-filter or invert a brand asset (inverted blue = yellow).
  */
 function BrandMark({ light, dark, width }: { light: string; dark: string; width: number }) {
   return (
