@@ -9,7 +9,7 @@ import { platform } from './shared';
  */
 export function agentContext(origin: string): string {
   return [
-    'Alternate Clouds is the Alternate Futures cloud platform. It deploys containers, AI agents, GPU workloads, and confidential (TEE) services on decentralized infrastructure (Akash, Phala, Spheron) from the web app, the acc CLI, or the TypeScript SDK.',
+    'Alternate Clouds is the Alternate Futures cloud platform. It deploys containers, AI agents, GPU workloads, and confidential (TEE) services on decentralized infrastructure from the web app, the acc CLI, or the TypeScript SDK.',
     '',
     `- Docs index for agents: ${origin}/llms.txt`,
     `- Every page in one file: ${origin}/llms-full.txt`,
