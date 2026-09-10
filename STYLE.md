@@ -11,7 +11,7 @@ Every page is one of four kinds. Say which in the first sentence and do not mix.
 | Kind | Answers | Sidebar group | Example |
 |---|---|---|---|
 | Tutorial | "Show me" | Start here | Quick start |
-| How-to guide | "How do I ..." | Guides, Self-hosting | Custom domains |
+| How-to guide | "How do I ..." | Guides | Custom domains |
 | Reference | "What exactly is ..." | Reference | Command reference |
 | Explanation | "Why / what is ..." | Start here | What is Alternate Clouds? |
 
@@ -19,7 +19,7 @@ Sidebar rules (`content/docs/meta.json`):
 
 - Two top-level blocks, each with an icon header: the company (Alternate
   Futures: overview, brand, changelog) and the product (Alternate Clouds).
-- Inside the product: Start here, Guides, Reference, Self-hosting, Archive.
+- Inside the product: Start here, Guides, Reference, Archive.
   Add a group only when it will hold three or more pages.
 - Never nest deeper than one folder. Folders are for a tool with several pages
   (CLI, SDK) or an archive, not for topics.

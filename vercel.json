@@ -5,5 +5,10 @@
   "outputDirectory": "out",
   "installCommand": "pnpm install",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/guides/decentralized-registry", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/registry-architecture", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/registry-deployment", "destination": "/legacy", "permanent": true }
+  ]
 }

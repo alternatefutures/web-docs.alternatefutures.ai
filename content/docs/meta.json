@@ -25,10 +25,6 @@
     "---Reference---",
     "cli",
     "sdk",
-    "---Self-hosting---",
-    "guides/decentralized-registry",
-    "guides/registry-architecture",
-    "guides/registry-deployment",
     "---Archive---",
     "legacy"
   ]
