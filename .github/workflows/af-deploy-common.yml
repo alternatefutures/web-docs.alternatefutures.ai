@@ -86,9 +86,18 @@ jobs:
       - name: Install dependencies (docs)
         run: pnpm install
 
-      # Both generators parse the checked-out source repos statically — no
-      # install/build of the CLI or SDK is needed (the SDK generator writes its
-      # own tsconfig when the SDK's `extends` target is not installed).
+      # The CLI generator parses source statically (no install). The SDK
+      # generator runs TypeDoc, which needs the SDK's dependencies to resolve
+      # types: without them every return type renders as `any` and source
+      # links lose the `src/` prefix, so the committed reference (generated
+      # locally with deps) never matches and the drift PR reopens on every run
+      # (PR #36). Install them; the generator falls back to a synthesized
+      # tsconfig only if this step fails.
+      - name: Install SDK dependencies (for TypeDoc type resolution)
+        continue-on-error: true
+        working-directory: alternate-clouds-sdk
+        run: pnpm install --frozen-lockfile --ignore-scripts || pnpm install --no-frozen-lockfile --ignore-scripts
+
       - name: Generate CLI documentation
         run: pnpm generate:cli
         env:
