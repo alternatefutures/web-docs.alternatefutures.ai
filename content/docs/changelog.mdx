@@ -1,101 +1,88 @@
 ---
 title: "Changelog"
-description: "Changelog for the Alternate Futures platform, CLI, SDK, and infrastructure."
+description: "What changed in Alternate Clouds, the acc CLI, and these docs, by month, from the acc launch in June 2026 onward."
 ---
 
+This page is a reference: user-visible changes to Alternate Clouds, the `acc`
+CLI, and these docs, newest first. CLI versions carry their npm publish date.
+Anything before June 2026 belongs to the retired `af` product; see
+[What changed from af](/legacy).
 
-All notable changes to the Alternate Futures platform are documented here in reverse chronological order.
+## September 2026
 
-## February 2026
+- **New documentation site** (2026-09-07). Rebuilt on the current product:
+  every page states what you can do today, the [command reference](/cli/commands)
+  and [SDK reference](/sdk/api) are generated from source on every change,
+  and the sidebar separates Start here, Guides, and Reference.
+- **Docs for AI agents.** Every page has **Copy for AI** and **Open in**
+  (Claude, ChatGPT, Cursor), a Markdown twin, and the site publishes
+  [/llms.txt](/llms.txt) and [/llms-full.txt](/llms-full.txt). See
+  [Docs for AI agents](/ai-agents).
+- **New pages:** [Accounts, organizations, and projects](/guides/account-model),
+  [How billing works](/guides/how-billing-works),
+  [How a deployment works](/guides/how-deployments-work),
+  [Deploy an AI agent](/guides/deploy-an-agent), a current
+  [Web app overview](/guides/dashboard), and a rewritten
+  [Troubleshoot common problems](/troubleshooting).
+- **Retired guides removed** (2026-09-10). The `af`-era guides redirect to
+  [What changed from af](/legacy).
 
-### Platform launch (public beta)
-**Released: February 2026**
+## August 2026
 
-The Alternate Futures platform enters public beta, providing decentralized cloud infrastructure for static sites, AI agents, cloud functions, and storage management.
+- **acc 1.1.0** (published 2026-08-18).
+  - Region selection on create and deploy: `--region us-east|us-west|eu|asia`,
+    or leave it out for the cheapest offer worldwide.
+  - GPU services: `--gpu`, `--gpu-model`, `--gpu-count`, and `acc regions --gpu <model>`
+    for availability and price.
+  - `acc cp` copies files to and from a running deployment; `acc ssh` fixes.
+  - `acc attest <serviceId>` fetches the attestation report of a confidential
+    service; `--verify` checks it on your machine against the chip vendor's
+    roots.
+  - `acc billing topup --crypto` tops up credits with a stablecoin transfer
+    and asks for a refund address for any difference.
+  - `acc chat`: end-to-end encrypted rooms from the terminal (`join`, `send`,
+    `read`, and an agent mode for bots).
+- **Account settings redesigned** (2026-08-10): change your verified email,
+  link a wallet to an existing account, and delete your account (queued, with
+  a grace period, 2026-08-13).
+- **Low-balance guidance.** Deploys refused for insufficient credits explain
+  what to top up (2026-08-09), and the balance in the top bar links to Billing.
 
-- **Web App** - Dashboard for managing projects, sites, agents, and billing at [clouds.alternatefutures.ai](https://clouds.alternatefutures.ai)
-- **Multi-Auth Support** - Sign in with email (magic link), Google, GitHub, Twitter, Discord, or Web3 wallets (MetaMask, WalletConnect, Phantom)
-- **Three Storage Networks** - Deploy to IPFS, Filecoin, or Arweave from a unified interface
-- **AI Agent Hosting** - Deploy and manage Eliza, ComfyUI, and custom AI agents
-- **Cloud Functions** - Serverless functions on decentralized infrastructure
-- **Observability** - Distributed tracing, metrics, and logging for all deployments
-- **Billing** - Usage-based pricing with Stripe integration and credit system
+## July 2026
 
-### CLI v1.0
+- **Pay the subscription from credits** (2026-07-08). Plans can be funded from
+  the credit wallet instead of a card.
+- **Crypto topups in the web app** (2026-07-13): pay in any supported asset
+  through WalletConnect; credits land as US dollars.
+- **Open signup** (2026-07-14). The invite list is off; anyone can sign up and
+  start the 14-day trial.
+- **Sign in with an Ethereum wallet** on by default (2026-07-28), and a
+  redesigned sign-in page (2026-07-27).
+- **acc 1.0.3** (published 2026-07-02): clearer error when a service name is
+  already taken in another project.
 
-**Released: February 2026**
+## June 2026
 
-The `@alternatefutures/cli` package is now available on npm. The CLI binary is `af`.
+- **`af` becomes `acc`** (2026-06-19). The CLI is renamed and republished as
+  `@alternatefutures/acc` (1.0.1, then 1.0.2 the same day). Install with
+  `npm install -g @alternatefutures/acc`. The old `@alternatefutures/cli`
+  package is frozen; see [What changed from af](/legacy).
+- **The web app moves to** [clouds.alternatefutures.ai](https://clouds.alternatefutures.ai)
+  (2026-06-19). The old address redirects.
+- **GPU services reach active reliably** (2026-06-29), with logs and a shell
+  for GPU machines.
+- **Deployment file editor** (2026-06-11) and **web terminal** (2026-06-13) on
+  a service's page in the web app.
+- **Teams.** Organization roles (owner, admin, member), invitations, and
+  per-member project access (2026-06-06). Members, Billing, and Settings
+  pages are owner and admin only.
+- **Template catalog** grows through the summer to 23 templates: AI agents,
+  inference servers, databases, game servers, and developer tools.
+  `acc templates list` shows the current set.
 
-- `af login` - Interactive browser-based authentication
-- `af sites init` - Initialize site configuration with framework detection
-- `af sites deploy` - Deploy to IPFS, Filecoin, or Arweave
-- `af sites list` - View all sites and deployments
-- `af storage add` - Upload files to decentralized storage
-- `af pat create` - Generate Personal Access Tokens for automation
-- `af projects list` - Manage projects and organizations
-- Automatic framework detection for React, Next.js, Vue, Astro, SvelteKit, Hugo, and more
-- JSON output mode for scripting and CI/CD integration
-- Environment variable support (`AF_TOKEN`, `AF_PROJECT_ID`)
+## Before June 2026
 
-```bash
-npm install -g @alternatefutures/cli
-```
-
-### SDK v1.0
-
-**Released: February 2026**
-
-The `@alternatefutures/sdk` package is now available on npm with full TypeScript support.
-
-- `AlternateFuturesSdk` - Main SDK class with fluent API
-- `PersonalAccessTokenService` - Token-based authentication
-- `StaticAccessTokenService` - Static token authentication for serverless
-- IPFS upload and pinning (`af.ipfs().add()`)
-- Site management (`af.sites().list()`, `af.sites().get()`)
-- Storage management across all three networks
-- Full TypeScript type definitions
-- Browser and Node.js support
-
-```bash
-npm install @alternatefutures/sdk
-```
-
-### Template repositories
-**Released: February 2026**
-
-Starter templates for popular frameworks, pre-configured for Alternate Futures deployment:
-
-- [template-react](https://github.com/alternatefutures/template-react) - React + Vite starter
-- [template-nextjs](https://github.com/alternatefutures/template-nextjs) - Next.js static export starter
-- [template-vue](https://github.com/alternatefutures/template-vue) - Vue.js + Vite starter
-- [template-astro](https://github.com/alternatefutures/template-astro) - Astro starter
-- [template-sveltekit](https://github.com/alternatefutures/template-sveltekit) - SvelteKit static adapter starter
-- [template-hugo](https://github.com/alternatefutures/template-hugo) - Hugo static site starter
-- [template-vitepress](https://github.com/alternatefutures/template-vitepress) - VitePress documentation starter
-
-Each template includes an `af.config.json` with the correct build command and output directory pre-configured.
-
-### Documentation site
-**Released: February 2026**
-
-Comprehensive documentation at [docs.alternatefutures.ai](https://docs.alternatefutures.ai) covering:
-
-- Getting started guides and quickstart tutorial
-- Framework-specific deployment guides (Next.js, React, Astro)
-- CLI command reference
-- SDK API reference (auto-generated from TypeDoc)
-- Migration guides from other static hosting platforms
-- CI/CD integration for GitHub Actions, GitLab CI, CircleCI, and Jenkins
-- Infrastructure guides for the decentralized container registry
-- Brand guidelines and design system
-
-### Infrastructure
-
-**Released: February 2026**
-
-- **SSL Proxy** - Pingap-based SSL termination proxy on decentralized compute with a dedicated IP
-- **Auth Service** - Hono + SQLite authentication service on decentralized compute
-- **Secrets Management** - Infisical deployment for secure credential storage
-- **Decentralized Container Registry** - Self-hosted registry with IPFS-backed storage
-- **DNS** - Multi-provider DNS configuration (Cloudflare, Google, deSEC)
+The `af` CLI (0.2.x, December 2025 to April 2026) and the first web app
+deployed static sites to IPFS, Filecoin, and Arweave, hosted agents, and ran
+cloud functions. That product line is retired. Its commands do not exist in
+`acc`; [What changed from af](/legacy) maps each feature to its replacement.
