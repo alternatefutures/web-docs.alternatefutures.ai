@@ -18,12 +18,14 @@
   --color-fd-primary: #000aff;
   --color-fd-primary-foreground: #ffffff;
   --color-fd-ring: #000aff;
+  --color-fd-info: #000aff; /* info callouts share the accent */
 }
 
 .dark {
   --color-fd-primary: #a5b2ff;
   --color-fd-primary-foreground: #0000af;
   --color-fd-ring: #a5b2ff;
+  --color-fd-info: #a5b2ff;
   --color-fd-background: hsl(0 0% 4.5%);
   --color-fd-card: hsl(0 0% 6%);
   --color-fd-popover: hsl(0 0% 9%);

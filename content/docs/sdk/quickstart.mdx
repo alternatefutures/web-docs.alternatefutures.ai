@@ -32,8 +32,7 @@ yarn add @alternatefutures/sdk
 </Tabs>
 
 
-## Basic Setup
-
+## Basic setup
 ### Node.js
 
 ```typescript
@@ -71,10 +70,8 @@ const af = new AlternateFuturesSdk({
 });
 ```
 
-## Common Operations
-
-### List Sites
-
+## Common operations
+### List sites
 ```typescript
 const sites = await af.sites().list();
 
@@ -97,8 +94,7 @@ const result = await af.ipfs().addFromContent({
 });
 ```
 
-### Manage Storage
-
+### Manage storage
 ```typescript
 // List stored files
 const pins = await af.storage().list();
@@ -137,8 +133,7 @@ await af.ipns().publish({
 });
 ```
 
-## Error Handling
-
+## Error handling
 ```typescript
 import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
 
@@ -162,8 +157,7 @@ try {
 }
 ```
 
-## TypeScript Support
-
+## TypeScript support
 The SDK is fully typed. Import types for better IDE support:
 
 ```typescript
@@ -180,8 +174,7 @@ import {
 const sites: Site[] = await af.sites().list();
 ```
 
-## Environment Variables
-
+## Environment variables
 For security, store your credentials in environment variables:
 
 ```bash
@@ -202,8 +195,7 @@ const af = new AlternateFuturesSdk({
 });
 ```
 
-## Next Steps
-
+## Next steps
 - **[Installation Guide](./installation)** - Detailed setup instructions
 - **[API Reference](./api)** - Complete SDK API documentation
 - **[CLI Documentation](/cli/)** - Command-line interface

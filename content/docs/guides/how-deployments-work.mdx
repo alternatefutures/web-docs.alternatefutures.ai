@@ -1,0 +1,96 @@
+---
+title: "How a deployment works"
+description: "What happens between acc services deploy and a running URL: placement on a provider network, image start, status changes, billing checks, and confidential mode."
+---
+
+This page explains what the platform does with a deployment, so the statuses
+and failures you see make sense. For fixes, see
+[Troubleshoot common problems](/troubleshooting); for money, see
+[How billing works](/guides/how-billing-works).
+
+## What you ask for
+
+A deployment starts from a service definition: an image (or a template that
+provides one), the port it listens on, CPU, memory and storage, an optional
+GPU, a region or "Any", whether it must run confidentially, its environment
+variables, and a spend control. The web app and the CLI collect the same
+fields; templates pre-fill most of them and list the variables they need.
+
+## Placement
+
+Alternate Clouds does not own servers. It runs a marketplace: your request is
+published to a network of independent providers, providers that can meet it
+respond with offers, and the platform picks one.
+
+- **Region** narrows the offers to `us-east`, `us-west`, `eu`, or `asia`.
+  "Any" accepts the cheapest offer worldwide.
+- **Resources and GPU model** decide who can bid at all. The rarer the
+  request, the fewer offers, and the longer the wait. `acc regions` shows
+  availability and price before you commit.
+- **Time.** Most deployments have a provider within a few minutes. One that
+  makes no progress for about 25 minutes is marked failed automatically and is
+  not charged.
+
+Until an offer is accepted you see the deployment as created, then waiting for
+offers, then selecting a provider.
+
+## Start
+
+The chosen provider pulls the image and starts the container with your
+environment variables. Two things go wrong here more than anywhere else:
+
+- **The image cannot be pulled.** Wrong name or tag, or a private image (images
+  on GitHub Container Registry are private by default).
+- **A moving tag.** Providers cache images by tag. `latest` or `main` keeps
+  serving whatever was cached, so the platform refuses those two when you
+  change a service's image. Use versioned tags such as `myimage:1.4.2`.
+
+When the container is up, the deployment becomes **active**.
+
+## Live
+
+- **URL.** Each service gets `https://<slug>-app.alternatefutures.ai`. The
+  platform's proxy maps it to the current active deployment, so the address
+  survives redeploys.
+- **Logs and shell.** `acc services logs <id>` and `acc ssh <id>` go straight
+  to the running container.
+- **Redeploying** creates a new deployment and closes the previous one. The
+  service, its URL, and its settings stay; only the running instance changes.
+
+## Where billing touches a deployment
+
+- **Before placement**, the platform checks that your organization's credits
+  cover at least one hour of everything you would be running, and refuses the
+  deploy if not.
+- **While active**, usage is metered per hour and paid from the credit wallet.
+- **If credits run low**, services are suspended (not deleted) and resume on
+  their own after a topup.
+- **Spend controls** you set on the service stop it on their own: a total or
+  monthly budget cap, or an auto-stop timer. The stop reason is recorded and
+  shown by `acc services info`.
+
+## Confidential deployments
+
+With `--confidential`, the platform only accepts offers from providers whose
+hardware runs the container inside a trusted execution environment (TEE): an
+isolated part of the processor whose memory the host cannot read. The hardware
+produces a signed statement of exactly what is running. `acc attest <id>`
+fetches it, and `acc attest <id> --verify` checks it against the chip vendor's
+roots on your machine, so trust does not depend on the provider or on us.
+
+## Statuses in one place
+
+| You see | Meaning |
+|---|---|
+| Created, waiting for offers, selecting a provider | Placement in progress. |
+| Deploying | A provider accepted and is starting the container. |
+| Active | Running and reachable at its URL. Billing is on. |
+| Failed | Placement or start did not succeed. Not billed. Check `acc services logs`. |
+| Suspended | Paused because credits ran low. Resumes after a topup. |
+| Closed | Stopped by you, by a redeploy, or by a spend control. |
+
+## Next steps
+
+- [Quick start](/guides/quickstart)
+- [Troubleshoot common problems](/troubleshooting)
+- [How billing works](/guides/how-billing-works)

@@ -19,6 +19,6 @@ export function agentContext(origin: string): string {
     `- CLI: npm install -g ${platform.cliPackage} && acc login. Command groups: projects, services, deployments, regions, templates, ssh, cp, attest, chat, billing, pat. Any command accepts --help.`,
     '- Non-interactive use: export AF_TOKEN (from acc pat create) and AF_PROJECT_ID, add -y to skip prompts, run acc whoami --json as a pre-flight check.',
     `- Agent skills plugin for Claude Code, Cursor, and Codex: ${platform.skillsRepo}`,
-    '- Pages in the Legacy section describe the retired af CLI. Those commands do not exist in acc.',
+    '- The retired af CLI (sites, storage, functions, IPFS) is not acc; its commands do not exist. /legacy explains what replaced each part, and old /guides/<af-topic> URLs redirect there.',
   ].join('\n');
 }

@@ -39,8 +39,7 @@ yarn add @alternatefutures/sdk
 </Tabs>
 
 
-## Quick Start
-
+## Quick start
 ### Node.js
 
 ```typescript
@@ -85,8 +84,7 @@ const sites = await af.sites().list();
 
 **Note:** The Node.js version (`@alternatefutures/sdk/node`) provides access to filesystem-dependent features like directory uploads. The browser version has a narrower feature set suitable for web applications.
 
-## SDK Clients
-
+## SDK clients
 | Client | Method | Description |
 |--------|--------|-------------|
 | **Sites** | `af.sites()` | Deploy and manage static sites |
@@ -102,8 +100,7 @@ const sites = await af.sites().list();
 | **User** | `af.user()` | User account information |
 | **Billing** | `af.billing()` | Billing and usage data |
 
-## Authentication Options
-
+## Authentication options
 The SDK supports three authentication methods:
 
 ### 1. Personal Access Token (Server-Side)
@@ -147,8 +144,7 @@ const accessTokenService = new ApplicationAccessTokenService({
 await accessTokenService.login();
 ```
 
-## Common Examples
-
+## Common examples
 ### Deploy a Site
 
 ```typescript
@@ -165,8 +161,7 @@ const deployment = await af.sites().createDeployment({
 });
 ```
 
-### Manage Storage
-
+### Manage storage
 ```typescript
 // List all stored files
 const files = await af.storage().list();
@@ -194,8 +189,7 @@ await af.ipns().publish({
 const records = await af.ipns().list();
 ```
 
-### Custom Domains
-
+### Custom domains
 ```typescript
 // Add a domain to a site
 const domain = await af.domains().create({
@@ -207,8 +201,7 @@ const domain = await af.domains().create({
 const verified = await af.domains().verify({ id: domain.id });
 ```
 
-## TypeScript Support
-
+## TypeScript support
 The SDK provides full TypeScript definitions:
 
 ```typescript
@@ -239,8 +232,7 @@ const sites: Site[] = await af.sites().list();
 - **[Quick Start](./quickstart)** - Get started in 5 minutes
 - **[API Reference](./api)** - Complete API documentation
 
-## Getting Help
-
+## Getting help
 - **[CLI Documentation](/cli/)** - Command-line interface
 - **[Guides](/guides/)** - Tutorials and best practices
 - **[GitHub Issues](https://github.com/alternatefutures)** - Report bugs or request features

@@ -56,8 +56,7 @@ mutation {
 
 Based on your chosen verification method, add the appropriate DNS record at your domain registrar:
 
-## DNS Configuration Methods
-
+## DNS configuration methods
 ### Method 1: TXT Record Verification (Recommended)
 
 Add a TXT record to verify domain ownership:
@@ -213,8 +212,7 @@ mutation {
 3. Wait 5-10 minutes for Let's Encrypt validation
 4. Certificate automatically installed and renewed
 
-## Domain Status
-
+## Domain status
 **Verification Status:**
 - `PENDING` - DNS not yet propagated
 - `VERIFIED` - Domain ownership confirmed
@@ -238,10 +236,8 @@ query {
 }
 ```
 
-## Managing Multiple Domains
-
-### List All Domains
-
+## Managing multiple domains
+### List all domains
 Get all domains for a site:
 
 ```graphql
@@ -259,8 +255,7 @@ query {
 }
 ```
 
-### Set Primary Domain
-
+### Set the primary domain
 Set a verified domain as the primary domain for your site:
 
 ```graphql
@@ -281,8 +276,7 @@ mutation {
 - Domain must be verified
 - Only verified domains can be primary
 
-### Remove Domain
-
+### Remove a domain
 Remove a custom domain:
 
 ```graphql
@@ -293,8 +287,7 @@ mutation {
 
 **Note:** Cannot remove a domain that is set as primary. Set a different primary domain first.
 
-### Common Multi-Domain Setup
-
+### Common multi-domain setup
 Add multiple domains for different purposes:
 
 - **Primary domain**: `example.com`
@@ -306,8 +299,7 @@ Each domain can have its own SSL certificate and verification method.
 
 ## Troubleshooting
 
-### Verification Failing
-
+### Verification failing
 **1. Check DNS propagation:**
 ```bash
 dig example.com TXT
@@ -356,8 +348,7 @@ query {
 
 If attempts > 10 and still failing, double-check DNS configuration.
 
-### SSL Certificate Issues
-
+### SSL certificate issues
 **Check certificate status:**
 ```graphql
 query {
@@ -392,8 +383,7 @@ curl -vI https://example.com
 openssl s_client -connect example.com:443 -servername example.com
 ```
 
-### DNS Provider Specific Issues
-
+### DNS provider-specific issues
 **Cloudflare:**
 - Disable "orange cloud" proxy for verification
 - Use "DNS only" (grey cloud) mode initially
@@ -493,8 +483,7 @@ mutation {
 - Update content without changing address
 - Access via: `/ipns/{hash}`
 
-## Complete Example Workflow
-
+## Complete example workflow
 Here's a complete example of adding a custom domain with SSL:
 
 ```graphql
@@ -569,8 +558,7 @@ mutation SetPrimary {
 }
 ```
 
-## API Reference
-
+## API reference
 ### Mutations
 
 **createDomain** - Add a custom domain

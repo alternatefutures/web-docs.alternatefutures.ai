@@ -1,29 +1,50 @@
 ---
-title: "Retired af CLI guides"
-description: "What happened to the af CLI, which guides in this section still apply, and where the current equivalents live."
+title: "What changed from af"
+description: "The retired af CLI and its sites, storage, functions, and IPFS workflow: what replaced each part in Alternate Clouds, and where the old guide links now point."
 ---
 
-<Callout type="warn" title="Read this first">
-The guides in this section were written for the retired `af` command line tool
-and its sites, storage, functions, and IPFS workflow. The current CLI is `acc`.
-It deploys compute services (containers, templates, GPU and confidential
-workloads) and does not include the `af sites`, `af storage`, `af functions`,
-`af ipns`, `af ens`, or `af gateways` commands. Commands on these pages will not
-work with `acc`.
+This page explains what happened to the `af` command line tool and where each
+of its features went. Every old guide under `/guides/` for `af` now redirects
+here.
+
+<Callout type="warn" title="af commands do not work in acc">
+The current CLI is `acc`. It deploys compute services (containers, templates,
+GPU and confidential workloads). The `af sites`, `af storage`, `af functions`,
+`af ipns`, `af ens`, `af gateways`, `af agents`, `af observability`, and
+`af registry` command groups do not exist in `acc`. If a tutorial tells you to
+run one of them, it is out of date.
 </Callout>
 
-## What to use instead
+## Where each feature went
 
-| You want to | Use |
+| You used | Now |
 |---|---|
-| Deploy a container or an app from a template | [Quick start](/guides/quickstart) and `acc services create` |
-| Point a domain at a service | [Custom domains](/guides/custom-domains) |
-| Automate deploys from CI or an agent | [Docs for AI agents](/ai-agents) and [Access tokens](/guides/api-keys) |
-| Host a static site | Not available in `acc` yet. Deploy the site inside a container (for example an `nginx` image that serves your build output). |
-| Store files on IPFS or Arweave | Not available in `acc`. Container images come from any public OCI registry (for example GitHub Container Registry). |
+| `af sites` (static sites on IPFS, Filecoin, or Arweave) | Not in `acc`. Serve your build output from a container, for example an `nginx` image, with `acc services create --kind docker`. See [Quick start](/guides/quickstart). |
+| `af agents` (Eliza and other agents) | Templates. `acc templates list --category AI_ML`, then follow [Deploy an AI agent](/guides/deploy-an-agent). |
+| `af functions` | Functions deploy from the web app **Deploy** page. The CLI's `--kind function` is not available yet. |
+| `af applications` | Projects and services. See [Manage projects](/guides/projects). |
+| `af api-keys` | Personal access tokens: `acc pat create`. See [Create and use access tokens](/guides/api-keys). |
+| `af observability` | `acc services logs`, `acc services info`, and `acc deployments`. |
+| `af storage`, `af ipns`, `af ens`, `af gateways` | Not available. Container images come from any public OCI registry, for example GitHub Container Registry. |
+| `af registry` (self-hosted registry prototype) | Retired. The platform pulls from public registries. |
+| `af sites deploy` in CI (GitHub Actions, GitLab, CircleCI, Jenkins) | `acc` with `AF_TOKEN` and `AF_PROJECT_ID` set, and `-y` on commands that confirm. See [Docs for AI agents](/ai-agents). |
+| Framework guides (Next.js, React, Astro) and migrations from other static hosts | Build the static output into a container image and deploy it as a service. |
 
-## Why these pages are still here
+## Custom domains
 
-They document product surface that is planned to return, and people still land
-on them from older tutorials. Each page carries a banner. Nothing in this
-section is used by the search index for "how do I" answers about `acc`.
+`af` attached domains to sites. In Alternate Clouds, domains attach to services
+and are in early access. See [Custom domains](/guides/custom-domains).
+
+## Old links
+
+`/guides/sites`, `/guides/functions`, `/guides/agents`, `/guides/storage`,
+`/guides/observability`, `/guides/applications`, `/guides/gateways`,
+`/guides/ipns`, `/guides/ens`, `/guides/cicd`, `/guides/best-practices`, the
+`deploy-*` framework guides, and the `migrate-from-*` guides all redirect to
+this page. The retired pages remain in the site's git history.
+
+## Next steps
+
+- [What is Alternate Clouds?](/guides)
+- [Quick start](/guides/quickstart)
+- [Command reference](/cli/commands)

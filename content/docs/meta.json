@@ -10,9 +10,11 @@
     "---Start here---",
     "guides/index",
     "guides/quickstart",
+    "guides/deploy-an-agent",
     "guides/authentication",
     "guides/dashboard",
     "guides/account-model",
+    "guides/how-deployments-work",
     "guides/how-billing-works",
     "ai-agents",
     "---Guides---",
@@ -26,6 +28,6 @@
     "cli",
     "sdk",
     "---Archive---",
-    "legacy"
+    "legacy/index"
   ]
 }

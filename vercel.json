@@ -9,6 +9,24 @@
   "redirects": [
     { "source": "/guides/decentralized-registry", "destination": "/legacy", "permanent": true },
     { "source": "/guides/registry-architecture", "destination": "/legacy", "permanent": true },
-    { "source": "/guides/registry-deployment", "destination": "/legacy", "permanent": true }
+    { "source": "/guides/registry-deployment", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/sites", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/functions", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/agents", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/storage", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/observability", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/applications", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/gateways", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/ipns", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/ens", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/cicd", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/best-practices", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/deploy-nextjs", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/deploy-react", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/deploy-astro", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/migrate-from-fleek", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/migrate-from-netlify", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/migrate-from-spheron", "destination": "/legacy", "permanent": true },
+    { "source": "/guides/migrate-from-vercel", "destination": "/legacy", "permanent": true }
   ]
 }

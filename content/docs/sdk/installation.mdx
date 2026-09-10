@@ -76,8 +76,7 @@ import {
 
 The browser version has a narrower feature set optimized for web applications.
 
-## Authentication Methods
-
+## Authentication methods
 The SDK supports multiple authentication approaches. Choose the one that fits your use case.
 
 ### 1. Personal Access Token (Recommended for Servers)
@@ -139,10 +138,8 @@ const af = new AlternateFuturesSdk({
 await accessTokenService.login();
 ```
 
-## Environment Configuration
-
-### Environment Variables
-
+## Environment configuration
+### Environment variables
 Store your credentials securely using environment variables:
 
 ```bash
@@ -153,8 +150,7 @@ AF_PROJECT_ID=prj_your_project_id_here
 
 **Important:** Add `.env` to your `.gitignore` to avoid committing secrets.
 
-### Loading Environment Variables
-
+### Loading environment variables
 **Node.js with dotenv:**
 
 ```typescript
@@ -183,8 +179,7 @@ const token = import.meta.env.VITE_AF_TOKEN;
 const token = process.env.NEXT_PUBLIC_AF_TOKEN;
 ```
 
-## TypeScript Configuration
-
+## TypeScript configuration
 The SDK includes TypeScript definitions. For optimal type checking, ensure your `tsconfig.json` includes:
 
 ```json
@@ -197,8 +192,7 @@ The SDK includes TypeScript definitions. For optimal type checking, ensure your 
 }
 ```
 
-### Importing Types
-
+### Importing types
 ```typescript
 import {
   AlternateFuturesSdk,
@@ -213,8 +207,7 @@ import {
 } from '@alternatefutures/sdk/node';
 ```
 
-## SDK Client Reference
-
+## SDK client reference
 The SDK exposes multiple clients for different features:
 
 | Client | Access Method | Description |
@@ -232,8 +225,7 @@ The SDK exposes multiple clients for different features:
 | User | `af.user()` | User account information |
 | Billing | `af.billing()` | Billing and usage data |
 
-## Complete Example
-
+## Complete example
 Here's a complete example showing SDK initialization and common operations:
 
 ```typescript
@@ -276,8 +268,7 @@ async function main() {
 main().catch(console.error);
 ```
 
-## Custom Configuration
-
+## Custom configuration
 ### Custom API Endpoints
 
 For self-hosted or development environments:
@@ -312,14 +303,12 @@ Required environment variables are missing. Ensure these are set:
 
 When using the standard SDK installation, these are configured automatically.
 
-### TypeScript Import Errors
-
+### TypeScript import errors
 If you see TypeScript errors with imports, ensure:
 1. Your `moduleResolution` is set to `bundler` or `node16`
 2. You're importing from the correct entry point (`/node` vs default)
 
-## Next Steps
-
+## Next steps
 - **[Quick Start](./quickstart)** - Get started in 5 minutes
 - **[API Reference](./api)** - Complete SDK API documentation
 - **[CLI Documentation](/cli/)** - Command-line interface

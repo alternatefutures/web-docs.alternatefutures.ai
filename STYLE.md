@@ -23,8 +23,9 @@ Sidebar rules (`content/docs/meta.json`):
   Add a group only when it will hold three or more pages.
 - Never nest deeper than one folder. Folders are for a tool with several pages
   (CLI, SDK) or an archive, not for topics.
-- Retired content goes under Archive with a warning callout, never deleted
-  while people still land on it.
+- Retired content is not kept as pages. Archive holds one explanation page
+  (What changed from af); retired URLs get a permanent redirect to it in
+  `vercel.json` so old links and agents' bookmarks still land on an answer.
 
 ## Titles and headings
 
