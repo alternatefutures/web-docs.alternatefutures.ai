@@ -156,10 +156,19 @@ jobs:
 
       # "Merged to main is final": push the regenerated references straight to
       # the built branch so Vercel republishes with no click. Needs a token that
-      # may push to the protected branch (docs_bot_token: an admin's fine-grained
-      # PAT with Contents: write, or a bypass actor in the branch rule). The push
-      # re-triggers this workflow once; that run finds no drift and stops. If the
-      # push is refused (no token / protection), the PR step below takes over.
+      # may push to the protected branch (docs_bot_token: a PAT, classic or
+      # fine-grained, owned by an admin or a bypass actor of the branch rule).
+      # The push re-triggers this workflow once; that run finds no drift and
+      # stops. If the push is refused (no token / protection), the PR step below
+      # takes over.
+      #
+      # actions/checkout persists the run's GITHUB_TOKEN as
+      # `http.https://github.com/.extraheader`. git sends that header even when
+      # the push URL carries other credentials, so the push authenticated as
+      # github-actions[bot] and was refused with GH006 "Changes must be made
+      # through a pull request" (runs 34519788471, 34523579595, 34524671483,
+      # 34525906731; a fine-grained AND a classic admin PAT). `-c ...extraheader=`
+      # clears the list for this one command so the URL credential is the identity.
       - name: Commit regenerated references directly
         id: direct
         if: steps.drift.outputs.changed == 'true'
@@ -177,7 +186,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add content/docs/cli/commands.mdx content/docs/sdk/api.mdx
           git commit -m "docs: regenerate CLI/SDK references (cli@${{ steps.drift.outputs.cli_sha }}, sdk@${{ steps.drift.outputs.sdk_sha }})"
-          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ inputs.branch }}"
+          # Evidence for the run log: which account pushes (a login is not a secret). A bad token fails here; the PR step takes over.
+          echo "Pushing as $(curl -fsS -H "Authorization: Bearer ${TOKEN}" https://api.github.com/user | jq -r .login)"
+          git -c http.https://github.com/.extraheader= push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ inputs.branch }}"
           echo "✅ Regenerated references pushed to ${{ inputs.branch }}; Vercel deploys them." | tee -a "$GITHUB_STEP_SUMMARY"
 
       # Fallback and janitor. Runs on EVERY build: with no diff it is a no-op,

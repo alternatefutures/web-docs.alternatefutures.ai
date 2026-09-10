@@ -37,8 +37,10 @@ updates the PR on branch `bot/regenerate-references-<branch>` (peter-evans/creat
 **Requirements:**
 - `GH_PAT` secret here (read access to the private `alternate-clouds-cli`), and `GH_PAT` in
   each source repo (Contents: write on this repo) so `docs-update.yml` can dispatch
-- `DOCS_BOT_TOKEN` secret here: a token that may push to `main` past the branch rule (an
-  admin's fine-grained PAT with Contents: write; `enforce_admins` is off). Without it the
+- `DOCS_BOT_TOKEN` secret here: a token that may push to `main` past the branch rule (a
+  PAT, classic or fine-grained, owned by an admin or bypass actor of the rule; `enforce_admins`
+  is off). The push clears the `http.https://github.com/.extraheader` credential that
+  `actions/checkout` persists, otherwise it runs as `github-actions[bot]` and fails GH006. Without it the
   workflow falls back to pull requests.
 - Repo setting "Allow GitHub Actions to create and approve pull requests" (enabled), for the
   fallback PR path
