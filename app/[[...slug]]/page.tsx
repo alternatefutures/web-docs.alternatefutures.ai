@@ -6,6 +6,7 @@ import { AIActions } from '@/components/ai-actions';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { cn } from '@/lib/cn';
 
 interface PageParams {
   params: Promise<{ slug?: string[] }>;
@@ -20,18 +21,24 @@ export default async function Page(props: PageParams) {
   const markdownUrl = getPageMarkdownUrl(page).url;
   const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`;
 
+  // The AI hand-off actions live at the top of the sticky "On this page"
+  // column (left-aligned, above the heading) so they stay in view while
+  // reading. Fumadocs hides that column below `xl` and on pages with no
+  // headings or `full` width, so the actions fall back to the title row there.
+  const tocVisible = !page.data.full && page.data.toc.length > 0;
+  const actions = (className?: string) => (
+    <AIActions title={page.data.title} markdownUrl={markdownUrl} githubUrl={githubUrl} className={className} />
+  );
+
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} tableOfContent={{ style: 'clerk' }}>
-      {/* Title row: page title on the left, AI hand-off actions top-right on
-          every page (they stack under the title on narrow screens). */}
+    <DocsPage
+      toc={page.data.toc}
+      full={page.data.full}
+      tableOfContent={{ style: 'clerk', header: tocVisible ? actions('mb-5') : undefined }}
+    >
       <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <DocsTitle className="min-w-0">{page.data.title}</DocsTitle>
-        <AIActions
-          title={page.data.title}
-          markdownUrl={markdownUrl}
-          githubUrl={githubUrl}
-          className="shrink-0 sm:pt-1.5"
-        />
+        {actions(cn('shrink-0 sm:pt-1.5', tocVisible && 'xl:hidden'))}
       </div>
       <DocsBody>
         <MDX
