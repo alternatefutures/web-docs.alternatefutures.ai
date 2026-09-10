@@ -9,11 +9,19 @@
  *   - ../alternate-clouds-api (local sibling checkout), else
  *   - ./alternate-clouds-api (CI checkout inside this repo)
  *
- * House rule (see scripts/lib/provider-scrub.mjs): the docs never name the
- * compute vendors. Types, fields, arguments and enum values whose NAME carries
- * a vendor are omitted, vendor names inside descriptions are rewritten to the
- * tier they stand for, and the output is asserted clean. Set
- * DOCS_INCLUDE_PROVIDER_TYPES=1 to generate the complete schema instead.
+ * What is left out, on purpose (the docs describe only what a customer can use):
+ *   1. Vendor names (scripts/lib/provider-scrub.mjs): types, fields, arguments
+ *      and enum values whose NAME carries a compute vendor are omitted, vendor
+ *      names in descriptions are rewritten, and the output is asserted clean.
+ *      DOCS_INCLUDE_PROVIDER_TYPES=1 keeps them.
+ *   2. Retired hosting product (sites, IPFS storage, functions, IPNS, ENS,
+ *      zones, applications, private gateways) and admin-only or unreleased
+ *      surfaces (domains, DNS records): types declared under those schema
+ *      section banners and root fields under those `# Label` comments are
+ *      omitted. Field names ending in `Service(s)` are always kept, because the
+ *      schema files one of them under a legacy comment. Subscriptions are
+ *      omitted too: no client uses them and no transport is configured.
+ *      DOCS_INCLUDE_RETIRED_SURFACES=1 keeps them.
  *
  * Pages link to each other by heading id: Fumadocs slugs `### Project` to
  * `#project`, so a type named X is reachable at /api/<page>#x.
@@ -39,6 +47,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const OUT_DIR = join(REPO_ROOT, 'content/docs/api');
 const REDACT = process.env.DOCS_INCLUDE_PROVIDER_TYPES !== '1';
+const CURATE = process.env.DOCS_INCLUDE_RETIRED_SURFACES !== '1';
+
+// Section banners (types) and root-field labels (operations) of surfaces a
+// customer cannot use today. Matched against the RAW schema comment text.
+const EXCLUDED_SECTION_RE = /^(SITES|FUNCTIONS|DOMAINS|DNS RECORD|DOMAIN REGISTRATION|IPFS\/STORAGE|STORAGE ANALYTICS|STORAGE TRACKING|SUBSCRIPTIONS)\b/i;
+const EXCLUDED_LABEL_RE = /^(sites?\b|ipns|private gateways?|functions?\b|zones?\b|storage\b|ens\b|applications?\b|domains?\b|web3 domains?|domain registration|dns record)/i;
+// Root fields named after the retired product, whatever comment they sit under.
+const LEGACY_NAME_RE = /ipfs|ipns|arns|\bens\b|^sites?(?![a-z])|^pins?(?![a-z])|pinned|zone|privateGateway|afFunction|filecoin|arweave/i;
+const PROTECTED_FIELD_RE = /Services?$/;
 
 const API_REPO = [
   process.env.AF_API_REPO,
@@ -62,8 +79,10 @@ const sdl = source
 
 // ── Pre-scan: section banners, root-field labels, declaration order ──────────
 // Banners look like:   # ====…   /   # SITES & DEPLOYMENTS   /   # ====…
-// Inside Query/Mutation, `# Label` comments group the fields that follow.
-const ACRONYMS = new Set(['ipns', 'ipfs', 'ssl', 'dns', 'api', 'gpu', 'tee', 'cvm', 'sdl', 'url', 'id', 'ai', 'ml', 'pat', 'oauth', 'ssh', 'http', 'https', 'json', 'ws', 'cli', 'sdk', 'rpc', 'tls', 'jwt', 'ipv4', 'ipv6', 'cpu', 'ram', 'ens', 'cdn', 'fqdn', 'uuid', 'pats', 'apm', 'ipns']);
+// (a banner may carry extra comment lines; the first one is the title).
+// Inside Query/Mutation, the FIRST line of a `# …` comment block labels the
+// fields that follow; continuation lines are prose, not labels.
+const ACRONYMS = new Set(['ipns', 'ipfs', 'ssl', 'dns', 'api', 'gpu', 'tee', 'cvm', 'sdl', 'url', 'id', 'ai', 'ml', 'pat', 'oauth', 'ssh', 'http', 'https', 'json', 'ws', 'cli', 'sdk', 'rpc', 'tls', 'jwt', 'ipv4', 'ipv6', 'cpu', 'ram', 'ens', 'cdn', 'fqdn', 'uuid', 'pats', 'apm', 'af']);
 function sentenceCase(raw) {
   const words = raw.trim().toLowerCase().split(/\s+/).map((w) => {
     const core = w.replace(/[^a-z0-9]/g, '');
@@ -76,24 +95,42 @@ function sectionTitle(raw) {
   if (/akash/i.test(raw)) return 'Standard compute deployments';
   if (/phala/i.test(raw)) return 'Confidential compute deployments';
   if (/spheron/i.test(raw)) return 'GPU compute deployments';
-  return sentenceCase(raw);
+  if (/^sites/i.test(raw)) return 'Deployments';
+  return sentenceCase(tidyCopy(raw));
 }
 
 const lines = sdl.split('\n');
-const sectionOf = new Map();
+const sectionOf = new Map(); // type name → display section
+const rawSectionOf = new Map(); // type name → raw banner text
 const declLine = new Map();
 const rootLabels = { Query: new Map(), Mutation: new Map(), Subscription: new Map() };
+const rootRawLabels = { Query: new Map(), Mutation: new Map(), Subscription: new Map() };
 const isBanner = (l) => /^\s*#\s*=+\s*$/.test(l ?? '');
+const isComment = (l) => /^\s*#/.test(l ?? '');
 let section = 'Other';
+let rawSection = '';
 let inRoot = null;
 let label = null;
+let rawLabel = null;
+let prevComment = false;
 let inDescription = false;
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i];
   if ((line.match(/"""/g) ?? []).length % 2 === 1) inDescription = !inDescription;
   if (inDescription) continue;
-  if (isBanner(line) && !isBanner(lines[i + 1]) && /^\s*#\s*\S/.test(lines[i + 1] ?? '') && isBanner(lines[i + 2])) {
-    section = sectionTitle(lines[i + 1].replace(/^\s*#\s*/, ''));
+  if (isBanner(line)) {
+    let j = i + 1;
+    const titles = [];
+    while (j < lines.length && isComment(lines[j]) && !isBanner(lines[j])) {
+      titles.push(lines[j].replace(/^\s*#\s*/, '').trim());
+      j++;
+    }
+    if (titles.length > 0 && isBanner(lines[j])) {
+      rawSection = titles[0];
+      section = sectionTitle(titles[0]);
+      i = j;
+    }
+    prevComment = false;
     continue;
   }
   const decl = line.match(/^\s*(?:extend\s+)?(type|input|enum|union|interface|scalar)\s+([A-Za-z_]\w*)/);
@@ -102,26 +139,52 @@ for (let i = 0; i < lines.length; i++) {
     if (kind === 'type' && rootLabels[name]) {
       inRoot = name;
       label = null;
+      rawLabel = null;
     } else {
       inRoot = null;
-      if (!sectionOf.has(name)) sectionOf.set(name, section);
-      if (!declLine.has(name)) declLine.set(name, i);
+      if (!sectionOf.has(name)) {
+        sectionOf.set(name, section);
+        rawSectionOf.set(name, rawSection);
+        declLine.set(name, i);
+      }
     }
+    prevComment = false;
     continue;
   }
   if (inRoot) {
     if (/^\s*}\s*$/.test(line)) {
       inRoot = null;
+      prevComment = false;
+      continue;
+    }
+    if (/^\s*$/.test(line)) {
+      prevComment = false;
       continue;
     }
     const c = line.match(/^\s*#\s*(.+)$/);
     if (c) {
-      // "Service container logs (akash / phala)" → "Service container logs"
-      label = sentenceCase(tidyCopy(scrubProviders(stripProviderAsides(c[1]))));
+      // A label is a short heading-like first line ("Service links (…)");
+      // a paragraph ("Returns the plaintext value of …") keeps the current label.
+      if (!prevComment) {
+        const head = c[1].trim().split(/\s+(?:—|:)\s+/)[0].trim();
+        const bare = head.replace(/\s*\([^)]*\)/g, '').trim();
+        if (bare.length <= 48 && !/[.;,]$/.test(bare) && !/\.\s/.test(bare)) {
+          rawLabel = head;
+          // "Akash deployments" → tier-specific; file under Deployments. A vendor
+          // named only in an aside ("… (akash lease-status)") keeps its label.
+          const stripped = stripProviderAsides(head);
+          label = isProviderTerm(stripped) ? 'Deployments' : sentenceCase(tidyCopy(scrubProviders(stripped)));
+        }
+      }
+      prevComment = true;
       continue;
     }
+    prevComment = false;
     const f = line.match(/^\s*([a-zA-Z_]\w*)\s*[(:]/);
-    if (f && label && !rootLabels[inRoot].has(f[1])) rootLabels[inRoot].set(f[1], label);
+    if (f && label && !rootLabels[inRoot].has(f[1])) {
+      rootLabels[inRoot].set(f[1], label);
+      rootRawLabels[inRoot].set(f[1], rawLabel);
+    }
   }
 }
 
@@ -138,14 +201,79 @@ const userTypes = Object.values(schema.getTypeMap()).filter(
   (t) => !t.name.startsWith('__') && !isSpecifiedScalarType(t) && !ROOTS.includes(t.name),
 );
 
-// ── Redaction ────────────────────────────────────────────────────────────────
-const dropped = new Set();
-if (REDACT) for (const t of userTypes) if (isProviderTerm(t.name)) dropped.add(t.name);
+// ── Omissions: vendor names, retired and admin surfaces ──────────────────────
+// 1. Root fields: vendor-named or vendor-typed ones go; so do fields under an
+//    excluded `# Label` (unless the name is service-level).
+// 2. Types: everything reachable from the kept root fields stays, EXCEPT that a
+//    type declared under an excluded banner is only reached when a kept root
+//    field uses it directly (argument or return type), never through another
+//    type's field (that is how `Project.sites` would drag the retired `Site`
+//    back in). Types nothing kept reaches are not documented at all.
+const vendorNamed = (name) => REDACT && isProviderTerm(name);
+const sectionExcluded = (name) => CURATE && EXCLUDED_SECTION_RE.test(rawSectionOf.get(name) ?? '');
+const excludedRoot = { Query: [], Mutation: [] };
+// A vendor-named operation goes. A vendor-neutral operation whose RETURN type is
+// vendor-specific (deployFromTemplate) stays, with its return type described
+// generically. Retired-product operations go by name, by label, or because
+// their return/argument types are declared under an excluded banner.
+function rootFieldKept(rootName, f) {
+  if (vendorNamed(f.name)) return false;
+  if (!CURATE) return true;
+  if (LEGACY_NAME_RE.test(f.name)) return false;
+  const raw = rootRawLabels[rootName]?.get(f.name) ?? '';
+  if (EXCLUDED_LABEL_RE.test(raw) && !PROTECTED_FIELD_RE.test(f.name)) return false;
+  // Only the RETURN type decides here: input types are filed by the schema
+  // authors wherever convenient (CreateServiceInput sits under a legacy banner).
+  if (sectionExcluded(getNamedType(f.type).name)) return false;
+  return true;
+}
+const keptRootFields = { Query: [], Mutation: [] };
+for (const root of ['Query', 'Mutation']) {
+  for (const f of Object.values(schema.getType(root)?.getFields() ?? {})) {
+    if (rootFieldKept(root, f)) keptRootFields[root].push(f);
+    else if (!vendorNamed(f.name)) excludedRoot[root].push(f.name);
+  }
+}
+const direct = new Set();
+for (const root of ['Query', 'Mutation']) {
+  for (const f of keptRootFields[root]) {
+    if (!vendorNamed(getNamedType(f.type).name)) direct.add(getNamedType(f.type).name);
+    for (const a of f.args) if (!vendorNamed(a.name)) direct.add(getNamedType(a.type).name);
+  }
+}
+const reachable = new Set();
+const queue = [...direct];
+while (queue.length > 0) {
+  const name = queue.pop();
+  if (reachable.has(name) || vendorNamed(name)) continue;
+  const t = schema.getType(name);
+  if (!t || t.name.startsWith('__') || isSpecifiedScalarType(t)) continue;
+  reachable.add(name);
+  const follow = (ref) => {
+    const n = getNamedType(ref).name;
+    if (vendorNamed(n)) return;
+    if (sectionExcluded(n) && !direct.has(n)) return;
+    queue.push(n);
+  };
+  if (isObjectType(t) || isInterfaceType(t) || isInputObjectType(t)) {
+    for (const f of Object.values(t.getFields())) {
+      if (vendorNamed(f.name)) continue;
+      follow(f.type);
+      for (const a of f.args ?? []) if (!vendorNamed(a.name)) follow(a.type);
+    }
+    if (isObjectType(t)) for (const i of t.getInterfaces()) follow(i);
+    if (isInterfaceType(t)) for (const o of schema.getImplementations(t).objects) follow(o);
+  } else if (isUnionType(t)) {
+    for (const m of t.getTypes()) follow(m);
+  }
+}
+const dropped = new Set(userTypes.filter((t) => !reachable.has(t.name)).map((t) => t.name));
 const keepNamed = (t) => !dropped.has(getNamedType(t).name);
-const keepField = (f) => !(REDACT && isProviderTerm(f.name)) && keepNamed(f.type);
-const keepArg = (a) => !(REDACT && isProviderTerm(a.name)) && keepNamed(a.type);
-const enumValues = (t) => t.getValues().filter((v) => !(REDACT && isProviderTerm(v.name)));
+const keepField = (f) => !vendorNamed(f.name) && keepNamed(f.type);
+const keepArg = (a) => !vendorNamed(a.name) && keepNamed(a.type);
+const enumValues = (t) => t.getValues().filter((v) => !vendorNamed(v.name));
 const unionMembers = (t) => t.getTypes().filter((m) => !dropped.has(m.name));
+const keepRootField = (rootName, f) => keptRootFields[rootName].includes(f);
 let changed = true;
 while (changed) {
   changed = false;
@@ -190,10 +318,26 @@ function defaultOf(x) {
   const ast = x.astNode?.defaultValue;
   return ast ? ` Default: ${code(print(ast))}.` : '';
 }
+// Root fields registered without a `# Label` comment get a label from their name.
+function labelFor(rootName, name) {
+  const l = rootLabels[rootName].get(name);
+  // A service-level field filed under a legacy comment (deleteService under
+  // "Functions") is listed with the services.
+  if (l && CURATE && EXCLUDED_LABEL_RE.test(rootRawLabels[rootName].get(name) ?? '')) return 'Services';
+  if (l) return l;
+  if (/github/i.test(name)) return 'GitHub deploy';
+  if (/build/i.test(name)) return 'Builds';
+  if (/region/i.test(name)) return 'Regions';
+  return 'Other';
+}
 let usedFootnote = false;
-const FOOTNOTE = '\n† Some provider-specific fields or arguments are omitted from this page. Introspection on the endpoint returns the complete live schema.\n';
+const FOOTNOTE = '\n† Some fields, arguments or return types are omitted from this page: provider-specific ones, or ones that belong to retired or admin-only surfaces.\n';
 
 function header(title, description) {
+  const omitted = [
+    REDACT ? 'provider-specific types, fields and arguments' : null,
+    CURATE ? 'operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations' : null,
+  ].filter(Boolean);
   return `---
 title: "${title}"
 description: "${description}"
@@ -204,7 +348,7 @@ description: "${description}"
 <Callout type="info">
 Generated from the API server source (${pkg.name} ${pkg.version}) on every merge. Endpoint
 \`https://api.alternatefutures.ai/graphql\`, header \`Authorization: Bearer <personal access token>\`.
-See the [GraphQL API overview](/api) for how to call it.${REDACT ? ' Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.' : ''}
+See the [GraphQL API overview](/api) for how to call it.${omitted.length > 0 ? ` Left out on purpose: ${omitted.join('; ')}.` : ''}
 </Callout>
 
 `;
@@ -224,7 +368,7 @@ function fieldsTable(type) {
   }
   if (omitted) {
     usedFootnote = true;
-    s += '| † | | Provider-specific fields omitted |\n';
+    s += '| † | | Some fields omitted |\n';
   }
   return `${s}\n`;
 }
@@ -240,20 +384,24 @@ function renderRootField(f) {
   }
   if (args.length < f.args.length) {
     usedFootnote = true;
-    s += 'Some provider-specific arguments are omitted. †\n\n';
+    s += 'Some arguments are omitted. †\n\n';
   }
-  s += `Returns ${typeCell(f.type)}.\n\n`;
+  if (vendorNamed(getNamedType(f.type).name)) {
+    usedFootnote = true;
+    s += `Returns a deployment object for the service's compute tier${/\[/.test(String(f.type)) ? 's' : ''} (provider-specific, not documented here). †\n\n`;
+  } else {
+    s += `Returns ${typeCell(f.type)}.\n\n`;
+  }
   return s;
 }
 
 function renderRoot(rootName) {
   const type = schema.getType(rootName);
   if (!type) return '';
-  const fields = Object.values(type.getFields()).filter(keepField);
-  const labels = rootLabels[rootName];
+  const fields = Object.values(type.getFields()).filter((f) => keepRootField(rootName, f));
   const groups = new Map();
   for (const f of fields) {
-    const l = labels.get(f.name) ?? 'Other';
+    const l = labelFor(rootName, f.name);
     if (!groups.has(l)) groups.set(l, []);
     groups.get(l).push(f);
   }
@@ -284,18 +432,13 @@ function write(file, body) {
 
 mkdirSync(OUT_DIR, { recursive: true });
 
-// queries.mdx (+ subscriptions)
+// queries.mdx
 {
   let body = header(
     'Queries',
     'Every query the Alternate Clouds GraphQL API exposes, with arguments and return types, generated from the API source.',
   );
   body += renderRoot('Query');
-  const sub = schema.getType('Subscription');
-  if (sub && Object.values(sub.getFields()).some(keepField)) {
-    body += '## Subscriptions\n\nSubscriptions use the same endpoint over WebSocket (graphql-ws).\n\n';
-    for (const f of Object.values(sub.getFields()).filter(keepField)) body += renderRootField(f);
-  }
   write('queries.mdx', body);
 }
 
@@ -377,7 +520,7 @@ mkdirSync(OUT_DIR, { recursive: true });
       for (const v of values) body += `| ${code(v.name)} | ${cell(describe(v))} |\n`;
       if (values.length < t.getValues().length) {
         usedFootnote = true;
-        body += '| † | Provider-specific values omitted |\n';
+        body += '| † | Some values omitted |\n';
       }
       body += '\n';
     }
@@ -391,9 +534,13 @@ const stats = {
   inputs: count(isInputObjectType),
   enums: count(isEnumType),
   scalars: count(isScalarType),
-  queries: Object.values(schema.getType('Query')?.getFields() ?? {}).filter(keepField).length,
-  mutations: Object.values(schema.getType('Mutation')?.getFields() ?? {}).filter(keepField).length,
+  queries: Object.values(schema.getType('Query')?.getFields() ?? {}).filter((f) => keepRootField('Query', f)).length,
+  mutations: Object.values(schema.getType('Mutation')?.getFields() ?? {}).filter((f) => keepRootField('Mutation', f)).length,
 };
 console.log(`✨ Wrote content/docs/api/{queries,mutations,objects,inputs,enums}.mdx from ${API_REPO} (${pkg.name}@${pkg.version})`);
 console.log(`   ${JSON.stringify(stats)}`);
 if (dropped.size > 0) console.log(`   omitted types (${dropped.size}): ${[...dropped].sort().join(', ')}`);
+for (const root of ['Query', 'Mutation']) {
+  const ex = [...new Set(excludedRoot[root])].sort();
+  if (ex.length > 0) console.log(`   omitted ${root} fields (${ex.length}): ${ex.join(', ')}`);
+}

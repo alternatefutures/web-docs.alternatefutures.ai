@@ -1,6 +1,6 @@
 ---
 title: "Templates overview"
-description: "What a template is on Alternate Clouds, how to deploy one from the web app or the acc CLI, and where the generated catalog of every template lives."
+description: "What a template is on Alternate Clouds, how to deploy one from the web app or the acc CLI, which ones are web-app only, and where the generated catalog of every template lives."
 ---
 
 This page explains templates. For the full list with resources and settings,
@@ -14,8 +14,9 @@ gives you a running service in minutes without writing a deployment file.
 
 ## Deploy a template
 
-From the web app, create a new service and choose **Template**, then pick one
-from the list and fill in the required variables.
+From the web app, open **Deploy a template** at
+`https://clouds.alternatefutures.ai/deploy`, pick one and fill in the required
+variables.
 
 From the CLI:
 
@@ -27,13 +28,19 @@ acc services create --kind template --template <template-id>
 
 Every required environment variable without a default must be set before the
 deploy starts; the catalog marks them. Variables marked "set by the platform"
-are filled in for you.
+are filled in for you when you deploy.
+
+## Composite templates
+
+Some templates deploy several services together, for example an agent with its
+own database. These composite templates deploy from the web app only; the CLI
+does not support them yet and says so if you try. The catalog marks each one.
 
 ## Where the list comes from
 
-The catalog is generated from the platform's template registry on every merge,
-so it matches what `acc templates list` and the web app offer. Templates still
-in internal testing are not listed.
+The catalog is generated from the platform's template registry on every merge
+and filtered to what the platform currently offers, so it matches
+`acc templates list` and the web app.
 
 <Cards>
   <Card title="Template catalog" href="/templates/catalog" description="Every template with resources, ports, environment variables and health checks." />

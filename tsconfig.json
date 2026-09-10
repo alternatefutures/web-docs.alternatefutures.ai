@@ -33,6 +33,7 @@
   "exclude": [
     "node_modules",
     "alternate-clouds-cli",
-    "alternate-clouds-sdk"
+    "alternate-clouds-sdk",
+    "alternate-clouds-api"
   ]
 }

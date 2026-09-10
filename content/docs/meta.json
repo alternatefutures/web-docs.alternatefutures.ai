@@ -20,7 +20,6 @@
     "---Guides---",
     "guides/projects",
     "guides/billing",
-    "guides/custom-domains",
     "guides/api-keys",
     "troubleshooting",
     "guides/glossary",
@@ -30,6 +29,7 @@
     "api",
     "templates",
     "---Archive---",
-    "legacy/index"
+    "legacy/index",
+    "legacy/custom-domains"
   ]
 }

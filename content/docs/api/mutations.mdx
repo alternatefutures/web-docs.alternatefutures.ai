@@ -8,7 +8,7 @@ description: "Every mutation the Alternate Clouds GraphQL API exposes, with argu
 <Callout type="info">
 Generated from the API server source (@alternatefutures/backend 0.1.2) on every merge. Endpoint
 `https://api.alternatefutures.ai/graphql`, header `Authorization: Bearer <personal access token>`.
-See the [GraphQL API overview](/api) for how to call it. Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.
+See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
 ## Auth - SDK token exchange
@@ -119,7 +119,15 @@ Returns `Service!` · [Service](/api/objects#service).
 
 Returns `Service!` · [Service](/api/objects#service).
 
-## Attestation registry (org allowlist; af hosts, org authors)
+### deleteService
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+
+Returns `Service!` · [Service](/api/objects#service).
+
+## Attestation registry (org allowlist; AF hosts, org authors)
 
 ### addAttestationMeasurement
 
@@ -152,158 +160,6 @@ org's allowlist and the quote's report_data to bind the pubkey.
 | `input` | `RegisterAttestedIdentityInput!` · [RegisterAttestedIdentityInput](/api/inputs#registerattestedidentityinput) |  |
 
 Returns `AttestedIdentity!` · [AttestedIdentity](/api/objects#attestedidentity).
-
-## Sites
-
-### createSite
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `data` | `SiteDataInput!` · [SiteDataInput](/api/inputs#sitedatainput) |  |
-
-Returns `Site!` · [Site](/api/objects#site).
-
-### deleteSite
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `SiteWhereInput!` · [SiteWhereInput](/api/inputs#sitewhereinput) |  |
-
-Returns `Site!` · [Site](/api/objects#site).
-
-## Deployments
-
-### createCustomIpfsDeployment
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `data` | `DeploymentDataInput!` · [DeploymentDataInput](/api/inputs#deploymentdatainput) |  |
-
-Returns `SiteDeployment!` · [SiteDeployment](/api/objects#sitedeployment).
-
-### createDeployment
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `siteId` | `ID!` |  |
-| `sourceDirectory` | `String!` |  |
-| `storageType` | `StorageType` · [StorageType](/api/enums#storagetype) |  |
-| `buildOptions` | `BuildOptionsInput` · [BuildOptionsInput](/api/inputs#buildoptionsinput) |  |
-
-Returns `SiteDeployment!` · [SiteDeployment](/api/objects#sitedeployment).
-
-## Functions
-
-### createAFFunction
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `data` | `CreateAFFunctionDataInput!` · [CreateAFFunctionDataInput](/api/inputs#createaffunctiondatainput) |  |
-
-Returns `AFFunction!` · [AFFunction](/api/objects#affunction).
-
-### updateAFFunction
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `AFFunctionWhereInput!` · [AFFunctionWhereInput](/api/inputs#affunctionwhereinput) |  |
-| `data` | `UpdateAFFunctionDataInput!` · [UpdateAFFunctionDataInput](/api/inputs#updateaffunctiondatainput) |  |
-
-Returns `AFFunction!` · [AFFunction](/api/objects#affunction).
-
-### triggerAFFunctionDeployment
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `TriggerAFFunctionDeploymentWhereInput!` · [TriggerAFFunctionDeploymentWhereInput](/api/inputs#triggeraffunctiondeploymentwhereinput) |  |
-| `data` | `TriggerAFFunctionDeploymentDataInput` · [TriggerAFFunctionDeploymentDataInput](/api/inputs#triggeraffunctiondeploymentdatainput) |  |
-
-Returns `AFFunctionDeployment!` · [AFFunctionDeployment](/api/objects#affunctiondeployment).
-
-### deleteAFFunction
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `DeleteAFFunctionWhereInput!` · [DeleteAFFunctionWhereInput](/api/inputs#deleteaffunctionwhereinput) |  |
-
-Returns `AFFunction!` · [AFFunction](/api/objects#affunction).
-
-### deleteService
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `id` | `ID!` |  |
-
-Returns `Service!` · [Service](/api/objects#service).
-
-## Domains
-
-### createDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `CreateDomainInput!` · [CreateDomainInput](/api/inputs#createdomaininput) |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### createOrgDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `CreateOrgDomainInput!` · [CreateOrgDomainInput](/api/inputs#createorgdomaininput) |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### assignDomainToSite
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `siteId` | `ID!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### verifyDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-
-Returns `Boolean!`.
-
-### provisionSsl
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `email` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### renewSslCertificate
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### setPrimaryDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `siteId` | `ID!` |  |
-| `domainId` | `ID!` |  |
-
-Returns `Boolean!`.
-
-### deleteDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `id` | `ID!` |  |
-
-Returns `Boolean!`.
 
 ## Agent chat
 
@@ -339,12 +195,6 @@ Returns `Message!` · [Message](/api/objects#message).
 
 Returns `Boolean!`.
 
-## Storage tracking
-
-### triggerStorageSnapshot
-
-Returns `StorageSnapshot!` · [StorageSnapshot](/api/objects#storagesnapshot).
-
 ## Observability settings
 
 ### updateObservabilitySettings
@@ -356,92 +206,15 @@ Returns `StorageSnapshot!` · [StorageSnapshot](/api/objects#storagesnapshot).
 
 Returns `ObservabilitySettings!` · [ObservabilitySettings](/api/objects#observabilitysettings).
 
-## Domain registration / purchase
-
-### purchaseDomain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `PurchaseDomainInput!` · [PurchaseDomainInput](/api/inputs#purchasedomaininput) |  |
-
-Returns `DomainRegistrationResult!` · [DomainRegistrationResult](/api/objects#domainregistrationresult).
-
-## DNS record management (admin)
-
-### addDnsRecord
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `CreateDNSRecordInput!` · [CreateDNSRecordInput](/api/inputs#creatednsrecordinput) |  |
-
-Returns `DNSUpdateResult!` · [DNSUpdateResult](/api/objects#dnsupdateresult).
-
-### updateDnsRecord
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `UpdateDNSRecordInput!` · [UpdateDNSRecordInput](/api/inputs#updatednsrecordinput) |  |
-
-Returns `DNSUpdateResult!` · [DNSUpdateResult](/api/objects#dnsupdateresult).
-
-### deleteDnsRecord
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `DeleteDNSRecordInput!` · [DeleteDNSRecordInput](/api/inputs#deletednsrecordinput) |  |
-
-Returns `DNSUpdateResult!` · [DNSUpdateResult](/api/objects#dnsupdateresult).
-
-## Web3 domains
-
-### registerArns
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `arnsName` | `String!` |  |
-| `contentId` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### updateArnsContent
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `contentId` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### setEnsContentHash
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `ensName` | `String!` |  |
-| `contentHash` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### publishIpns
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `cid` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
-### updateIpns
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-| `cid` | `String!` |  |
-
-Returns `Domain!` · [Domain](/api/objects#domain).
-
 ## Templates
+
+### deployFromTemplate
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `DeployFromTemplateInput!` · [DeployFromTemplateInput](/api/inputs#deployfromtemplateinput) |  |
+
+Returns a deployment object for the service's compute tier (provider-specific, not documented here). †
 
 ### deployCompositeTemplate
 
@@ -481,8 +254,6 @@ Returns `Boolean!`.
 | `vars` | `[EnvVarInput!]!` · [EnvVarInput](/api/inputs#envvarinput) |  |
 
 Returns `[ServiceEnvVar!]!` · [ServiceEnvVar](/api/objects#serviceenvvar).
-
-## Back via cache or polling, the client should fetch on-demand only.
 
 ### revealServiceEnvVar
 
@@ -536,7 +307,7 @@ Returns `ServiceLink!` · [ServiceLink](/api/objects#servicelink).
 
 Returns `Boolean!`.
 
-## Capped at 1 mb and target the running container (ephemeral).
+## Deployment file access (files tab)
 
 ### writeServiceFile
 
@@ -586,7 +357,7 @@ Returns `Boolean!`.
 
 Returns `FeedbackReport!` · [FeedbackReport](/api/objects#feedbackreport).
 
-## Other
+## GitHub deploy
 
 ### syncGithubInstallation
 
@@ -650,3 +421,5 @@ Trigger a new build. With no sha, builds the tip of the tracked branch (default 
 
 Returns `BuildJob!` · [BuildJob](/api/objects#buildjob).
 
+
+† Some fields, arguments or return types are omitted from this page: provider-specific ones, or ones that belong to retired or admin-only surfaces.

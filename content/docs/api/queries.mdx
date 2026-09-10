@@ -8,7 +8,7 @@ description: "Every query the Alternate Clouds GraphQL API exposes, with argumen
 <Callout type="info">
 Generated from the API server source (@alternatefutures/backend 0.1.2) on every merge. Endpoint
 `https://api.alternatefutures.ai/graphql`, header `Authorization: Bearer <personal access token>`.
-See the [GraphQL API overview](/api) for how to call it. Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.
+See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
 ## Version
@@ -72,300 +72,6 @@ Returns `ProjectList!` · [ProjectList](/api/objects#projectlist).
 | `projectId` | `ID` |  |
 
 Returns `[Service!]!` · [Service](/api/objects#service).
-
-## Sites
-
-### site
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `SiteWhereInput!` · [SiteWhereInput](/api/inputs#sitewhereinput) |  |
-
-Returns `Site` · [Site](/api/objects#site).
-
-### sites
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `SitesWhereInput` · [SitesWhereInput](/api/inputs#siteswhereinput) |  |
-
-Returns `SiteList!` · [SiteList](/api/objects#sitelist).
-
-### siteBySlug
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `SiteBySlugWhereInput!` · [SiteBySlugWhereInput](/api/inputs#sitebyslugwhereinput) |  |
-
-Returns `Site` · [Site](/api/objects#site).
-
-## IPNS records
-
-### ipnsRecord
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `name` | `String!` |  |
-
-Returns `IPNSRecord` · [IPNSRecord](/api/objects#ipnsrecord).
-
-### ipnsRecords
-
-Returns `IpnsRecordList!` · [IpnsRecordList](/api/objects#ipnsrecordlist).
-
-## Private gateways
-
-### privateGateway
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `id` | `ID!` |  |
-
-Returns `PrivateGateway` · [PrivateGateway](/api/objects#privategateway).
-
-### privateGatewayBySlug
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `slug` | `String!` |  |
-
-Returns `PrivateGateway` · [PrivateGateway](/api/objects#privategateway).
-
-### privateGateways
-
-Returns `PrivateGatewayList!` · [PrivateGatewayList](/api/objects#privategatewaylist).
-
-## Deployments
-
-### deployment
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `DeploymentWhereInput!` · [DeploymentWhereInput](/api/inputs#deploymentwhereinput) |  |
-
-Returns `SiteDeployment` · [SiteDeployment](/api/objects#sitedeployment).
-
-### deployments
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `siteId` | `ID` |  |
-
-Returns `[SiteDeployment!]!` · [SiteDeployment](/api/objects#sitedeployment).
-
-## Functions
-
-### afFunction
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `AFFunctionWhereInput!` · [AFFunctionWhereInput](/api/inputs#affunctionwhereinput) |  |
-
-Returns `AFFunction` · [AFFunction](/api/objects#affunction).
-
-### afFunctionByName
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `AFFunctionByNameWhereInput!` · [AFFunctionByNameWhereInput](/api/inputs#affunctionbynamewhereinput) |  |
-
-Returns `AFFunction` · [AFFunction](/api/objects#affunction).
-
-### afFunctions
-
-Returns `AFFunctionList!` · [AFFunctionList](/api/objects#affunctionlist).
-
-### afFunctionDeployment
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `AFFunctionDeploymentWhereInput!` · [AFFunctionDeploymentWhereInput](/api/inputs#affunctiondeploymentwhereinput) |  |
-
-Returns `AFFunctionDeployment` · [AFFunctionDeployment](/api/objects#affunctiondeployment).
-
-### afFunctionDeployments
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `AFFunctionDeploymentsWhereInput!` · [AFFunctionDeploymentsWhereInput](/api/inputs#affunctiondeploymentswhereinput) |  |
-
-Returns `AFFunctionDeploymentList!` · [AFFunctionDeploymentList](/api/objects#affunctiondeploymentlist).
-
-## Domains
-
-### domain
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `id` | `ID!` |  |
-
-Returns `Domain` · [Domain](/api/objects#domain).
-
-### domains
-
-Returns `DomainList!` · [DomainList](/api/objects#domainlist).
-
-### domainByHostname
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `hostname` | `String!` |  |
-
-Returns `Domain` · [Domain](/api/objects#domain).
-
-### domainVerificationInstructions
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domainId` | `ID!` |  |
-
-Returns `DomainVerificationInstructions!` · [DomainVerificationInstructions](/api/objects#domainverificationinstructions).
-
-### sslCertificateStatus
-
-Returns `[SslCertificateStatusInfo!]!` · [SslCertificateStatusInfo](/api/objects#sslcertificatestatusinfo).
-
-### orgDomains
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `orgId` | `ID!` |  |
-
-Returns `[Domain!]!` · [Domain](/api/objects#domain).
-
-## Zones (SDK compatibility)
-
-### zones
-
-Returns `ZoneList!` · [ZoneList](/api/objects#zonelist).
-
-### zone
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `id` | `ID!` |  |
-
-Returns `Zone` · [Zone](/api/objects#zone).
-
-## Storage (SDK compatibility)
-
-### pins
-
-Returns `PinList!` · [PinList](/api/objects#pinlist).
-
-### pin
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `PinWhereInput!` · [PinWhereInput](/api/inputs#pinwhereinput) |  |
-
-Returns `Pin` · [Pin](/api/objects#pin).
-
-### pinsByFilename
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `PinsByFilenameWhereInput!` · [PinsByFilenameWhereInput](/api/inputs#pinsbyfilenamewhereinput) |  |
-
-Returns `PinList!` · [PinList](/api/objects#pinlist).
-
-### filecoinDeals
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `FilecoinDealsWhereInput!` · [FilecoinDealsWhereInput](/api/inputs#filecoindealswhereinput) |  |
-
-Returns `FilecoinDealList!` · [FilecoinDealList](/api/objects#filecoindeallist).
-
-## ENS (SDK compatibility - minimal)
-
-### ensRecords
-
-Returns `EnsRecordList!` · [EnsRecordList](/api/objects#ensrecordlist).
-
-### ensRecordsByIpnsId
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `where` | `IPNSRecordWhereInput!` · [IPNSRecordWhereInput](/api/inputs#ipnsrecordwhereinput) |  |
-
-Returns `EnsRecordList!` · [EnsRecordList](/api/objects#ensrecordlist).
-
-## Applications (SDK compatibility - minimal)
-
-### applications
-
-Returns `ApplicationList!` · [ApplicationList](/api/objects#applicationlist).
-
-## Domain registration / purchase
-
-### checkDomainAvailability
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `input` | `CheckDomainAvailabilityInput!` · [CheckDomainAvailabilityInput](/api/inputs#checkdomainavailabilityinput) |  |
-
-Returns `[DomainAvailability!]!` · [DomainAvailability](/api/objects#domainavailability).
-
-### domainPricing
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `name` | `String!` |  |
-| `extension` | `String!` |  |
-| `operation` | `String` |  |
-| `period` | `Int` |  |
-
-Returns `DomainPricing!` · [DomainPricing](/api/objects#domainpricing).
-
-### registeredDomains
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `limit` | `Int` |  |
-| `offset` | `Int` |  |
-| `status` | `String` |  |
-
-Returns `RegisteredDomainList!` · [RegisteredDomainList](/api/objects#registereddomainlist).
-
-## DNS record management (admin)
-
-### dnsRecords
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domain` | `String!` |  |
-
-Returns `[DNSRecord!]!` · [DNSRecord](/api/objects#dnsrecord).
-
-### dnsRecord
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `domain` | `String!` |  |
-| `name` | `String!` |  |
-| `type` | `DNSRecordType!` · [DNSRecordType](/api/enums#dnsrecordtype) |  |
-
-Returns `DNSRecord` · [DNSRecord](/api/objects#dnsrecord).
-
-## Storage analytics
-
-### storageAnalytics
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `projectId` | `ID` |  |
-
-Returns `StorageAnalytics!` · [StorageAnalytics](/api/objects#storageanalytics).
-
-### storageUsageTrend
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `projectId` | `ID` |  |
-| `days` | `Int` |  |
-
-Returns `[StorageUsageTrend!]!` · [StorageUsageTrend](/api/objects#storageusagetrend).
 
 ## Workspace metrics (aggregated compute, storage, traffic)
 
@@ -437,30 +143,6 @@ Returns `[Chat!]!` · [Chat](/api/objects#chat).
 | `before` | `String` |  |
 
 Returns `[Message!]!` · [Message](/api/objects#message).
-
-## Storage tracking
-
-### pinnedContent
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `limit` | `Int` |  |
-
-Returns `[PinnedContent!]!` · [PinnedContent](/api/objects#pinnedcontent).
-
-### storageSnapshots
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `startDate` | `Date` |  |
-| `endDate` | `Date` |  |
-| `limit` | `Int` |  |
-
-Returns `[StorageSnapshot!]!` · [StorageSnapshot](/api/objects#storagesnapshot).
-
-### storageStats
-
-Returns `StorageTrackingStats!` · [StorageTrackingStats](/api/objects#storagetrackingstats).
 
 ## Observability / APM
 
@@ -564,7 +246,7 @@ the EFFECTIVE status (a revoked measurement retires its identities): the same ve
 
 Returns `[AttestedIdentity!]!` · [AttestedIdentity](/api/objects#attestedidentity).
 
-## Deployment file access (files tab): container filesystem, ephemeral
+## Deployment file access (files tab)
 
 ### serviceFiles
 
@@ -608,7 +290,7 @@ Returns `[ServiceLink!]!` · [ServiceLink](/api/objects#servicelink).
 
 Returns `OrgBillingRunway` · [OrgBillingRunway](/api/objects#orgbillingrunway).
 
-## Other
+## GitHub deploy
 
 ### githubAppEnabled
 
@@ -644,6 +326,8 @@ Returns `[GithubRepoSummary!]!` · [GithubRepoSummary](/api/objects#githubreposu
 
 Returns `[GithubBranchSummary!]!` · [GithubBranchSummary](/api/objects#githubbranchsummary).
 
+## Builds
+
 ### buildJob
 
 Fetch a single BuildJob by id (auth: caller must have access to the parent service's project). Used by the Source-tab build-history UI to lazy-load the logs blob on row expand.
@@ -665,6 +349,8 @@ List recent BuildJobs for a service, newest first. Logs blob omitted: fetch it v
 
 Returns `[BuildJob!]!` · [BuildJob](/api/objects#buildjob).
 
+## Regions
+
 ### regions
 
 Return curated region buckets with live availability + pricing for the picker. Defaults to the standard compute tier when provider is omitted. The gpuModelHint argument is reserved for future per-model price emphasis;
@@ -674,29 +360,9 @@ ignored today.
 |----------|------|-------------|
 | `gpuModelHint` | `String` |  |
 
-Some provider-specific arguments are omitted. †
+Some arguments are omitted. †
 
 Returns `[Region!]!` · [Region](/api/objects#region).
 
-## Subscriptions
 
-Subscriptions use the same endpoint over WebSocket (graphql-ws).
-
-### deploymentLogs
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `deploymentId` | `ID!` |  |
-
-Returns `DeploymentLog!` · [DeploymentLog](/api/objects#deploymentlog).
-
-### deploymentStatus
-
-| Argument | Type | Description |
-|----------|------|-------------|
-| `deploymentId` | `ID!` |  |
-
-Returns `DeploymentStatusUpdate!` · [DeploymentStatusUpdate](/api/objects#deploymentstatusupdate).
-
-
-† Some provider-specific fields or arguments are omitted from this page. Introspection on the endpoint returns the complete live schema.
+† Some fields, arguments or return types are omitted from this page: provider-specific ones, or ones that belong to retired or admin-only surfaces.

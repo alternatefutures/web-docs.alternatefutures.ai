@@ -8,7 +8,7 @@ description: "The object, interface, union and scalar types returned by the Alte
 <Callout type="info">
 Generated from the API server source (@alternatefutures/backend 0.1.2) on every merge. Endpoint
 `https://api.alternatefutures.ai/graphql`, header `Authorization: Bearer <personal access token>`.
-See the [GraphQL API overview](/api) for how to call it. Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.
+See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
 ## User & authentication
@@ -85,10 +85,9 @@ Includes the token value which is only shown once during creation
 | `backupStorageOnArweave` | `Boolean` |  |
 | `backupStorageOnFilecoin` | `Boolean` |  |
 | `user` | `User!` · [User](/api/objects#user) |  |
-| `sites` | `[Site!]!` · [Site](/api/objects#site) |  |
-| `functions` | `[AFFunction!]!` · [AFFunction](/api/objects#affunction) |  |
 | `createdAt` | `Date!` |  |
 | `updatedAt` | `Date!` |  |
+| † | | Some fields omitted |
 
 ### ProjectList
 
@@ -156,8 +155,6 @@ stay end-to-end encrypted and opaque to the platform.
 | `shutdownPriority` | `Int!` |  |
 | `createdAt` | `Date!` |  |
 | `updatedAt` | `Date!` |  |
-| `site` | `Site` · [Site](/api/objects#site) |  |
-| `afFunction` | `AFFunction` · [AFFunction](/api/objects#affunction) |  |
 | `metrics` | `ServiceDeploymentMetrics!` · [ServiceDeploymentMetrics](/api/objects#servicedeploymentmetrics) |  |
 | `envVars` | `[ServiceEnvVar!]!` · [ServiceEnvVar](/api/objects#serviceenvvar) |  |
 | `ports` | `[ServicePort!]!` · [ServicePort](/api/objects#serviceport) |  |
@@ -178,7 +175,7 @@ stay end-to-end encrypted and opaque to the platform.
 | `lastBuildSha` | `String` | Most recent built commit SHA. Null until the first build succeeds. |
 | `lastBuildStatus` | `String` | One of 'PENDING' \| 'RUNNING' \| 'SUCCEEDED' \| 'FAILED' \| 'CANCELED' or null. |
 | `lastBuildAt` | `Date` |  |
-| † | | Provider-specific fields omitted |
+| † | | Some fields omitted |
 
 ## Service deployment metrics
 
@@ -198,7 +195,7 @@ Extensible: new scalar fields can be added without reshaping clients.
 | `activeCount` | `Int!` | Deployments live right now across all providers. |
 | `lastDeployedAt` | `String` | ISO-8601 timestamp of the most recent deploy attempt, or null. |
 | `lastDeployTrigger` | `String` | Trigger of the most recent deploy attempt (MANUAL, RETRY, FAILOVER, …). |
-| † | | Provider-specific fields omitted |
+| † | | Some fields omitted |
 
 ## Service environment variables
 
@@ -305,109 +302,6 @@ deployments within the configured window (used for cap enforcement).
 | `createdAt` | `Date!` |  |
 | `updatedAt` | `Date!` |  |
 
-## Sites & deployments
-
-### Site
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `slug` | `String!` |  |
-| `serviceId` | `ID` |  |
-| `service` | `Service` · [Service](/api/objects#service) |  |
-| `project` | `Project!` · [Project](/api/objects#project) |  |
-| `deployments` | `[SiteDeployment!]!` · [SiteDeployment](/api/objects#sitedeployment) |  |
-| `domains` | `[Domain!]!` · [Domain](/api/objects#domain) |  |
-| `zones` | `[Zone!]!` · [Zone](/api/objects#zone) |  |
-| `ipnsRecords` | `[IPNSRecord!]!` · [IPNSRecord](/api/objects#ipnsrecord) |  |
-| `primaryDomain` | `Domain` · [Domain](/api/objects#domain) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-| † | | Provider-specific fields omitted |
-
-### SiteList
-
-Wrapper type for paginated site list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[Site!]!` · [Site](/api/objects#site) |  |
-
-### SiteDeployment
-
-Legacy site deployment (IPFS/Arweave/Filecoin era; SDK compatibility).
-Renamed from `Deployment` on 2026-09-10: that name is the provider union used
-by `Service.activeDeployment`, and the duplicate definition made the union
-shadow this type, so every `deployments \{ id ... }` selection failed validation.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `cid` | `String!` |  |
-| `status` | `DeploymentStatus!` · [DeploymentStatus](/api/enums#deploymentstatus) |  |
-| `storageType` | `StorageType!` · [StorageType](/api/enums#storagetype) |  |
-| `siteId` | `ID!` |  |
-| `site` | `Site!` · [Site](/api/objects#site) |  |
-| `pin` | `Pin` · [Pin](/api/objects#pin) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-## Functions
-
-### AFFunction
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `slug` | `String!` |  |
-| `sourceCode` | `String` |  |
-| `invokeUrl` | `String` |  |
-| `projectId` | `ID!` |  |
-| `currentDeploymentId` | `ID` |  |
-| `routes` | `JSON` |  |
-| `status` | `FunctionStatus!` · [FunctionStatus](/api/enums#functionstatus) |  |
-| `project` | `Project!` · [Project](/api/objects#project) |  |
-| `siteId` | `String` |  |
-| `serviceId` | `ID` |  |
-| `service` | `Service` · [Service](/api/objects#service) |  |
-| `currentDeployment` | `AFFunctionDeployment` · [AFFunctionDeployment](/api/objects#affunctiondeployment) |  |
-| `deployments` | `[AFFunctionDeployment!]!` · [AFFunctionDeployment](/api/objects#affunctiondeployment) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-| † | | Provider-specific fields omitted |
-
-### AFFunctionList
-
-Wrapper type for function list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[AFFunction!]!` · [AFFunction](/api/objects#affunction) |  |
-
-### AFFunctionDeployment
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `afFunctionId` | `ID!` |  |
-| `cid` | `String!` |  |
-| `blake3Hash` | `String` |  |
-| `assetsCid` | `String` |  |
-| `sgx` | `Boolean!` |  |
-| `afFunction` | `AFFunction!` · [AFFunction](/api/objects#affunction) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### AFFunctionDeploymentList
-
-Wrapper type for function deployments list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[AFFunctionDeployment!]!` · [AFFunctionDeployment](/api/objects#affunctiondeployment) |  |
-
 ## Deployment health (live container status)
 
 ### ContainerHealth
@@ -430,365 +324,6 @@ Wrapper type for function deployments list (SDK compatibility)
 | `overall` | `String!` |  |
 | `containers` | `[ContainerHealth!]!` · [ContainerHealth](/api/objects#containerhealth) |  |
 | `lastChecked` | `Date!` |  |
-
-### DeploymentProgress
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `deploymentId` | `String!` |  |
-| `provider` | `String!` |  |
-| `status` | `String!` |  |
-| `step` | `String!` |  |
-| `stepNumber` | `Int!` |  |
-| `totalSteps` | `Int!` |  |
-| `retryCount` | `Int!` |  |
-| `message` | `String` |  |
-| `errorMessage` | `String` |  |
-| `timestamp` | `String!` |  |
-
-## Domains
-
-### Domain
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `hostname` | `String!` |  |
-| `verified` | `Boolean!` |  |
-| `isVerified` | `Boolean!` |  |
-| `zone` | `Zone` · [Zone](/api/objects#zone) |  |
-| `dnsConfigs` | `[DNSConfig!]!` · [DNSConfig](/api/objects#dnsconfig) |  |
-| `status` | `String` |  |
-| `domainType` | `DomainType!` · [DomainType](/api/enums#domaintype) |  |
-| `organizationId` | `ID` |  |
-| `site` | `Site` · [Site](/api/objects#site) |  |
-| `txtVerificationToken` | `String` |  |
-| `txtVerificationStatus` | `VerificationStatus!` · [VerificationStatus](/api/enums#verificationstatus) |  |
-| `dnsVerifiedAt` | `Date` |  |
-| `sslStatus` | `SslStatus!` · [SslStatus](/api/enums#sslstatus) |  |
-| `sslIssuedAt` | `Date` |  |
-| `sslExpiresAt` | `Date` |  |
-| `sslAutoRenew` | `Boolean!` |  |
-| `arnsName` | `String` |  |
-| `ensName` | `String` |  |
-| `ipnsHash` | `String` |  |
-| `lastDnsCheck` | `Date` |  |
-| `dnsCheckAttempts` | `Int!` |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### DNSConfig
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `type` | `String!` |  |
-| `name` | `String!` |  |
-| `value` | `String!` |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### DomainList
-
-Wrapper type for domains list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[Domain!]!` · [Domain](/api/objects#domain) |  |
-
-### DomainVerificationInstructions
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `method` | `String!` |  |
-| `recordType` | `String!` |  |
-| `hostname` | `String!` |  |
-| `value` | `String!` |  |
-| `instructions` | `String!` |  |
-
-### SslCertificateStatusInfo
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `hostname` | `String!` |  |
-| `sslStatus` | `SslStatus!` · [SslStatus](/api/enums#sslstatus) |  |
-| `sslExpiresAt` | `Date` |  |
-| `sslAutoRenew` | `Boolean!` |  |
-| `verified` | `Boolean!` |  |
-| `daysUntilExpiry` | `Int` |  |
-| `needsRenewal` | `Boolean!` |  |
-| `isExpired` | `Boolean!` |  |
-| `site` | `Site!` · [Site](/api/objects#site) |  |
-
-## DNS record management (admin)
-
-### DNSRecord
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `String` |  |
-| `name` | `String!` |  |
-| `type` | `DNSRecordType!` · [DNSRecordType](/api/enums#dnsrecordtype) |  |
-| `value` | `String!` |  |
-| `ttl` | `Int!` |  |
-| `priority` | `Int` |  |
-
-### DNSUpdateResult
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | `Boolean!` |  |
-| `recordId` | `String` |  |
-| `error` | `String` |  |
-
-## Domain registration / purchase
-
-### DomainAvailability
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domain` | `String!` |  |
-| `available` | `Boolean!` |  |
-| `status` | `String!` |  |
-| `reason` | `String` |  |
-| `isPremium` | `Boolean!` |  |
-| `price` | `DomainPrice` · [DomainPrice](/api/objects#domainprice) |  |
-| `premiumPrice` | `DomainPrice` · [DomainPrice](/api/objects#domainprice) |  |
-
-### DomainPrice
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `currency` | `String!` |  |
-| `registrationPrice` | `Float!` |  |
-
-### DomainPricing
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `currency` | `String!` |  |
-| `price` | `Float!` |  |
-| `isPremium` | `Boolean!` |  |
-| `isPromotion` | `Boolean!` |  |
-| `period` | `Int!` |  |
-
-### DomainRegistrationResult
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | `Boolean!` |  |
-| `domainId` | `Int` |  |
-| `status` | `String` |  |
-| `error` | `String` |  |
-| `domain` | `Domain` · [Domain](/api/objects#domain) |  |
-
-### RegisteredDomain
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `Int!` |  |
-| `fullName` | `String!` |  |
-| `name` | `String!` |  |
-| `extension` | `String!` |  |
-| `status` | `String!` |  |
-| `expirationDate` | `String!` |  |
-| `renewalDate` | `String!` |  |
-| `autorenew` | `String!` |  |
-| `whoisPrivacy` | `Boolean!` |  |
-| `createdAt` | `String` |  |
-
-### RegisteredDomainList
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domains` | `[RegisteredDomain!]!` · [RegisteredDomain](/api/objects#registereddomain) |  |
-| `total` | `Int!` |  |
-
-## Ipfs/storage
-
-### Pin
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `cid` | `String!` |  |
-| `filename` | `String` |  |
-| `extension` | `String` |  |
-| `arweavePin` | `ArweavePin` · [ArweavePin](/api/objects#arweavepin) |  |
-| `name` | `String` |  |
-| `size` | `Int` |  |
-| `deployment` | `SiteDeployment!` · [SiteDeployment](/api/objects#sitedeployment) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### ArweavePin
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `bundlrId` | `String` |  |
-
-### PinList
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[Pin!]!` · [Pin](/api/objects#pin) |  |
-
-### FilecoinDeal
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `dealId` | `String!` |  |
-
-### FilecoinDealList
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[FilecoinDeal!]!` · [FilecoinDeal](/api/objects#filecoindeal) |  |
-
-### IPNSRecord
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `hash` | `String!` |  |
-| `ensRecords` | `[EnsRecord!]!` · [EnsRecord](/api/objects#ensrecord) |  |
-| `site` | `Site!` · [Site](/api/objects#site) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### EnsRecord
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String` |  |
-| `updatedAt` | `Date` |  |
-| `createdAt` | `Date` |  |
-| `status` | `String` |  |
-| `site` | `Site` · [Site](/api/objects#site) |  |
-| `ipnsRecord` | `IPNSRecord` · [IPNSRecord](/api/objects#ipnsrecord) |  |
-
-### IpnsRecordList
-
-Wrapper type for paginated IPNS record list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[IPNSRecord!]!` · [IPNSRecord](/api/objects#ipnsrecord) |  |
-
-### Zone
-
-Zone type for DNS zone management
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `site` | `Site!` · [Site](/api/objects#site) |  |
-| `originUrl` | `String` |  |
-| `type` | `String` |  |
-| `status` | `String` |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### ZoneList
-
-Wrapper type for zones list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[Zone!]!` · [Zone](/api/objects#zone) |  |
-
-### ApplicationWhitelistDomain
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `hostname` | `String!` |  |
-| `createdAt` | `Date` |  |
-| `updatedAt` | `Date` |  |
-
-### Application
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `clientId` | `String!` |  |
-| `whitelistDomains` | `[ApplicationWhitelistDomain!]!` · [ApplicationWhitelistDomain](/api/objects#applicationwhitelistdomain) |  |
-| `whiteLabelDomains` | `[ApplicationWhitelistDomain!]!` · [ApplicationWhitelistDomain](/api/objects#applicationwhitelistdomain) |  |
-| `createdAt` | `Date` |  |
-| `updatedAt` | `Date` |  |
-
-### ApplicationList
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[Application!]!` · [Application](/api/objects#application) |  |
-
-### EnsRecordList
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[EnsRecord!]!` · [EnsRecord](/api/objects#ensrecord) |  |
-
-### PrivateGateway
-
-Private Gateway type for custom IPFS gateway access
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `slug` | `String!` |  |
-| `primaryDomain` | `Domain` · [Domain](/api/objects#domain) |  |
-| `project` | `Project!` · [Project](/api/objects#project) |  |
-| `zone` | `Zone` · [Zone](/api/objects#zone) |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### PrivateGatewayList
-
-Wrapper type for paginated private gateway list (SDK compatibility)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `data` | `[PrivateGateway!]!` · [PrivateGateway](/api/objects#privategateway) |  |
-
-## Storage analytics
-
-### StorageAnalytics
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `totalSize` | `Float!` |  |
-| `ipfsSize` | `Float!` |  |
-| `arweaveSize` | `Float!` |  |
-| `deploymentCount` | `Int!` |  |
-| `siteCount` | `Int!` |  |
-| `breakdown` | `[StorageBreakdown!]!` · [StorageBreakdown](/api/objects#storagebreakdown) |  |
-
-### StorageBreakdown
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `name` | `String!` |  |
-| `type` | `StorageBreakdownType!` · [StorageBreakdownType](/api/enums#storagebreakdowntype) |  |
-| `size` | `Float!` |  |
-| `deploymentCount` | `Int!` |  |
-| `storageType` | `StorageType!` · [StorageType](/api/enums#storagetype) |  |
-| `lastDeployment` | `Date` |  |
-
-### StorageUsageTrend
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `date` | `Date!` |  |
-| `totalSize` | `Float!` |  |
-| `deploymentCount` | `Int!` |  |
 
 ## Workspace metrics
 
@@ -862,23 +397,6 @@ Wrapper type for paginated private gateway list (SDK compatibility)
 | Field | Type | Description |
 |-------|------|-------------|
 | `commitHash` | `String!` |  |
-
-### DeploymentLog
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `deploymentId` | `ID!` |  |
-| `timestamp` | `Date!` |  |
-| `message` | `String!` |  |
-| `level` | `String!` |  |
-
-### DeploymentStatusUpdate
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `deploymentId` | `ID!` |  |
-| `status` | `DeploymentStatus!` · [DeploymentStatus](/api/enums#deploymentstatus) |  |
-| `timestamp` | `Date!` |  |
 
 ### ServiceLogResult
 
@@ -1039,10 +557,10 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | `status` | `AgentStatus!` · [AgentStatus](/api/enums#agentstatus) |  |
 | `userId` | `ID!` |  |
 | `user` | `User!` · [User](/api/objects#user) |  |
-| `afFunction` | `AFFunction` · [AFFunction](/api/objects#affunction) |  |
 | `chats` | `[Chat!]!` · [Chat](/api/objects#chat) |  |
 | `createdAt` | `Date!` |  |
 | `updatedAt` | `Date!` |  |
+| † | | Some fields omitted |
 
 ### Chat
 
@@ -1088,47 +606,9 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | `size` | `Int!` |  |
 | `url` | `String!` |  |
 | `cid` | `String` |  |
-| `storageType` | `StorageType` · [StorageType](/api/enums#storagetype) |  |
 | `createdAt` | `Date!` |  |
 | `updatedAt` | `Date!` |  |
-
-### PinnedContent
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `userId` | `ID!` |  |
-| `user` | `User!` · [User](/api/objects#user) |  |
-| `cid` | `String!` |  |
-| `sizeBytes` | `String!` |  |
-| `pinnedAt` | `Date!` |  |
-| `unpinnedAt` | `Date` |  |
-| `filename` | `String` |  |
-| `mimeType` | `String` |  |
-| `metadata` | `JSON` |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
-
-### StorageSnapshot
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `userId` | `ID!` |  |
-| `user` | `User!` · [User](/api/objects#user) |  |
-| `date` | `Date!` |  |
-| `totalBytes` | `String!` |  |
-| `pinCount` | `Int!` |  |
-| `createdAt` | `Date!` |  |
-
-### StorageTrackingStats
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `currentBytes` | `String!` |  |
-| `currentBytesFormatted` | `String!` |  |
-| `pinCount` | `Int!` |  |
-| `lastSnapshot` | `StorageSnapshot` · [StorageSnapshot](/api/objects#storagesnapshot) |  |
+| † | | Some fields omitted |
 
 ## Observability / APM
 
@@ -1270,27 +750,6 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | `costFormatted` | `String!` |  |
 | `periodStart` | `Date!` |  |
 | `periodEnd` | `Date!` |  |
-
-## Deployment policy (budget, GPU, runtime constraints)
-
-### DeploymentPolicy
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-| `acceptableGpuModels` | `[String!]!` |  |
-| `gpuUnits` | `Int` |  |
-| `gpuVendor` | `String` |  |
-| `maxBudgetUsd` | `Float` |  |
-| `maxMonthlyUsd` | `Float` |  |
-| `runtimeMinutes` | `Int` |  |
-| `expiresAt` | `Date` |  |
-| `reservedCents` | `Int!` |  |
-| `stopReason` | `PolicyStopReason` · [PolicyStopReason](/api/enums#policystopreason) |  |
-| `stoppedAt` | `Date` |  |
-| `totalSpentUsd` | `Float!` |  |
-| `createdAt` | `Date!` |  |
-| `updatedAt` | `Date!` |  |
 
 ## Templates
 
@@ -1517,4 +976,4 @@ rather than the picker.
 | `JSON` |  |
 
 
-† Some provider-specific fields or arguments are omitted from this page. Introspection on the endpoint returns the complete live schema.
+† Some fields, arguments or return types are omitted from this page: provider-specific ones, or ones that belong to retired or admin-only surfaces.

@@ -39,3 +39,4 @@ pnpm-debug.log*
 # Sibling repos checked out by CI (af-deploy-common.yml) to feed the generators
 alternate-clouds-cli/
 alternate-clouds-sdk/
+alternate-clouds-api/

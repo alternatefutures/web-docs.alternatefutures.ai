@@ -1,6 +1,6 @@
 ---
 title: "GraphQL API overview"
-description: "How to call the Alternate Clouds GraphQL API directly: the endpoint, authentication with a personal access token, an example query, and where the generated schema reference lives."
+description: "How to call the Alternate Clouds GraphQL API directly: the endpoint, authentication with a personal access token, an example query, how errors look, and where the generated schema reference lives."
 ---
 
 This page explains how to call the API directly. The web app, the
@@ -11,9 +11,9 @@ anything they can do, a plain HTTP client can do too.
 
 - Endpoint: `https://api.alternatefutures.ai/graphql` (POST, JSON body).
 - Header: `Authorization: Bearer <personal access token>`. Create a token with
-  `acc pat create` or in the web app; see [Access tokens](/guides/api-keys).
-- Introspection is enabled, so any GraphQL client or IDE can load the live
-  schema from the endpoint.
+  `acc pat create`; see [Access tokens](/guides/api-keys).
+- Introspection is disabled on the production endpoint. Use the pages below,
+  which are generated from the same schema.
 
 ## First call
 
@@ -24,9 +24,16 @@ curl -s https://api.alternatefutures.ai/graphql \
   -d '{"query":"{ projects { data { id name } } }"}'
 ```
 
-The response lists the projects your token can see. Errors come back in the
-standard GraphQL `errors` array with a message; a `401` means the token is
-missing, expired or revoked.
+The response lists the projects your token can see.
+
+## How errors look
+
+Responses come back with HTTP 200 and the standard GraphQL `errors` array. A
+missing, expired or revoked token gives:
+
+```json
+{"errors":[{"message":"Not authenticated","extensions":{"code":"UNAUTHENTICATED"}}],"data":null}
+```
 
 ## Reference
 
@@ -34,8 +41,8 @@ The pages below are generated from the API server's source on every merge, so
 they match the deployed schema.
 
 <Cards>
-  <Card title="Queries" href="/api/queries" description="Read data: projects, services, deployments, billing, and more." />
-  <Card title="Mutations" href="/api/mutations" description="Change data: create and deploy services, manage domains, tokens and billing." />
+  <Card title="Queries" href="/api/queries" description="Read data: projects, services, deployments, templates, billing, and more." />
+  <Card title="Mutations" href="/api/mutations" description="Change data: create and deploy services, manage environment variables, tokens and billing." />
   <Card title="Object types" href="/api/objects" description="What queries and mutations return." />
   <Card title="Input types" href="/api/inputs" description="What mutations and filtered queries accept." />
   <Card title="Enums" href="/api/enums" description="Fixed value sets such as service states and categories." />
@@ -45,7 +52,8 @@ they match the deployed schema.
 
 - Queries are limited by complexity. Prefer flat selections with IDs over deeply
   nested lists, then fetch details in a second query.
-- Provider-specific types, fields and arguments are omitted from these pages.
-  Introspection returns the complete live schema.
+- These pages leave out, on purpose, provider-specific types and fields, the
+  operations of the retired hosting product (sites, IPFS storage, functions),
+  and admin-only operations.
 - For scripted work, the CLI with `--json` and `AF_TOKEN` is often simpler than
   hand-written GraphQL; see [Docs for AI agents](/ai-agents).

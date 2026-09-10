@@ -8,7 +8,7 @@ description: "The input object types accepted by Alternate Clouds GraphQL querie
 <Callout type="info">
 Generated from the API server source (@alternatefutures/backend 0.1.2) on every merge. Endpoint
 `https://api.alternatefutures.ai/graphql`, header `Authorization: Bearer <personal access token>`.
-See the [GraphQL API overview](/api) for how to call it. Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.
+See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
 ## Service links (inter-service connections)
@@ -21,41 +21,7 @@ See the [GraphQL API overview](/api) for how to call it. Provider-specific types
 | `value` | `String!` |  |
 | `secret` | `Boolean` |  |
 
-### ServicePortInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `containerPort` | `Int!` |  |
-| `publicPort` | `Int` |  |
-| `protocol` | `String` |  |
-
 ## Functions
-
-### AFFunctionByNameWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String!` |  |
-
-### AFFunctionWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-
-### CreateAFFunctionDataInput
-
-SDK compatibility input type for creating a function.
-Some clients (including the CLI/SDK) use CreateAFFunctionDataInput.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String` |  |
-| `siteId` | `ID` |  |
-| `slug` | `String` |  |
-| `sourceCode` | `String` |  |
-| `routes` | `JSON` |  |
-| `status` | `FunctionStatus` · [FunctionStatus](/api/enums#functionstatus) |  |
 
 ### CreateServiceInput
 
@@ -93,131 +59,7 @@ update against: the user must redeploy to pick the new values up.
 | `healthProbe` | `JSON` | Optional application HTTP health probe. Pass null to remove the probe; pass an object to set/replace it. Required key: path (must start with "/"). Optional keys: port (1-65535), expectStatus (HTTP code, default 200), intervalSec (default 30, clamped 10-3600), timeoutSec (default 5, clamped 1-30). |
 | `failoverPolicy` | `JSON` | Optional health-aware auto-failover policy. Pass null to remove the policy; pass an object to set/replace it. Required key: enabled (boolean). Optional keys: maxAttempts (default 3, clamped 1-10), windowHours (default 24, clamped 1-720). Refused on services with persistent volumes: that combination would silently lose data on a failover event. |
 
-### UpdateAFFunctionDataInput
-
-SDK compatibility input type for updating a function.
-Some clients (including the CLI/SDK) use UpdateAFFunctionDataInput.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String` |  |
-| `siteId` | `ID` |  |
-| `slug` | `String` |  |
-| `sourceCode` | `String` |  |
-| `routes` | `JSON` |  |
-| `status` | `FunctionStatus` · [FunctionStatus](/api/enums#functionstatus) |  |
-
-### AFFunctionDeploymentsWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `afFunctionId` | `ID!` |  |
-| `functionId` | `ID` |  |
-
-### AFFunctionDeploymentWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID` |  |
-| `cid` | `String` |  |
-| `functionId` | `ID` |  |
-
-### TriggerAFFunctionDeploymentWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `functionId` | `ID!` |  |
-| `cid` | `String` |  |
-
-### TriggerAFFunctionDeploymentDataInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `cid` | `String` |  |
-| `assetsCid` | `String` |  |
-| `blake3Hash` | `String` |  |
-| `sgx` | `Boolean` |  |
-
-### DeleteAFFunctionWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-
-## DNS record management (admin)
-
-### CreateDNSRecordInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domain` | `String!` |  |
-| `name` | `String!` |  |
-| `type` | `DNSRecordType!` · [DNSRecordType](/api/enums#dnsrecordtype) |  |
-| `value` | `String!` |  |
-| `ttl` | `Int` |  |
-| `priority` | `Int` |  |
-
-### UpdateDNSRecordInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domain` | `String!` |  |
-| `recordId` | `String!` |  |
-| `value` | `String` |  |
-| `ttl` | `Int` |  |
-| `priority` | `Int` |  |
-
-### DeleteDNSRecordInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domain` | `String!` |  |
-| `recordId` | `String!` |  |
-
 ## Domain registration / purchase
-
-### CheckDomainAvailabilityInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `domains` | `[DomainNameInput!]!` · [DomainNameInput](/api/inputs#domainnameinput) |  |
-| `withPrice` | `Boolean` |  |
-
-### DomainNameInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String!` |  |
-| `extension` | `String!` |  |
-
-### PurchaseDomainInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String!` |  |
-| `extension` | `String!` |  |
-| `orgId` | `ID!` |  |
-| `period` | `Int` |  |
-| `enableWhoisPrivacy` | `Boolean` |  |
-| `autorenew` | `String` |  |
-| `acceptPremiumFee` | `Float` |  |
-
-### CreateDomainInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `hostname` | `String!` |  |
-| `siteId` | `ID!` |  |
-| `domainType` | `DomainType` · [DomainType](/api/enums#domaintype) |  |
-| `verificationMethod` | `String` |  |
-
-### CreateOrgDomainInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `hostname` | `String!` |  |
-| `orgId` | `ID!` |  |
-| `domainType` | `DomainType` · [DomainType](/api/enums#domaintype) |  |
 
 ### LoginWithPersonalAccessTokenDataInput
 
@@ -227,70 +69,6 @@ Input for exchanging a Personal Access Token for an access token
 |-------|------|-------------|
 | `personalAccessToken` | `String!` |  |
 | `projectId` | `ID` |  |
-
-## Ipfs/storage
-
-### PinWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `cid` | `String!` |  |
-
-### PinsByFilenameWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `filename` | `String!` |  |
-| `extension` | `String` |  |
-
-### FilecoinDealsWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `cid` | `String!` |  |
-
-### IPNSRecordWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `ipnsRecordId` | `ID` |  |
-
-### SitesWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `projectId` | `ID` |  |
-
-### SiteWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-
-### SiteBySlugWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `slug` | `String!` |  |
-
-### SiteDataInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `String!` |  |
-
-### DeploymentWhereInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `ID!` |  |
-
-### DeploymentDataInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `siteId` | `ID!` |  |
-| `cid` | `String!` |  |
 
 ## Attestation registry (org-owned allowlist + verified identities)
 
@@ -480,15 +258,6 @@ Input for exchanging a Personal Access Token for an access token
 | `policy` | `DeploymentPolicyInput` · [DeploymentPolicyInput](/api/inputs#deploymentpolicyinput) |  |
 
 ## Mutations
-
-### BuildOptionsInput
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `buildCommand` | `String!` |  |
-| `installCommand` | `String` |  |
-| `workingDirectory` | `String` |  |
-| `outputDirectory` | `String` |  |
 
 ### CreateProjectDataInput
 

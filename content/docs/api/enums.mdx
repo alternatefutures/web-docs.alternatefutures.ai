@@ -8,7 +8,7 @@ description: "The enumeration types used by the Alternate Clouds GraphQL API and
 <Callout type="info">
 Generated from the API server source (@alternatefutures/backend 0.1.2) on every merge. Endpoint
 `https://api.alternatefutures.ai/graphql`, header `Authorization: Bearer <personal access token>`.
-See the [GraphQL API overview](/api) for how to call it. Provider-specific types, fields and arguments are omitted here; introspection on the endpoint returns the complete live schema.
+See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
 ## Service registry (canonical workloads)
@@ -23,88 +23,6 @@ See the [GraphQL API overview](/api) for how to call it. Provider-specific types
 | `DATABASE` |  |
 | `CRON` |  |
 | `BUCKET` |  |
-
-## Sites & deployments
-
-### DeploymentStatus
-
-| Value | Description |
-|-------|-------------|
-| `PENDING` |  |
-| `BUILDING` |  |
-| `UPLOADING` |  |
-| `SUCCESS` |  |
-| `FAILED` |  |
-
-### StorageType
-
-| Value | Description |
-|-------|-------------|
-| `IPFS` |  |
-| `ARWEAVE` |  |
-| `FILECOIN` |  |
-
-## Functions
-
-### FunctionStatus
-
-| Value | Description |
-|-------|-------------|
-| `ACTIVE` |  |
-| `INACTIVE` |  |
-| `DEPLOYING` |  |
-| `FAILED` |  |
-
-## Domains
-
-### DomainType
-
-| Value | Description |
-|-------|-------------|
-| `WEB2` |  |
-| `ARNS` |  |
-| `ENS` |  |
-| `IPNS` |  |
-
-### VerificationStatus
-
-| Value | Description |
-|-------|-------------|
-| `PENDING` |  |
-| `VERIFIED` |  |
-| `FAILED` |  |
-
-### SslStatus
-
-| Value | Description |
-|-------|-------------|
-| `NONE` |  |
-| `PENDING` |  |
-| `ACTIVE` |  |
-| `EXPIRED` |  |
-| `FAILED` |  |
-
-## DNS record management (admin)
-
-### DNSRecordType
-
-| Value | Description |
-|-------|-------------|
-| `A` |  |
-| `AAAA` |  |
-| `CNAME` |  |
-| `TXT` |  |
-| `MX` |  |
-| `NS` |  |
-
-## Storage analytics
-
-### StorageBreakdownType
-
-| Value | Description |
-|-------|-------------|
-| `SITE` |  |
-| `FUNCTION` |  |
 
 ## Attestation registry (org-owned allowlist + verified identities)
 
@@ -197,17 +115,6 @@ server-side on every file query/mutation: the UI only renders it.
 | `MIN` |  |
 | `MAX` |  |
 | `COUNT` |  |
-
-## Deployment policy (budget, GPU, runtime constraints)
-
-### PolicyStopReason
-
-| Value | Description |
-|-------|-------------|
-| `BUDGET_EXCEEDED` |  |
-| `RUNTIME_EXPIRED` |  |
-| `MANUAL_STOP` |  |
-| `BALANCE_LOW` |  |
 
 ## Templates
 

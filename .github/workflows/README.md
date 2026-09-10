@@ -42,7 +42,7 @@ Generators and their sources:
 | `generate-cli-docs.mjs` | CLI Commander registrations (`src/commands`, `src/cli.ts`), parsed statically by `scripts/lib/cli-model.mjs` | `content/docs/cli/commands.mdx` |
 | `generate-sdk-docs.mjs` | SDK source via TypeDoc | `content/docs/sdk/api.mdx` |
 | `generate-graphql-docs.mjs` | API `src/schema/typeDefs.ts` (SDL) via the `graphql` package | `content/docs/api/{queries,mutations,objects,inputs,enums}.mdx` |
-| `generate-template-docs.mjs` | API `src/templates/registry.ts`, executed under `tsx` (`scripts/lib/dump-templates.mts`) | `content/docs/templates/catalog.mdx` |
+| `generate-template-docs.mjs` | API `src/templates/registry.ts`, executed under `tsx` (`scripts/lib/dump-templates.mts`), filtered to the IDs the production API's public `templates` query returns (platform feature flags) | `content/docs/templates/catalog.mdx` |
 | `check-cli-drift.mjs` | the same CLI model + every hand-written page | nothing; exit 1 on stale `acc` invocations |
 
 All generated copy passes `scripts/lib/provider-scrub.mjs`: compute-vendor names are rewritten

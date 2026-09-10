@@ -1,17 +1,23 @@
 ---
 title: "Deploy an AI agent"
-description: "Tutorial: deploy the Alternate Agent template with a monthly budget cap, give it a name and instructions, chat with it at its URL, and shut it down."
+description: "Tutorial: deploy the Alternate Agent template from the web app with a monthly budget cap, give it a name and instructions, chat with it at its URL, then manage and shut it down from the CLI."
 ---
 
-This tutorial takes you from a signed-in CLI to a running AI agent with a
+This tutorial takes you from a signed-in account to a running AI agent with a
 chat UI, a spending limit, and a clean shutdown. It takes about ten minutes.
 You will use the **Alternate Agent** template, which bills its model usage to
 your Alternate Clouds credits, so no third-party AI keys are needed.
+
+The agent is a composite template (the agent plus its own PostgreSQL database),
+and composite templates deploy from the web app only; the CLI does not support
+them yet. Everything after the deploy works from the CLI.
 
 ## Before you start
 
 - You have finished the [Quick start](/guides/quickstart): `acc` is installed,
   you are logged in, and a project is active (`acc whoami` shows it).
+- You are signed in to the web app at `https://clouds.alternatefutures.ai`
+  with the same account.
 - Your organization has credits or an active trial.
 
 ## 1. Look at the template
@@ -21,77 +27,58 @@ acc templates info alternate-agent
 ```
 
 The output lists the resources (1 vCPU, 2 GiB memory, 2 GiB storage), the
-port, and the environment variables. Two are required:
+port, and the environment variables. Two of them are filled in by the platform
+when you deploy:
 
-| Variable | What to put in it |
+| Variable | What the platform does |
 |---|---|
-| `AF_API_KEY` | A personal access token. The agent uses it to pay for chat, image, and video inference from your credits. |
-| `AF_ORG_ID` | Your organization id. `acc whoami --json` prints it as `organization.id` (acc 1.1.1 or later); it is also the segment after `/org/` in the web app's address bar. |
+| `AF_API_KEY` | Creates a scoped access token for the agent. The agent uses it to pay for chat, image, and video inference from your credits. |
+| `AF_ORG_ID` | Fills in your organization id. |
 
 Everything else has a default. You will set `AGENT_NAME` and
 `AGENT_INSTRUCTIONS` to make it yours.
 
-## 2. Create a token for the agent
+## 2. Deploy from the web app with a budget cap
 
-```bash
-acc pat create --name my-agent
-```
+1. Open **Deploy a template** at `https://clouds.alternatefutures.ai/deploy`
+   and choose **Alternate Agent**.
+2. Set `AGENT_NAME` (for example `Atlas`) and `AGENT_INSTRUCTIONS` (for example
+   `You are a concise assistant for the Atlas project.`). Leave `AF_API_KEY`
+   and `AF_ORG_ID` as the platform pre-fills them.
+3. Under **Budget Cap**, set a **Monthly limit** of 20. The platform stops the
+   service once it has spent 20 dollars in a month; your machine is not
+   involved.
+4. Deploy.
 
-Copy the token; it is shown once. Giving the agent its own token means you can
-revoke it later with `acc pat delete` without touching anything else.
+The template creates two services in your project, the agent and its database.
+The deployment now goes through placement and start;
+[How a deployment works](/guides/how-deployments-work) explains each stage.
 
-## 3. Deploy with a budget cap
-
-Replace the two values in angle brackets with the token from step 2 and your
-organization id (`acc whoami --json`, field `organization.id`).
-
-```bash
-acc services create --kind template --template alternate-agent \
-  --name my-agent \
-  --env AF_API_KEY=<token-from-step-2> \
-  --env AF_ORG_ID=<your-org-id> \
-  --env AGENT_NAME="Atlas" \
-  --env AGENT_INSTRUCTIONS="You are a concise assistant for the Atlas project." \
-  --budget-monthly 20 \
-  -y
-```
-
-What the flags do:
-
-- `--budget-monthly 20` stops the service once it has spent 20 dollars in a
-  month. The platform enforces it, not your machine.
-- `-y` accepts the defaults for everything you did not pass (region "Any",
-  the template's resources, no GPU) instead of prompting.
-
-The command prints the new service id. The deployment now goes through
-placement and start; [How a deployment works](/guides/how-deployments-work)
-explains each stage.
-
-## 4. Watch it come up
+## 3. Watch it come up
 
 ```bash
 acc services list
 ```
 
-Run it again every twenty seconds or so until the service shows as active with
-a URL of the form `https://my-agent-app.alternatefutures.ai`. If it is still
-waiting after a few minutes, see
+Run it again every twenty seconds or so until the agent service shows as
+active with a URL of the form `https://my-agent-app.alternatefutures.ai`. If it
+is still waiting after a few minutes, see
 [The deployment stays in a waiting or creating state](/troubleshooting#the-deployment-stays-in-a-waiting-or-creating-state).
 
-To see the agent starting:
+To see the agent starting, use the id `acc services list` printed:
 
 ```bash
 acc services logs <serviceId> --tail 100
 ```
 
-## 5. Talk to it
+## 4. Talk to it
 
-Open the URL from step 4 in a browser. The chat UI loads with the name you
+Open the URL from step 3 in a browser. The chat UI loads with the name you
 set. Ask it something; the reply is billed to your credits through the token
-from step 2, and you can see the charge later under **Billing**, **Usage** in
-the web app.
+the platform created for it, and you can see the charge later under
+**Billing**, **Usage** in the web app.
 
-## 6. Change it without redeploying by hand
+## 5. Change it without redeploying by hand
 
 Environment variables live on the service. To give the agent a different
 personality:
@@ -103,11 +90,13 @@ acc services deploy <serviceId>
 
 The redeploy creates a new deployment; the URL does not change.
 
-## 7. Shut it down
+## 6. Shut it down
+
+Close both services the template created, so nothing keeps billing:
 
 ```bash
-acc services close <serviceId>   # stops the service and its charges
-acc pat delete <tokenId>         # optional: revoke the agent's token (id from acc pat list)
+acc services list
+acc services close <serviceId>   # once for the agent, once for its database
 ```
 
 `acc services close` keeps the service definition so you can deploy it again
@@ -115,7 +104,10 @@ later. `acc services delete <serviceId>` removes it entirely.
 
 ## What you learned
 
-- Templates carry their own resources and declare the variables they need.
+- Templates carry their own resources and declare the variables they need;
+  some variables the platform fills in for you.
+- Composite templates deploy from the web app; from then on the CLI manages
+  their services like any other.
 - A per-service budget cap is set at deploy time and enforced server-side.
 - Configuration changes are environment variables plus a redeploy.
 - Closing a service is how you stop paying for it.
@@ -124,4 +116,5 @@ later. `acc services delete <serviceId>` removes it entirely.
 
 - [How a deployment works](/guides/how-deployments-work)
 - [How billing works](/guides/how-billing-works)
-- [Docs for AI agents](/ai-agents), for running the same steps from CI or another agent
+- [Template catalog](/templates/catalog), every template with its variables
+- [Docs for AI agents](/ai-agents), for running the CLI steps from CI or another agent
