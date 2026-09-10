@@ -1,6 +1,6 @@
 ---
 title: "SDK overview"
-description: "What the @alternatefutures/sdk TypeScript package covers against the current Alternate Clouds API (projects, access tokens, functions, custom domains), what it does not, and which legacy clients to avoid."
+description: "What the @alternatefutures/sdk TypeScript package covers against the current Alternate Clouds API (projects, access tokens, functions), what it does not, and which legacy clients to avoid."
 ---
 
 This page explains what the SDK is for today. For setup, see
@@ -21,12 +21,11 @@ the API that runs today.
 | Projects | `sdk.projects()` | `list()`, `create({ name })` |
 | Access tokens | `sdk.user()` | `listPersonalAccessTokens()` |
 | Functions | `sdk.functions()` | list, get, create, update, deploy, delete |
-| Custom domains | `sdk.domains()` | `createCustomDomain`, `verifyCustomDomain`, `provisionSsl`, `setPrimaryDomain`, `removeCustomDomain`, `listDomainsForSite`, `listZones`, `getZone` (domains are in [early access](/guides/custom-domains)) |
 
 ## What the SDK does not cover
 
-Services, deployments, templates, regions, logs, and billing have no SDK
-client. For those, use the [`acc` CLI](/cli) (every command works
+Services, deployments, templates, regions, logs, custom domains, and billing
+have no SDK client. For those, use the [`acc` CLI](/cli) (every command works
 non-interactively with `AF_TOKEN`, `AF_PROJECT_ID`, and `-y`), the
 [web app](/guides/dashboard), or the GraphQL API directly at
 `https://api.alternatefutures.ai/graphql` with a personal access token as a
@@ -36,23 +35,27 @@ bearer token.
 
 <Callout type="warn" title="Present in the package, not backed by the current API">
 `sdk.sites()`, `sdk.storage()`, `sdk.ipfs()`, `sdk.ipns()`, `sdk.ens()`,
-`sdk.privateGateways()`, `sdk.applications()`, and `sdk.billing()` come from
-the retired hosting product. Against the current API their calls fail
-validation, hit fields that no longer exist, or return empty lists. They remain
-in the package and in the [API reference](/sdk/api) for compatibility only.
+`sdk.privateGateways()`, and `sdk.applications()` come from the retired
+hosting product. Against the current API their calls fail validation, hit
+fields that no longer exist, or return empty lists. `sdk.domains()` is that
+product's domain and zone client and is not verified against today's API;
+manage custom domains in the [web app](/guides/custom-domains). All of these
+remain in the package and in the [API reference](/sdk/api) for compatibility
+only.
 </Callout>
 
 `ApplicationAccessTokenService` and `StaticAccessTokenService` are also
 legacy: the first talks to a retired service, the second only carries a token
 you obtained elsewhere.
 
-## One configuration rule
+## Two rules
 
-The SDK's built-in endpoint defaults point at hosts that no longer exist. Set
-the GraphQL endpoint explicitly, either with the `SDK__GRAPHQL_API_URL`
-environment variable or the `graphqlServiceApiUrl` option, on both the SDK
-and the token service. [Install the SDK](/sdk/installation) shows the full
-set of variables.
+- Import from the package root, `@alternatefutures/sdk`, on Node too. The
+  `/node` entry point in 0.2.4 fails to load; see
+  [Install the SDK](/sdk/installation#troubleshooting).
+- No endpoint setup. 0.2.4 targets `https://api.alternatefutures.ai/graphql`
+  by default. Pass `graphqlServiceApiUrl` to the SDK and to the token service
+  only to reach another host.
 
 ## Next steps
 

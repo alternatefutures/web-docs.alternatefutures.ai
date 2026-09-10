@@ -4,8 +4,7 @@ description: "First calls with @alternatefutures/sdk: list and create projects, 
 ---
 
 This page shows the first working calls with the SDK. It assumes you finished
-[Install the SDK](/sdk/installation): the three `SDK__*` variables, `AF_TOKEN`,
-and `AF_PROJECT_ID` are set.
+[Install the SDK](/sdk/installation): `AF_TOKEN` and `AF_PROJECT_ID` are set.
 
 ## Set up
 
@@ -15,7 +14,7 @@ import {
   AlternateFuturesSdk,
   PersonalAccessTokenService,
   type Project,
-} from '@alternatefutures/sdk/node';
+} from '@alternatefutures/sdk';
 
 const sdk = new AlternateFuturesSdk({
   accessTokenService: new PersonalAccessTokenService({
@@ -57,17 +56,34 @@ Tokens are created and revoked with the CLI: `acc pat create --name <name>`,
 
 ## Handle errors
 
+The SDK reports every failed call, including a wrong, revoked, or
+out-of-project token, as an `UnknownError` whose message is always
+"Unexpected error. Repeat the action or contact support." and whose `data` is
+empty. The API's own message is not passed through. Catch it by name, then
+check the inputs with the CLI:
+
 ```typescript
 try {
   await sdk.projects().list();
 } catch (error) {
-  if (error instanceof Error && error.name === 'AuthorizationError') {
-    console.error('Token rejected or no access to this project');
+  if (error instanceof Error && error.name === 'UnknownError') {
+    console.error('The API rejected the call. Check acc pat list and acc projects list.');
   } else {
     throw error;
   }
 }
 ```
+
+To see the API's actual message, send the same query directly:
+
+```bash
+curl -s https://api.alternatefutures.ai/graphql \
+  -H "Authorization: Bearer $AF_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ projects { data { id name } } }"}'
+```
+
+A bad token answers `Not authenticated`; a good one returns your projects.
 
 ## Deploy something
 

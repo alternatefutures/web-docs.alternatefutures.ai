@@ -102,7 +102,10 @@ execSync(
   // `-p` both packages: `npx typedoc --plugin x` installs only typedoc, then fails
   // with ERR_MODULE_NOT_FOUND for the plugin. 4.2.x is the plugin line that peers
   // on typedoc 0.26 (4.3+ needs 0.27).
-  `npx --yes -p typedoc@0.26 -p typedoc-plugin-markdown@4.2 typedoc --plugin typedoc-plugin-markdown --skipErrorChecking ` +
+  // --gitRevision main: source links point at blob/main/<file>#L<n> instead of the
+  // checked-out SHA. Without it every merge commit on the SDK's main rewrote all
+  // 364 links and produced a content-free drift commit/PR (docs PR #38).
+  `npx --yes -p typedoc@0.26 -p typedoc-plugin-markdown@4.2 typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --gitRevision main ` +
     `${tsconfigArg}--out ${JSON.stringify(TMP)} --readme none ${entryArgs}`,
   { cwd: SDK_REPO, stdio: 'inherit' },
 );

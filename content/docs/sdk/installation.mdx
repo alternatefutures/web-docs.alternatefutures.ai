@@ -1,6 +1,6 @@
 ---
 title: "Install the SDK"
-description: "Install @alternatefutures/sdk, point it at the current API with three environment variables, authenticate with a personal access token, and fix the two errors people hit first."
+description: "Install @alternatefutures/sdk, authenticate with a personal access token and a project id, verify with one call, and fix the errors people hit first."
 ---
 
 This page shows how to install and configure the SDK. What it covers is in the
@@ -39,32 +39,28 @@ yarn add @alternatefutures/sdk
 </Tab>
 </Tabs>
 
-## 2. Point it at the current API
+## 2. Configure
 
-The package's built-in endpoint defaults point at hosts that no longer exist,
-so set these before constructing anything:
+Put the token and the project id in `.env`, and add `.env` to `.gitignore`:
 
 ```bash
 # .env
-SDK__GRAPHQL_API_URL=https://api.alternatefutures.ai/graphql
-SDK__IPFS__STORAGE_API_URL=https://api.alternatefutures.ai   # required by the constructor; only the retired storage clients use it
-SDK__UPLOAD_PROXY_API_URL=https://api.alternatefutures.ai    # same
 AF_TOKEN=...          # your personal access token
 AF_PROJECT_ID=...     # from acc projects list
 ```
 
-Add `.env` to `.gitignore`. The two storage variables must be present or the
-constructor throws `EnvNotSetError`, even though nothing that works today
-reads them.
+No endpoint configuration is needed. The published package (0.2.4) targets
+`https://api.alternatefutures.ai/graphql`, the API that runs today, for both
+the token exchange and every query.
 
 ## 3. Construct the SDK
 
-Use the `/node` entry point on a server and the default entry point in a
-browser. The token service takes the token and the project.
+Import from the package root, on Node as well as in the browser. The token
+service takes the token and the project.
 
 ```typescript
 import 'dotenv/config';
-import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk/node';
+import { AlternateFuturesSdk, PersonalAccessTokenService } from '@alternatefutures/sdk';
 
 const sdk = new AlternateFuturesSdk({
   accessTokenService: new PersonalAccessTokenService({
@@ -74,16 +70,17 @@ const sdk = new AlternateFuturesSdk({
 });
 ```
 
-Prefer options over environment variables? Pass `graphqlServiceApiUrl` to
-both constructors:
+The package also lists a `@alternatefutures/sdk/node` entry point. In 0.2.4 it
+does not load under Node (see Troubleshooting), so use the root import.
+
+To talk to another API host, for example a staging deployment, pass
+`graphqlServiceApiUrl` to both constructors:
 
 ```typescript
 const graphqlServiceApiUrl = 'https://api.alternatefutures.ai/graphql';
 
 const sdk = new AlternateFuturesSdk({
   graphqlServiceApiUrl,
-  ipfsStorageApiUrl: 'https://api.alternatefutures.ai',
-  uploadProxyApiUrl: 'https://api.alternatefutures.ai',
   accessTokenService: new PersonalAccessTokenService({
     personalAccessToken: process.env.AF_TOKEN!,
     projectId: process.env.AF_PROJECT_ID!,
@@ -104,16 +101,18 @@ are all right.
 
 ## Troubleshooting
 
-- **`EnvNotSetError: SDK__IPFS__STORAGE_API_URL`** (or `SDK__UPLOAD_PROXY_API_URL`).
-  The constructor requires both. Set them as in step 2.
-- **`fetch failed`, TLS handshake errors, or a hostname ending in
-  `service.alternatefutures.ai`.** The SDK is using its retired default
-  endpoint. Set `SDK__GRAPHQL_API_URL` (or `graphqlServiceApiUrl` on both
-  constructors).
-- **`AuthorizationError`.** The token is wrong, revoked, or does not have
-  access to `AF_PROJECT_ID`. Check with `acc pat list` and `acc projects list`.
-- **`SdkRequiredNodeRuntimeError`.** A legacy Node-only client was called from
-  the browser build. Those clients are retired; see the [overview](/sdk).
+- **`ERR_PACKAGE_PATH_NOT_EXPORTED` naming `files-from-path`** when importing
+  `@alternatefutures/sdk/node`. That entry point's CommonJS bundle requires an
+  ESM-only dependency and fails on every Node version. Import from
+  `@alternatefutures/sdk` instead.
+- **`UnknownError: Unexpected error. Repeat the action or contact support.`**
+  The SDK reports every API error this way, including a wrong, revoked, or
+  out-of-project token. Check the token with `acc pat list` and the project
+  with `acc projects list`. The API's own message is not passed through;
+  [Handle errors](/sdk/quickstart#handle-errors) shows how to get it with
+  `curl`.
+- **`SdkRequiredNodeRuntimeError`.** A legacy Node-only client was called.
+  Those clients are retired; see the [overview](/sdk).
 
 ## Next steps
 
