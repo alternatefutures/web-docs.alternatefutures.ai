@@ -142,10 +142,11 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      # Idempotent: reuses the same branch/PR while drift persists; the PR is
-      # closed and its branch deleted automatically once the base catches up.
-      - name: Open or update PR with regenerated references
-        if: steps.drift.outputs.changed == 'true'
+      # Idempotent: reuses the same branch/PR while drift persists. Runs on
+      # EVERY build, not only on drift: with no diff the action is a no-op, and
+      # when an earlier drift PR is still open it closes that PR and deletes
+      # the branch (run #53 left PR #35 open because this step was gated).
+      - name: Open, update, or close the regenerated-references PR
         uses: peter-evans/create-pull-request@v7
         with:
           base: ${{ inputs.branch }}
