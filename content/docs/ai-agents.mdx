@@ -55,6 +55,10 @@ acc services create --kind docker --image nginx:latest --port 80 -y
   [Access tokens](/guides/api-keys).
 - `acc <command> --help` prints the options for any command. The full list is in
   the [command reference](/cli/commands).
+- Prefer a template when one fits: the [template catalog](/templates/catalog) lists
+  every ID with its required variables, generated from the platform source.
+- Calling the API directly? The [GraphQL API reference](/api) is generated from the
+  server schema on every merge, so its queries and mutations match production.
 
 ## Platform context block
 

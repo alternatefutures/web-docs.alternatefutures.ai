@@ -1,0 +1,51 @@
+---
+title: "GraphQL API overview"
+description: "How to call the Alternate Clouds GraphQL API directly: the endpoint, authentication with a personal access token, an example query, and where the generated schema reference lives."
+---
+
+This page explains how to call the API directly. The web app, the
+[`acc` CLI](/cli) and the [SDK](/sdk) all talk to this one GraphQL API, so
+anything they can do, a plain HTTP client can do too.
+
+## Endpoint and authentication
+
+- Endpoint: `https://api.alternatefutures.ai/graphql` (POST, JSON body).
+- Header: `Authorization: Bearer <personal access token>`. Create a token with
+  `acc pat create` or in the web app; see [Access tokens](/guides/api-keys).
+- Introspection is enabled, so any GraphQL client or IDE can load the live
+  schema from the endpoint.
+
+## First call
+
+```bash
+curl -s https://api.alternatefutures.ai/graphql \
+  -H "Authorization: Bearer $AF_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ projects { data { id name } } }"}'
+```
+
+The response lists the projects your token can see. Errors come back in the
+standard GraphQL `errors` array with a message; a `401` means the token is
+missing, expired or revoked.
+
+## Reference
+
+The pages below are generated from the API server's source on every merge, so
+they match the deployed schema.
+
+<Cards>
+  <Card title="Queries" href="/api/queries" description="Read data: projects, services, deployments, billing, and more." />
+  <Card title="Mutations" href="/api/mutations" description="Change data: create and deploy services, manage domains, tokens and billing." />
+  <Card title="Object types" href="/api/objects" description="What queries and mutations return." />
+  <Card title="Input types" href="/api/inputs" description="What mutations and filtered queries accept." />
+  <Card title="Enums" href="/api/enums" description="Fixed value sets such as service states and categories." />
+</Cards>
+
+## Good to know
+
+- Queries are limited by complexity. Prefer flat selections with IDs over deeply
+  nested lists, then fetch details in a second query.
+- Provider-specific types, fields and arguments are omitted from these pages.
+  Introspection returns the complete live schema.
+- For scripted work, the CLI with `--json` and `AF_TOKEN` is often simpler than
+  hand-written GraphQL; see [Docs for AI agents](/ai-agents).

@@ -1,0 +1,6 @@
+{
+  "title": "Templates",
+  "description": "Ready-to-deploy service templates: what they are, how to deploy one, and the generated catalog.",
+  "defaultOpen": false,
+  "pages": ["index", "catalog"]
+}

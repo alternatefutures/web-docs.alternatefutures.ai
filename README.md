@@ -13,6 +13,12 @@ Built with **Fumadocs** (Next.js, static export), deployed by Vercel from the
   (`scripts/generate-cli-docs.mjs` → `content/docs/cli/commands.mdx`)
 - **SDK reference** - AUTO-GENERATED from `alternate-clouds-sdk` via TypeDoc
   (`scripts/generate-sdk-docs.mjs` → `content/docs/sdk/api.mdx`)
+- **GraphQL API reference** - AUTO-GENERATED from the API server's schema
+  (`scripts/generate-graphql-docs.mjs` → `content/docs/api/{queries,mutations,objects,inputs,enums}.mdx`)
+- **Template catalog** - AUTO-GENERATED from the API server's template registry
+  (`scripts/generate-template-docs.mjs` → `content/docs/templates/catalog.mdx`)
+- **Drift lint** - `scripts/check-cli-drift.mjs` fails the build when a hand-written
+  page types an `acc` command or flag the CLI no longer has
 - **Agent-readable** - `/llms.txt` (platform context + index), `/llms-full.txt`
   (everything), a raw-markdown endpoint per page (`/llms.mdx/<path>/content.md`),
   and a **Copy for AI** button on every page that copies the page plus the
@@ -28,19 +34,22 @@ pnpm dev                 # dev server on :3000
 
 pnpm generate:cli        # regenerate CLI reference (needs ../alternate-clouds-cli)
 pnpm generate:sdk        # regenerate SDK reference (needs ../alternate-clouds-sdk)
+pnpm generate:api        # regenerate GraphQL API reference (needs ../alternate-clouds-api)
+pnpm generate:templates  # regenerate template catalog (needs ../alternate-clouds-api)
+pnpm check:cli-drift     # lint hand-written pages against the CLI (needs ../alternate-clouds-cli)
 
 pnpm build               # static export to out/
 ```
 
 The generators locate sibling checkouts automatically; override with
-`AF_CLI_REPO` / `AF_SDK_REPO`.
+`AF_CLI_REPO` / `AF_SDK_REPO` / `AF_API_REPO`.
 
 ## Structure
 
 ```
 app/                # Next.js app (routing, layout, llms.txt endpoints)
 content/docs/       # All documentation pages (MDX) + meta.json sidebars
-scripts/            # CLI/SDK reference generators
+scripts/            # reference generators (CLI, SDK, GraphQL API, templates) + CLI drift lint
 public/             # Static assets (logos, icons)
 ```
 
@@ -64,7 +73,8 @@ clicks. The CLI's `npm-publish.yml` sends the same event after a release.
 
 ## Rules
 
-- Never hand-edit `content/docs/cli/commands.mdx` or `content/docs/sdk/api.mdx`
-  - they are overwritten by the generators.
+- Never hand-edit a generated page (listed in `scripts/lib/generated-files.mjs`:
+  `cli/commands.mdx`, `sdk/api.mdx`, `api/*.mdx` except `index`, `templates/catalog.mdx`)
+  - they are overwritten by the generators on every merge to a source repo.
 - The CLI binary is `acc` (`@alternatefutures/acc`). `af` is retired; pages in
   the "Legacy (retired af CLI)" sidebar section are kept for reference only.

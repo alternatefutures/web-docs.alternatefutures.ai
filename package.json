@@ -10,7 +10,10 @@
     "start": "serve out",
     "types:check": "next typegen && tsc --noEmit",
     "generate:cli": "node scripts/generate-cli-docs.mjs",
-    "generate:sdk": "node scripts/generate-sdk-docs.mjs"
+    "generate:sdk": "node scripts/generate-sdk-docs.mjs",
+    "generate:api": "node scripts/generate-graphql-docs.mjs",
+    "generate:templates": "node scripts/generate-template-docs.mjs",
+    "check:cli-drift": "node scripts/check-cli-drift.mjs"
   },
   "keywords": [
     "alternate-futures",
@@ -43,9 +46,11 @@
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
+    "graphql": "^16.14.2",
     "postcss": "^8.5.26",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }
 }

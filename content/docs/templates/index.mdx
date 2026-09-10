@@ -1,0 +1,41 @@
+---
+title: "Templates overview"
+description: "What a template is on Alternate Clouds, how to deploy one from the web app or the acc CLI, and where the generated catalog of every template lives."
+---
+
+This page explains templates. For the full list with resources and settings,
+see the [template catalog](/templates/catalog); for a worked example, see
+[Deploy an AI agent](/guides/deploy-an-agent).
+
+A template is a ready-to-deploy service definition: a container image, default
+resources (CPU, memory, storage, GPU when needed), the ports it exposes, the
+environment variables it accepts, and a health check. Deploying from a template
+gives you a running service in minutes without writing a deployment file.
+
+## Deploy a template
+
+From the web app, create a new service and choose **Template**, then pick one
+from the list and fill in the required variables.
+
+From the CLI:
+
+```bash
+acc templates list
+acc templates info <template-id>
+acc services create --kind template --template <template-id>
+```
+
+Every required environment variable without a default must be set before the
+deploy starts; the catalog marks them. Variables marked "set by the platform"
+are filled in for you.
+
+## Where the list comes from
+
+The catalog is generated from the platform's template registry on every merge,
+so it matches what `acc templates list` and the web app offer. Templates still
+in internal testing are not listed.
+
+<Cards>
+  <Card title="Template catalog" href="/templates/catalog" description="Every template with resources, ports, environment variables and health checks." />
+  <Card title="Command reference" href="/cli/commands" description="The acc templates and services commands." />
+</Cards>

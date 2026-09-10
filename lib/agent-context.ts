@@ -15,6 +15,7 @@ export function agentContext(origin: string): string {
     `- Every page in one file: ${origin}/llms-full.txt`,
     `- Any page as Markdown: ${origin}/llms.mdx/<path>/content.md (CLI reference: ${origin}/llms.mdx/cli/commands/content.md)`,
     `- Agent guide: ${origin}/ai-agents`,
+    `- GraphQL API reference (generated from the server schema): ${origin}/api · template catalog: ${origin}/templates/catalog`,
     `- Web app: ${platform.appUrl} (sign in with email or an Ethereum wallet; 14-day trial, no card)`,
     `- CLI: npm install -g ${platform.cliPackage} && acc login. Command groups: projects, services, deployments, regions, templates, ssh, cp, attest, chat, billing, pat. Any command accepts --help.`,
     '- Non-interactive use: export AF_TOKEN (from acc pat create) and AF_PROJECT_ID, add -y to skip prompts, run acc whoami --json as a pre-flight check.',

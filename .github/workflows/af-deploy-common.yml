@@ -26,7 +26,7 @@ on:
         type: string
     secrets:
       gh_pat:
-        description: Token that can read alternatefutures/alternate-clouds-cli (private)
+        description: Token that can read the private source repos (alternate-clouds-cli, alternate-clouds-sdk, alternate-clouds-api)
         required: false
       docs_bot_token:
         description: Token allowed to push regenerated references straight to the protected branch (admin PAT or bypass actor). Without it the workflow falls back to a pull request.
@@ -60,6 +60,17 @@ jobs:
         with:
           repository: alternatefutures/alternate-clouds-sdk
           path: alternate-clouds-sdk
+          ref: main
+          token: ${{ secrets.gh_pat || github.token }}
+
+      # The GraphQL schema reference and the template catalog come from the API
+      # server source (private repo, needs gh_pat). No install: the generators
+      # read typeDefs.ts and run the template registry, which has no dependencies.
+      - name: Checkout alternate-clouds-api repo
+        uses: actions/checkout@v7
+        with:
+          repository: alternatefutures/alternate-clouds-api
+          path: alternate-clouds-api
           ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
@@ -112,6 +123,16 @@ jobs:
         env:
           AF_SDK_REPO: ${{ github.workspace }}/alternate-clouds-sdk
 
+      - name: Generate GraphQL API reference
+        run: pnpm generate:api
+        env:
+          AF_API_REPO: ${{ github.workspace }}/alternate-clouds-api
+
+      - name: Generate template catalog
+        run: pnpm generate:templates
+        env:
+          AF_API_REPO: ${{ github.workspace }}/alternate-clouds-api
+
       # Builds with the REGENERATED references, so a PR below never proposes
       # MDX that does not compile.
       - name: Build (Next.js static export)
@@ -129,13 +150,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FILES="content/docs/cli/commands.mdx content/docs/sdk/api.mdx"
+          FILES="$(node scripts/lib/generated-files.mjs)"
           CHANGED="$(git status --porcelain -- $FILES | awk '{print $2}')"
           CLI_SHA="$(git -C alternate-clouds-cli rev-parse --short HEAD)"
           SDK_SHA="$(git -C alternate-clouds-sdk rev-parse --short HEAD)"
+          API_SHA="$(git -C alternate-clouds-api rev-parse --short HEAD)"
           {
             echo "cli_sha=$CLI_SHA"
             echo "sdk_sha=$SDK_SHA"
+            echo "api_sha=$API_SHA"
           } >> "$GITHUB_OUTPUT"
           if [ -z "$CHANGED" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -146,7 +169,7 @@ jobs:
             {
               echo "## ⚠️ Committed references are stale"
               echo
-              echo "Regenerated from alternate-clouds-cli@$CLI_SHA (main) and alternate-clouds-sdk@$SDK_SHA (main):"
+              echo "Regenerated from alternate-clouds-cli@$CLI_SHA, alternate-clouds-sdk@$SDK_SHA and alternate-clouds-api@$API_SHA (all main):"
               echo
               for f in $CHANGED; do echo "- \`$f\`"; done
               echo
@@ -184,8 +207,8 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/docs/cli/commands.mdx content/docs/sdk/api.mdx
-          git commit -m "docs: regenerate CLI/SDK references (cli@${{ steps.drift.outputs.cli_sha }}, sdk@${{ steps.drift.outputs.sdk_sha }})"
+          git add $(node scripts/lib/generated-files.mjs)
+          git commit -m "docs: regenerate references (cli@${{ steps.drift.outputs.cli_sha }}, sdk@${{ steps.drift.outputs.sdk_sha }}, api@${{ steps.drift.outputs.api_sha }})"
           # Evidence for the run log: which account pushes (a login is not a secret). A bad token fails here; the PR step takes over.
           echo "Pushing as $(curl -fsS -H "Authorization: Bearer ${TOKEN}" https://api.github.com/user | jq -r .login)"
           git -c http.https://github.com/.extraheader= push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ inputs.branch }}"
@@ -204,13 +227,28 @@ jobs:
           add-paths: |
             content/docs/cli/commands.mdx
             content/docs/sdk/api.mdx
-          commit-message: "docs: regenerate CLI/SDK references"
-          title: "docs: regenerate CLI/SDK references"
+            content/docs/api/queries.mdx
+            content/docs/api/mutations.mdx
+            content/docs/api/objects.mdx
+            content/docs/api/inputs.mdx
+            content/docs/api/enums.mdx
+            content/docs/templates/catalog.mdx
+          commit-message: "docs: regenerate references"
+          title: "docs: regenerate references"
           body: |
             Automated by `📚 Docs build` — the committed generated references no longer match the source repos.
 
             - `alternate-clouds-cli` @ `${{ steps.drift.outputs.cli_sha }}` (main) → `content/docs/cli/commands.mdx`
             - `alternate-clouds-sdk` @ `${{ steps.drift.outputs.sdk_sha }}` (main) → `content/docs/sdk/api.mdx`
+            - `alternate-clouds-api` @ `${{ steps.drift.outputs.api_sha }}` (main) → `content/docs/api/*.mdx`, `content/docs/templates/catalog.mdx`
 
             Triggered by `${{ github.event_name }}` on `${{ inputs.branch }}` (run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
             Merging deploys the update via Vercel. Do not edit these files by hand — rerun the generators instead.
+
+      # Hand-written pages vs the CLI. Runs last so the reference update above
+      # has already landed; it fails THIS run when a tutorial or guide types a
+      # command or flag the CLI no longer has (findings in the job summary).
+      - name: Check hand-written pages against the CLI
+        run: pnpm check:cli-drift
+        env:
+          AF_CLI_REPO: ${{ github.workspace }}/alternate-clouds-cli

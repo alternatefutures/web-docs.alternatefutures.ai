@@ -26,8 +26,9 @@ export default async function Page(props: PageParams) {
   // reading. Fumadocs hides that column below `xl` and on pages with no
   // headings or `full` width, so the actions fall back to the title row there.
   const tocVisible = !page.data.full && page.data.toc.length > 0;
+  // `key`: Fumadocs renders the TOC header inside a children array.
   const actions = (className?: string) => (
-    <AIActions title={page.data.title} markdownUrl={markdownUrl} githubUrl={githubUrl} className={className} />
+    <AIActions key="ai-actions" title={page.data.title} markdownUrl={markdownUrl} githubUrl={githubUrl} className={className} />
   );
 
   return (

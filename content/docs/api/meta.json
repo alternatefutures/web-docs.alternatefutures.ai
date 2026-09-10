@@ -1,0 +1,6 @@
+{
+  "title": "API (GraphQL)",
+  "description": "The GraphQL API behind the web app, the CLI and the SDK: how to call it and the generated schema reference.",
+  "defaultOpen": false,
+  "pages": ["index", "queries", "mutations", "objects", "inputs", "enums"]
+}

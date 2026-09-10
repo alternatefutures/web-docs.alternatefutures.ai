@@ -27,6 +27,8 @@
     "---Reference---",
     "cli",
     "sdk",
+    "api",
+    "templates",
     "---Archive---",
     "legacy/index"
   ]
