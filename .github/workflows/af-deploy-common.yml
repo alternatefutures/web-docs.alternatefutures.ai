@@ -53,14 +53,14 @@ jobs:
           ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
-      # SDK default branch is develop; main has been stale since 2025-12-29 and
-      # carries observability.ts, which breaks TypeDoc (see PR #34 / issue #33).
+      # "Merged to main is final": the SDK reference tracks main (main and
+      # develop were reconciled on 2026-09-11; before that main was stale).
       - name: Checkout alternate-clouds-sdk repo
         uses: actions/checkout@v7
         with:
           repository: alternatefutures/alternate-clouds-sdk
           path: alternate-clouds-sdk
-          ref: develop
+          ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Setup Node.js
@@ -146,7 +146,7 @@ jobs:
             {
               echo "## ⚠️ Committed references are stale"
               echo
-              echo "Regenerated from alternate-clouds-cli@$CLI_SHA (main) and alternate-clouds-sdk@$SDK_SHA (develop):"
+              echo "Regenerated from alternate-clouds-cli@$CLI_SHA (main) and alternate-clouds-sdk@$SDK_SHA (main):"
               echo
               for f in $CHANGED; do echo "- \`$f\`"; done
               echo
@@ -199,7 +199,7 @@ jobs:
             Automated by `📚 Docs build` — the committed generated references no longer match the source repos.
 
             - `alternate-clouds-cli` @ `${{ steps.drift.outputs.cli_sha }}` (main) → `content/docs/cli/commands.mdx`
-            - `alternate-clouds-sdk` @ `${{ steps.drift.outputs.sdk_sha }}` (develop) → `content/docs/sdk/api.mdx`
+            - `alternate-clouds-sdk` @ `${{ steps.drift.outputs.sdk_sha }}` (main) → `content/docs/sdk/api.mdx`
 
             Triggered by `${{ github.event_name }}` on `${{ inputs.branch }}` (run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
             Merging deploys the update via Vercel. Do not edit these files by hand — rerun the generators instead.
