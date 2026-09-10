@@ -21,7 +21,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 
 const SDK_REPO = [
-  process.env.AF_SDK_REPO,
+  process.env.AF_SDK_REPO && resolve(process.env.AF_SDK_REPO), // absolute: the synthesized tsconfig lives in TMP
   resolve(REPO_ROOT, '../alternate-clouds-sdk'),
   resolve(REPO_ROOT, 'alternate-clouds-sdk'),
 ]

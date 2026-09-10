@@ -40,6 +40,20 @@ const mdx = (s) =>
 
 // Extract every .command('name') block in a file together with its
 // .description() and .option() calls, by walking the chained segments.
+// Some descriptions are i18n calls: .description(t('patDescription')). Resolve
+// them from the CLI's English strings so the reference is not left blank.
+let EN_STRINGS = {};
+try {
+  EN_STRINGS = JSON.parse(readFileSync(join(CLI_REPO, 'locales/en.json'), 'utf8'));
+} catch {
+  /* no locales file: t() descriptions stay empty */
+}
+const T_CALL = `t\\(\\s*(['"\`])([A-Za-z0-9_.-]+)\\1\\s*\\)`;
+function resolveT(seg, method) {
+  const m = seg.match(new RegExp(`\\.${method}\\(\\s*${T_CALL}`));
+  return m ? (EN_STRINGS[m[2]] ?? '') : '';
+}
+
 function parseCommands(content, fileLabel) {
   const commands = [];
   // String literal matched with its own delimiter (', " or `), tolerating the
@@ -63,9 +77,14 @@ function parseCommands(content, fileLabel) {
       description: o[4],
       defaultValue: o[6],
     }));
+    // Options described with t('key') do not match optRe's string-literal shape.
+    const optTRe = new RegExp(`\\.option\\(\\s*${STR}\\s*,\\s*${T_CALL.replace(/\\1/g, '\\3')}`, 'g');
+    for (const o of seg.matchAll(optTRe)) {
+      if (!options.some((x) => x.flag === o[2])) options.push({ flag: o[2], description: EN_STRINGS[o[4]] ?? '', defaultValue: undefined });
+    }
     commands.push({
       name: indices[i].name,
-      description: desc ? desc[2] : '',
+      description: desc ? desc[2] : resolveT(seg, 'description'),
       options,
       file: fileLabel,
     });

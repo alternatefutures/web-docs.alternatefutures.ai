@@ -37,13 +37,13 @@ jobs:
       pull-requests: write   # open/update the "regenerate references" PR
     steps:
       - name: Checkout docs repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
 
       # Private repo: needs gh_pat. github.token only works inside this repo.
       - name: Checkout alternate-clouds-cli repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: alternatefutures/alternate-clouds-cli
           path: alternate-clouds-cli
@@ -53,7 +53,7 @@ jobs:
       # SDK default branch is develop; main has been stale since 2025-12-29 and
       # carries observability.ts, which breaks TypeDoc (see PR #34 / issue #33).
       - name: Checkout alternate-clouds-sdk repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: alternatefutures/alternate-clouds-sdk
           path: alternate-clouds-sdk
@@ -61,21 +61,21 @@ jobs:
           token: ${{ secrets.gh_pat || github.token }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       # Version comes from package.json `packageManager` (pnpm@10.x). Passing
-      # `version:` here too makes action-setup@v4 fail with
+      # `version:` here too makes action-setup fail with
       # "Multiple versions of pnpm specified" (runs 34120434578, 34124739136).
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         name: Setup pnpm cache
         with:
           path: ${{ env.STORE_PATH }}
@@ -106,7 +106,7 @@ jobs:
         run: pnpm build
 
       - name: Upload built site
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs-site-${{ inputs.environment }}
           path: out/
@@ -147,7 +147,7 @@ jobs:
       # when an earlier drift PR is still open it closes that PR and deletes
       # the branch (run #53 left PR #35 open because this step was gated).
       - name: Open, update, or close the regenerated-references PR
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: ${{ inputs.branch }}
           branch: bot/regenerate-references-${{ inputs.branch }}
