@@ -28,6 +28,9 @@ on:
       gh_pat:
         description: Token that can read alternatefutures/alternate-clouds-cli (private)
         required: false
+      docs_bot_token:
+        description: Token allowed to push regenerated references straight to the protected branch (admin PAT or bypass actor). Without it the workflow falls back to a pull request.
+        required: false
 
 jobs:
   build-docs:
@@ -151,10 +154,36 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      # Idempotent: reuses the same branch/PR while drift persists. Runs on
-      # EVERY build, not only on drift: with no diff the action is a no-op, and
-      # when an earlier drift PR is still open it closes that PR and deletes
-      # the branch (run #53 left PR #35 open because this step was gated).
+      # "Merged to main is final": push the regenerated references straight to
+      # the built branch so Vercel republishes with no click. Needs a token that
+      # may push to the protected branch (docs_bot_token: an admin's fine-grained
+      # PAT with Contents: write, or a bypass actor in the branch rule). The push
+      # re-triggers this workflow once; that run finds no drift and stops. If the
+      # push is refused (no token / protection), the PR step below takes over.
+      - name: Commit regenerated references directly
+        id: direct
+        if: steps.drift.outputs.changed == 'true'
+        continue-on-error: true
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.docs_bot_token }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TOKEN" ]; then
+            echo "::notice::docs_bot_token not set; leaving the regenerated references to the pull request step."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/docs/cli/commands.mdx content/docs/sdk/api.mdx
+          git commit -m "docs: regenerate CLI/SDK references (cli@${{ steps.drift.outputs.cli_sha }}, sdk@${{ steps.drift.outputs.sdk_sha }})"
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ inputs.branch }}"
+          echo "✅ Regenerated references pushed to ${{ inputs.branch }}; Vercel deploys them." | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Fallback and janitor. Runs on EVERY build: with no diff it is a no-op,
+      # after a successful direct push it sees no changes and closes any stale
+      # drift PR, and when the direct push was refused it opens/updates the PR
+      # (run #53 left PR #35 open because this step was once gated on drift).
       - name: Open, update, or close the regenerated-references PR
         uses: peter-evans/create-pull-request@v8
         with:

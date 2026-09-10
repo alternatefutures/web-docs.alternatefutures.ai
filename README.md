@@ -51,15 +51,16 @@ build `pnpm run build`, output `out/`). Vercel runs only the Next.js build, so
 the live site shows the **committed** CLI/SDK reference files.
 
 Pushes to `develop`/`staging`/`main` also run
-`.github/workflows/af-deploy-*.yml` → shared `af-deploy-common.yml`, a build
-check that checks out the CLI/SDK repos, regenerates the references, builds,
-uploads `out/` as an artifact and, when the committed references are stale,
-opens a pull request with the regenerated files. Merging that PR updates the
-live reference. See `.github/workflows/README.md`.
+`.github/workflows/af-deploy-*.yml` → shared `af-deploy-common.yml`, which
+checks out the CLI/SDK repos, regenerates the references, builds, uploads
+`out/` as an artifact and, when the committed references are stale, commits
+them to the branch (Vercel deploys) or, without `DOCS_BOT_TOKEN`, opens a pull
+request. See `.github/workflows/README.md`.
 
-A CLI release triggers the same check: `alternate-clouds-cli`'s
-`npm-publish.yml` sends `repository_dispatch: docs-update` to this repo
-(needs the `GH_PAT` secret in the CLI repo).
+**Merged to main is final.** Every ecosystem repo (CLI, web app, API, SDK)
+has a `docs-update.yml` workflow that sends `repository_dispatch: docs-update`
+here on push to `main`, so a merge anywhere republishes the docs without
+clicks. The CLI's `npm-publish.yml` sends the same event after a release.
 
 ## Rules
 

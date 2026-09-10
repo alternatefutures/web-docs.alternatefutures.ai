@@ -8,10 +8,17 @@ This directory contains automated workflows for the Alternate Futures documentat
   deploys `main` on every push (`vercel.json`: `framework: null`, build `pnpm run build`,
   output `out/`). Vercel runs only the Next.js build, so the live site always shows the
   **committed** `content/docs/cli/commands.mdx` and `content/docs/sdk/api.mdx`.
-- **These workflows are a build check + drift detector.** They regenerate the CLI/SDK
+- **These workflows regenerate and publish the references.** They regenerate the CLI/SDK
   references from the source repos, build the site, upload `out/` as an artifact, and,
-  when the committed references are stale, open a pull request with the regenerated
-  files. Merging that PR is what updates the live reference.
+  when the committed references are stale, **commit them straight to the branch** (with
+  `DOCS_BOT_TOKEN`), which Vercel then deploys. If that push is refused (no token, or the
+  branch rule blocks it), they open a pull request instead; the same step closes stale PRs.
+- **"Merged to main is final."** Every ecosystem repo carries `.github/workflows/docs-update.yml`
+  (CLI, web app, API, SDK) that sends `repository_dispatch: docs-update` to this repo on
+  every push to `main` (SDK also on `develop` until its `main` is current). So a merge
+  anywhere → docs rebuild → regenerated references → live site, with no clicks. Repos that
+  have nothing generated yet (web app, API) still trigger a rebuild, so future generators
+  need no new plumbing.
 
 ## Workflows
 
@@ -28,11 +35,17 @@ updates the PR on branch `bot/regenerate-references-<branch>` (peter-evans/creat
   `npm-publish.yml` after a release) and `Release`
 
 **Requirements:**
-- `GH_PAT` secret (repo scope on `alternate-clouds-cli`) for checking out the private CLI repo
-- Repo setting "Allow GitHub Actions to create and approve pull requests" (enabled)
-- `main` branch protection still requires the status check `Quinn-first, then Senku + Lain`
-  from the disabled Review Gate, so bot PRs into `main` need an admin merge until that
-  required check is removed or the gate is re-enabled
+- `GH_PAT` secret here (read access to the private `alternate-clouds-cli`), and `GH_PAT` in
+  each source repo (Contents: write on this repo) so `docs-update.yml` can dispatch
+- `DOCS_BOT_TOKEN` secret here: a token that may push to `main` past the branch rule (an
+  admin's fine-grained PAT with Contents: write; `enforce_admins` is off). Without it the
+  workflow falls back to pull requests.
+- Repo setting "Allow GitHub Actions to create and approve pull requests" (enabled), for the
+  fallback PR path
+
+**Adding a new repo to the ecosystem:** copy `docs-update.yml` from any source repo, add the
+`GH_PAT` secret, done. Add a generator here only if the repo has a source of truth worth a
+page (candidates: GraphQL schema reference and template catalog from `alternate-clouds-api`).
 
 > Until 2026-09-08 the common workflow ended with `npm i -g @alternatefutures/cli && af sites deploy`.
 > That package is frozen at 0.3.0 and has no `sites` command, so the step printed the CLI

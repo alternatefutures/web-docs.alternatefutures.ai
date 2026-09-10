@@ -26,7 +26,7 @@ port, and the environment variables. Two are required:
 | Variable | What to put in it |
 |---|---|
 | `AF_API_KEY` | A personal access token. The agent uses it to pay for chat, image, and video inference from your credits. |
-| `AF_ORG_ID` | Your organization id, the segment after `/org/` in the web app's address bar (`clouds.alternatefutures.ai/org/<this part>/...`). |
+| `AF_ORG_ID` | Your organization id. `acc whoami --json` prints it as `organization.id` (acc 1.1.1 or later); it is also the segment after `/org/` in the web app's address bar. |
 
 Everything else has a default. You will set `AGENT_NAME` and
 `AGENT_INSTRUCTIONS` to make it yours.
@@ -43,7 +43,7 @@ revoke it later with `acc pat delete` without touching anything else.
 ## 3. Deploy with a budget cap
 
 Replace the two values in angle brackets with the token from step 2 and your
-organization id from step 1.
+organization id (`acc whoami --json`, field `organization.id`).
 
 ```bash
 acc services create --kind template --template alternate-agent \

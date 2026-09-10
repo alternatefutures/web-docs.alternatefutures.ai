@@ -25,3 +25,4 @@ jobs:
       branch: main
     secrets:
       gh_pat: ${{ secrets.GH_PAT }}
+      docs_bot_token: ${{ secrets.DOCS_BOT_TOKEN }}
