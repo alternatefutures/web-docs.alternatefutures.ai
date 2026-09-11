@@ -286,6 +286,7 @@ Input for exchanging a Personal Access Token for an access token
 | Field | Type | Description |
 |-------|------|-------------|
 | `projectId` | `ID!` |  |
+| `idempotencyKey` | `String` | SHA-256 request digest used to make create/dispatch retries idempotent. |
 | `installationId` | `ID!` | Local id of the GithubInstallation row (NOT the GitHub-side installation_id). |
 | `owner` | `String!` |  |
 | `repo` | `String!` |  |

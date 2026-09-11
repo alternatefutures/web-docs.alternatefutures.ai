@@ -359,16 +359,29 @@ Returns `FeedbackReport!` · [FeedbackReport](/api/objects#feedbackreport).
 
 ## GitHub deploy
 
-### syncGithubInstallation
+### beginGithubInstallationClaim
 
-Create a canonical GitHub install row or grant this AF org access to an existing install after GitHub redirects with installation_id.
+Begin a one-use GitHub user-authorization proof bound to the caller, AF
+organization, and exact installation id returned by GitHub's setup URL.
 
 | Argument | Type | Description |
 |----------|------|-------------|
 | `installationId` | `String!` |  |
 | `orgId` | `ID` |  |
 
-Returns `GithubInstallation!` · [GithubInstallation](/api/objects#githubinstallation).
+Returns `GithubInstallationClaim!` · [GithubInstallationClaim](/api/objects#githubinstallationclaim).
+
+### syncGithubInstallation
+
+Create or grant an installation only after exchanging a GitHub user OAuth
+code and proving that user can access the exact App installation.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `state` | `String!` |  |
+| `code` | `String!` |  |
+
+Returns `GithubInstallationSyncResult!` · [GithubInstallationSyncResult](/api/objects#githubinstallationsyncresult).
 
 ### refreshGithubInstallations
 
@@ -383,14 +396,14 @@ Returns `[GithubInstallation!]!` · [GithubInstallation](/api/objects#githubinst
 
 ### uninstallGithubInstallation
 
-Uninstall the AlternateFutures GitHub App from the account/org backing this installation.
-Calls DELETE /app/installations/\{id} on GitHub with the App JWT, then cleans up the local row
-and nulls gitInstallationId on linked services. Caller must be a member of an AF org with
-access to the installation. Returns true on success.
+Remove only this AF organization's installation grant and detach its
+services. GitHub-wide uninstall remains an installation-admin action on
+github.com and is reconciled by the signed deletion webhook.
 
 | Argument | Type | Description |
 |----------|------|-------------|
 | `installationId` | `ID!` |  |
+| `orgId` | `ID` |  |
 
 Returns `Boolean!`.
 

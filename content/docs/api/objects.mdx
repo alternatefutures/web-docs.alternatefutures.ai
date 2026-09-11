@@ -81,6 +81,7 @@ Includes the token value which is only shown once during creation
 | `id` | `ID!` |  |
 | `name` | `String!` |  |
 | `slug` | `String!` |  |
+| `organizationId` | `ID` | Owning organization; null for a personal project. |
 | `avatar` | `String` |  |
 | `backupStorageOnArweave` | `Boolean` |  |
 | `backupStorageOnFilecoin` | `Boolean` |  |
@@ -878,7 +879,7 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | `ID!` |  |
-| `organizationId` | `ID!` | Legacy/original AF owner. Access control also uses github_installation_access. |
+| `organizationId` | `ID` | Legacy/original AF owner. Access control also uses github_installation_access. |
 | `installationId` | `String!` | GitHub-side numeric installation id (returned as String to avoid Int32 overflow). |
 | `accountLogin` | `String!` |  |
 | `accountId` | `String!` |  |
@@ -910,6 +911,21 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | `name` | `String!` |  |
 | `sha` | `String!` |  |
 | `protected` | `Boolean!` |  |
+
+### GithubInstallationClaim
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `authorizeUrl` | `String!` |  |
+| `state` | `String!` |  |
+| `expiresAt` | `Date!` |  |
+
+### GithubInstallationSyncResult
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `installation` | `GithubInstallation!` · [GithubInstallation](/api/objects#githubinstallation) |  |
+| `organizationId` | `ID!` |  |
 
 ### BuildJob
 
