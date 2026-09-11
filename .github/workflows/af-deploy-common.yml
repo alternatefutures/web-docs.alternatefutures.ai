@@ -218,11 +218,16 @@ jobs:
           git -c http.https://github.com/.extraheader= push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ inputs.branch }}"
           echo "✅ Regenerated references pushed to ${{ inputs.branch }}; Vercel deploys them." | tee -a "$GITHUB_STEP_SUMMARY"
 
-      # Fallback and janitor. Runs on EVERY build: with no diff it is a no-op,
-      # after a successful direct push it sees no changes and closes any stale
-      # drift PR, and when the direct push was refused it opens/updates the PR
-      # (run #53 left PR #35 open because this step was once gated on drift).
+      # Fallback and janitor. Runs on every build EXCEPT right after a successful
+      # direct push: with no diff it is a no-op that closes any stale drift PR,
+      # and when the direct push was refused it opens/updates the PR (run #53
+      # left PR #35 open because this step was once gated on drift). After a
+      # successful direct push the action still compares against the checkout's
+      # stale `origin/main`, pushes an empty branch and fails on "No commits
+      # between main and bot/regenerate-references-main" (run 34595716854,
+      # 2026-09-11); the direct push's own re-triggered build runs the janitor.
       - name: Open, update, or close the regenerated-references PR
+        if: steps.direct.outcome != 'success'
         uses: peter-evans/create-pull-request@v8
         with:
           base: ${{ inputs.branch }}
