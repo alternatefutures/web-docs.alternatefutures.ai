@@ -76,7 +76,7 @@ Manage services in a project
 
 | Option | Description |
 |--------|-------------|
-| `-p, --project <id-or-name>` | Use a specific project |
+| `-p, --project <id-or-name>` | Use an accessible project by exact ID, name, or slug (ambiguous names are rejected) |
 
 ### `acc services list`
 
@@ -88,16 +88,24 @@ Show details for a service
 
 ### `acc services create`
 
-Create a new service (from a template, Docker image, or empty server)
+Create a new service (GitHub, template, Docker, function, bucket, database, or server)
 
 | Option | Description |
 |--------|-------------|
-| `--kind <kind>` | Service kind: template \| docker \| server \| function \| github |
+| `--kind <kind>` | Service kind: github \| template \| database \| docker \| function \| bucket \| server |
 | `--name <name>` | Service name (skips the name prompt; must be unique in the project) |
 | `--template <id>` | Template id (for --kind template — skips the catalog browse) |
 | `--image <ref>` | Docker image (for --kind docker — e.g. nginx:latest) |
 | `--port <n>` | Container port (for --kind docker) |
 | `--os <base>` | Base OS image (for --kind server — e.g. ubuntu:24.04) |
+| `--source-file <path>` | UTF-8 source file, max 512 KiB (required for --kind function; use - for stdin) |
+| `--routes-file <path>` | Optional JSON object of /path-to-HTTP(S)-URL routes (max 100 routes / 64 KiB) |
+| `--github-installation <id>` | Local GitHub App installation id (for --kind github) |
+| `--repo <owner/name>` | GitHub repository (for --kind github) |
+| `--branch <name>` | Git branch (defaults to repository default) |
+| `--root-directory <path>` | Monorepo subdirectory for --kind github (defaults to .) |
+| `--build-command <command>` | GitHub build command override |
+| `--start-command <command>` | GitHub start command override |
 | `--confidential` | Deploy on a TEE: verifiable confidential compute. |
 | `--region <region>` | Curated region: us-east \| us-west \| eu \| asia. |
 | `--cpu <cores>` | Override CPU (vCPUs). |
@@ -116,6 +124,14 @@ Create a new service (from a template, Docker image, or empty server)
 | `--ssh-key <pubkey>` | Break-glass OpenSSH public key (--kind server). Baked into the box so you keep direct SSH if the platform channel dies. |
 | `--ssh-key-file <path>` | Read the break-glass public key from a file (e.g. ~/.ssh/id_ed25519.pub). |
 | `-y, --yes` | Skip confirmation prompts. |
+
+### `acc services rebuild [id]`
+
+Rebuild a service from its connected GitHub repository
+
+| Option | Description |
+|--------|-------------|
+| `--sha <commit>` | Build a specific commit SHA |
 
 ### `acc services deploy [id]`
 
@@ -226,6 +242,7 @@ List regions with availability and pricing
 |--------|-------------|
 | `--provider <name>` | Filter by provider: akash \| phala (default: akash) |
 | `--gpu <model>` | Surface median price for a specific GPU model (e.g. h100, h200, a100, rtx4090) |
+| `--json` | Machine-readable JSON output (for agents/CI) |
 
 ### `acc templates`
 
