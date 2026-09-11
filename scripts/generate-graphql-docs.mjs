@@ -54,6 +54,12 @@ const CURATE = process.env.DOCS_INCLUDE_RETIRED_SURFACES !== '1';
 const EXCLUDED_SECTION_RE = /^(SITES|FUNCTIONS|DOMAINS|DNS RECORD|DOMAIN REGISTRATION|IPFS\/STORAGE|STORAGE ANALYTICS|STORAGE TRACKING|SUBSCRIPTIONS)\b/i;
 const EXCLUDED_LABEL_RE = /^(sites?\b|ipns|private gateways?|functions?\b|zones?\b|storage\b|ens\b|applications?\b|domains?\b|web3 domains?|domain registration|dns record)/i;
 // Root fields named after the retired product, whatever comment they sit under.
+// Surfaces that are merged and deployed but not usable by customers yet (the
+// swarm runtime control plane, identity issuer keys and the secret backend are
+// not provisioned). Hidden until launch: set DOCS_INCLUDE_UNRELEASED_SURFACES=1
+// in af-deploy-common.yml (or delete this filter) when the feature goes live.
+const UNRELEASED_NAME_RE = /^(swarm|identit|runtime|proofProviders|agentIam)|Swarm|A2a|Runtime(Agent|State|McpServer|Model|Secret)|Identity(Import|VerificationPolicy|Card|Credential|ProofRequest|Delegation)|^(rotate|deactivate)Identity$|CapabilityInvocation/;
+const HIDE_UNRELEASED = process.env.DOCS_INCLUDE_UNRELEASED_SURFACES !== '1';
 const LEGACY_NAME_RE = /ipfs|ipns|arns|\bens\b|^sites?(?![a-z])|^pins?(?![a-z])|pinned|zone|privateGateway|afFunction|filecoin|arweave/i;
 const PROTECTED_FIELD_RE = /Services?$/;
 
@@ -114,6 +120,7 @@ let label = null;
 let rawLabel = null;
 let prevComment = false;
 let inDescription = false;
+let argDepth = 0; // parenthesis depth inside a root type: >0 means inside an argument list
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i];
   if ((line.match(/"""/g) ?? []).length % 2 === 1) inDescription = !inDescription;
@@ -140,6 +147,7 @@ for (let i = 0; i < lines.length; i++) {
       inRoot = name;
       label = null;
       rawLabel = null;
+      argDepth = 0;
     } else {
       inRoot = null;
       if (!sectionOf.has(name)) {
@@ -180,7 +188,12 @@ for (let i = 0; i < lines.length; i++) {
       continue;
     }
     prevComment = false;
-    const f = line.match(/^\s*([a-zA-Z_]\w*)\s*[(:]/);
+    // Only a line at argument depth 0 declares a field. Lines inside a multi-line
+    // argument list (`runtimeStateAtVersion(` … `version: String!` … `): X`) are
+    // arguments and must not claim a label, or the real `version` query inherits
+    // whatever label the enclosing field had.
+    const f = argDepth === 0 ? line.match(/^\s*([a-zA-Z_]\w*)\s*[(:]/) : null;
+    argDepth = Math.max(0, argDepth + (line.match(/\(/g) ?? []).length - (line.match(/\)/g) ?? []).length);
     if (f && label && !rootLabels[inRoot].has(f[1])) {
       rootLabels[inRoot].set(f[1], label);
       rootRawLabels[inRoot].set(f[1], rawLabel);
@@ -220,6 +233,7 @@ function rootFieldKept(rootName, f) {
   if (vendorNamed(f.name)) return false;
   if (!CURATE) return true;
   if (LEGACY_NAME_RE.test(f.name)) return false;
+  if (HIDE_UNRELEASED && UNRELEASED_NAME_RE.test(f.name)) return false;
   const raw = rootRawLabels[rootName]?.get(f.name) ?? '';
   if (EXCLUDED_LABEL_RE.test(raw) && !PROTECTED_FIELD_RE.test(f.name)) return false;
   // Only the RETURN type decides here: input types are filed by the schema

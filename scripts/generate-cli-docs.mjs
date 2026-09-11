@@ -83,7 +83,9 @@ function renderTree(node, seen) {
 }
 
 const seen = new Set();
+const includeUnreleased = process.env.DOCS_INCLUDE_UNRELEASED_SURFACES === '1';
 for (const group of GROUPS) {
+  if (group.unreleased && !includeUnreleased) continue;
   out += `## ${group.title}\n\n`;
   if (group.title === 'Account') {
     for (const cmd of root.children.filter((c) => ROOT_COMMANDS.includes(c.name))) {
@@ -109,5 +111,11 @@ out += `
 | \`AF_AUTH_API_URL\` | Override auth service URL |
 `;
 
+// A root command that belongs to no group would vanish from the page silently
+// (that is how the swarm commands were missed on 2026-09-11). Warn so the
+// GROUPS table in lib/cli-model.mjs gets the new name.
+const grouped = new Set([...ROOT_COMMANDS, ...GROUPS.flatMap((g) => g.dirs)]);
+const ungrouped = root.children.map((c) => c.name).filter((n) => !grouped.has(n) && !['help', 'version'].includes(n));
+if (ungrouped.length > 0) console.warn(`⚠️  ${ungrouped.length} root command(s) in no GROUPS entry (not documented): ${ungrouped.join(', ')}`);
 writeFileSync(OUTPUT, out, 'utf8');
 console.log(`✨ Wrote ${OUTPUT} from ${cliRepo} (${pkg.name}@${pkg.version}, ${model.commands.length} commands)`);

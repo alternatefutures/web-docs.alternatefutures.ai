@@ -29,6 +29,20 @@ export const GROUPS = [
   },
   { title: 'Chat', dirs: ['chat'] },
   { title: 'Billing', dirs: ['billing', 'pat'] },
+  // Merged in the CLI but not usable until the swarm runtime control plane is
+  // live; rendered only with DOCS_INCLUDE_UNRELEASED_SURFACES=1 (see the GraphQL
+  // generator for the matching API filter).
+  // Names mirror COMMAND_GROUPS['Agents & Swarms'] in the CLI's src/cli.ts: these
+  // modules register top-level commands, so the group is matched by command name.
+  {
+    title: 'Agents & swarms',
+    dirs: [
+      'init', 'create', 'dev', 'serve', 'eval', 'run', 'replay', 'agent', 'agents', 'swarms',
+      'tasks', 'watch', 'trace', 'fork', 'state', 'mcp', 'models', 'skills', 'tools', 'bench',
+      'tee', 'secrets', 'identities', 'cards', 'delegations', 'proofs',
+    ],
+    unreleased: true,
+  },
 ];
 
 /** Commands registered directly on the program in src/cli.ts. */
