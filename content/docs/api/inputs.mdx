@@ -35,7 +35,7 @@ that don't need a specialized AFFunction or Site record.
 | `projectId` | `ID!` |  |
 | `type` | `ServiceType` · [ServiceType](/api/enums#servicetype) |  |
 | `templateId` | `String` |  |
-| `flavor` | `String` | Catalog flow discriminator. One of 'docker' \| 'server' \| 'function' \| 'template'. Validated server-side; rejected if any other value. Immutable post-creation. |
+| `flavor` | `String` | Catalog flow discriminator. One of 'docker' \| 'server' \| 'function' \| 'template' \| 'github' \| 'swarm'. Validated server-side; rejected if any other value. Immutable post-creation. 'swarm' defaults type to VM. |
 | `dockerImage` | `String` |  |
 | `containerPort` | `Int` |  |
 

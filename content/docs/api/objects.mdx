@@ -140,7 +140,9 @@ stay end-to-end encrypted and opaque to the platform.
 | `name` | `String!` |  |
 | `slug` | `String!` |  |
 | `projectId` | `ID!` |  |
-| `flavor` | `String` | Create-time discriminator describing the catalog flow that produced this service. One of 'docker' \| 'server' \| 'function' \| 'template'. Null on legacy rows; the web app falls through to 'docker' for VM rows and 'function' for FUNCTION rows. Immutable after creation. |
+| `flavor` | `String` | Create-time discriminator describing the catalog flow that produced this service. One of 'docker' \| 'server' \| 'function' \| 'template' \| 'github' \| 'swarm'. Null on legacy rows; the web app falls through to 'docker' for VM rows and 'function' for FUNCTION rows. Immutable after creation. 'swarm' (item D, 2026-09-18) marks the runtime service of ONE swarm, named after the team; it deploys only through deploySwarmRuntime. |
+| `swarmId` | `String` | The swarm this service hosts, or null. Resolution order: the bound swarm (SwarmDeploymentBinding by serviceId) → the swarm of an in-flight deploy claim → the service name when flavor is 'swarm' and nothing has deployed yet. Legacy 'swarm-runtime-\<team>' docker rows resolve through the binding, so every swarm service answers this. |
+| `spend` | `ServiceSpend!` · [ServiceSpend](/api/objects#servicespend) | Lifetime spend attributed to this service: compute from the settled per-deployment totals this API keeps (escrow consumed, hourly totals), inference from the org usage-log rows stamped with this serviceId by a deploy-minted token. Resolved on demand (one auth call): never select it in list queries. |
 | `templateId` | `ID` |  |
 | `dockerImage` | `String` |  |
 | `containerPort` | `Int` |  |
@@ -179,6 +181,31 @@ stay end-to-end encrypted and opaque to the platform.
 | † | | Some fields omitted |
 
 ## Service deployment metrics
+
+### ServiceSpend
+
+Spend attributed to one service (item D, 2026-09-18). Cents, USD.
+computeCents sums the API's own settled totals for every deployment of
+the service (the standard compute tier escrow consumedCents, the confidential compute (TEE) tier/the GPU compute tier totalBilledCents);
+inferenceCents sums service-auth usage rows with this serviceId
+(ai_inference). inferenceUnavailable is true when the auth lookup failed,
+in which case inferenceCents is 0 and totalCents is compute only.
+Inference is billed in fractions of a cent per request, so the *Usd fields
+(2026-09-20) carry the real sums with 8 decimals; the *Cents fields are
+rounded from them and read 0 below half a cent. Show the Usd fields.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `computeCents` | `Int!` |  |
+| `inferenceCents` | `Int!` |  |
+| `totalCents` | `Int!` |  |
+| `computeUsd` | `Float!` |  |
+| `inferenceUsd` | `Float!` |  |
+| `totalUsd` | `Float!` |  |
+| `inferenceRequests` | `Int!` | Number of inference requests billed to this service. |
+| `inferenceOwnKeyRequests` | `Int!` | Rows the org paid with its own provider key ($0 usage rows), counted for context. |
+| `inferenceUnavailable` | `Boolean!` |  |
+| `since` | `Date!` |  |
 
 ### ServiceDeploymentMetrics
 
