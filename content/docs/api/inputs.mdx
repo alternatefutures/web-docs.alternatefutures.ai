@@ -331,12 +331,16 @@ Input for exchanging a Personal Access Token for an access token
 One agent of a swarm spec (E-MVP M2). name: the agent id and @mention
 (lowercase letters, digits, - or _, 1 to 64). job: one sentence, 3 to 400
 characters; it becomes the persona ("You are \<name>. \<job>." plus the house
-rule), exactly as acc add agent writes it. model: an id from swarmModels.
+rule), exactly as acc add agent writes it. persona (2026-09-26): the whole
+persona instead, written byte for byte like acc swarms push ships it (1 byte
+to 64 KiB, printable). Give job or persona, not both. model: an id from
+swarmModels.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `name` | `String!` |  |
-| `job` | `String!` |  |
+| `job` | `String` |  |
+| `persona` | `String` |  |
 | `model` | `String!` |  |
 
 ### SwarmEdgeSpecInput

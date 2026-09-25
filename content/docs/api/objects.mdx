@@ -985,6 +985,7 @@ Never carries prompts. Agents are in plan order.
 |-------|------|-------------|
 | `swarmId` | `String!` |  |
 | `shape` | `String!` |  |
+| `model` | `String` | The model the hosted runtime uses for this project: one per project, from its model-provider config. Every deploy re-renders that config from the model the bundle's agents declare (2026-09-26), so after a deploy this is the agents' model; acc swarms model set overrides it only until the next deploy. Null before the first deploy. |
 | `agents` | `[SwarmRosterAgent!]!` · [SwarmRosterAgent](/api/objects#swarmrosteragent) |  |
 
 ### SwarmRoom
@@ -1097,6 +1098,7 @@ ready and failed are terminal (finishedAt set); errorCode/errorMessage only on f
 | `name` | `String!` |  |
 | `model` | `String!` |  |
 | `job` | `String` | The job sentence the persona was rendered from; null when the persona was hand-written from files. |
+| `persona` | `String!` | The persona text, verbatim: the system prompt the runtime applies (2026-09-26). Project members only; swarmRoster and the bridge credential never carry it. |
 
 ### SwarmDefinitionSpecEdge
 
@@ -1109,10 +1111,12 @@ ready and failed are terminal (finishedAt set); errorCode/errorMessage only on f
 
 The authored spec of a registered version, read back from its bundle for the
 web Definition editor (E-MVP M3): shape, agents in plan order, reducer /
-supervisor / maxIterations / edges as SwarmSpecInput would carry them.
-Personas never leave the API: job is the sentence they were rendered from,
-or null. editable is false when any agent has no job (authored from files),
-so the editor shows that version read-only.
+supervisor / maxIterations / edges as SwarmSpecInput would carry them. Each
+agent carries its persona verbatim plus job, the sentence a wizard persona
+was rendered from (null for a hand-written one). editable is false when the
+version holds settings the editor cannot show (agent tools, skills or
+sensitivity, an authority block written by hand): saving would drop them,
+so the editor shows that version read-only and points at the CLI.
 
 | Field | Type | Description |
 |-------|------|-------------|

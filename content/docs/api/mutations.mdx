@@ -230,6 +230,14 @@ Returns `SwarmDeployProgress!` · [SwarmDeployProgress](/api/objects#swarmdeploy
 
 ### setSwarmModel
 
+acc swarms model set: overwrite the project's model-provider config
+server-side (a listed provider/model through the platform proxy or the
+project's own key, or compat/\<model> with baseUrl for a self-hosted
+endpoint); the runtime reads it at boot. Every deploy re-renders the config
+from the model the agents declare (2026-09-26), so a listed model set here
+lasts only until the next deploy, while compat/\<model> stays as long as the
+agents declare it.
+
 | Argument | Type | Description |
 |----------|------|-------------|
 | `projectId` | `ID!` |  |
