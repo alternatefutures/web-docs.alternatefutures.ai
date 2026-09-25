@@ -1,0 +1,305 @@
+---
+title: "Deploy a swarm of agents"
+description: "Tutorial: build a team of AI agents from the web app or the acc CLI, deploy it, talk to it in its private chat room with @mentions, optionally answer in Discord, then change it and shut it down."
+---
+
+This tutorial takes you from a signed-in account to a running team of agents
+(a swarm) that answers in its own private chat room. It takes about ten
+minutes. You set no API key: the agents call their models through the
+platform, billed to your organization, whether they run on your laptop or in
+the cloud.
+
+There are two ways in, and they end in the same place. The **web app** needs
+nothing installed. The **CLI** gives you a folder you can keep in Git and run
+locally before deploying. Pick one, or start in the web app and manage the
+result from the CLI later.
+
+## Before you start
+
+- You are signed in at `https://clouds.alternatefutures.ai`, or you have
+  finished the [Quick start](/guides/quickstart) so `acc` is installed and
+  logged in.
+- Your organization has credits or an active trial. A deploy is refused before
+  anything is billed if the wallet is empty.
+
+## Path A: the web app
+
+### 1. Create the swarm
+
+1. Open a project (or create one), click **Add Service**, and choose the
+   **Swarm** card. The team gets a generated name and its **Source** tab
+   opens.
+2. To name the team yourself, open **Settings**, change **Name**, and save. The
+   name is fixed once the first version of the agents is saved.
+
+### 2. Add agents and save
+
+**Source** has three parts.
+
+1. **Shape**: how the agents work together. **One after another** hands each
+   answer to the next agent. **All at once** runs every agent on the same task
+   and one of them merges the answers. **Handoff** is two agents, the second
+   finishes what the first started. If unsure, pick **One after another**.
+2. **Agents**: add each agent with a one-word name (that is how you will
+   `@mention` it), one sentence under **What it does**, and a model from the
+   list.
+3. Click **Save** in the footer. The platform compiles the team and lists it
+   under **Version history** on the **Deployments** tab.
+
+### 3. Deploy
+
+Click **Deploy** in the footer. A banner under the header shows each phase:
+checking the project, reserving capacity, delivering private files, waiting
+for the runtime. It ends with "Deployed. Ask the team in the chat room or in
+Discord." The **Deployments** tab shows the lease.
+
+### 4. Talk to it
+
+On **Source**, under **Communication**, pick how to talk to the team:
+
+- **Web chat** shows the room link. Open it and enter the passphrase.
+- **Terminal chat** shows the `acc chat join` line for the same room.
+- **Copy passphrase** (top right of either row) copies the room passphrase.
+  Revealing it is recorded in the audit log.
+
+In the room, `@researcher find three sources on X` runs that one agent, and
+`@all summarize what we have` runs the whole team. A message with no mention
+runs nothing and costs nothing, so people can talk freely.
+
+Skip to [Change it, watch it, stop it](#change-it-watch-it-stop-it), or add
+[Discord](#optional-let-the-team-answer-in-discord).
+
+## Path B: the CLI
+
+### 1. Install and log in
+
+```bash
+npm install -g @alternatefutures/acc
+```
+
+```bash
+acc login
+```
+
+A browser opens; approve. `acc whoami` shows your account and active project.
+
+### 2. Create or pick a project
+
+```bash
+acc projects create --name my-swarm-project
+```
+
+Every later command uses the active project. `acc projects switch` changes it.
+
+### 3. Create the swarm folder
+
+```bash
+acc swarms init my-swarm && cd my-swarm
+```
+
+This writes `swarm.toml` and an empty `agents/` folder.
+
+### 4. Add an agent and a team
+
+The wizard asks in plain words and prints the flag for each answer:
+
+```bash
+acc add agent
+```
+
+- **What is this agent called?** One word, for example `researcher`. This is
+  how you will `@mention` it in the room.
+- **What is its job?** One sentence. It becomes the first line of
+  `personas/researcher.md`; edit that file any time.
+- **Which AI model should it think with?** A list; arrow keys and Enter. Every
+  model on the list works on the hosted runtime.
+- **Paste the provider key now?** Say no. No key is needed.
+
+Then the team:
+
+```bash
+acc add swarm
+```
+
+- **What should we call this team?** For example `review`.
+- **How should the agents work together?** One after another, all at once,
+  with a lead, pass it along, repeat until done, or custom. Pick "one after
+  another" if unsure.
+- **Who is on the team?** Space to toggle the agents you added, Enter.
+
+The same with flags, for scripts:
+
+```bash
+acc create agent researcher --model openai/gpt-5.6-sol
+acc create swarm review --shape sequential --members researcher
+```
+
+### 5. Try it on your laptop
+
+```bash
+acc run review --input "Say hello in one sentence."
+```
+
+The team runs on your machine. The model call goes through the platform and
+is billed to your organization exactly like a deployed run. Add `--fixture`
+to answer without a model, or `acc dev` to open the runtime with an inspector.
+
+### 6. Deploy to the cloud
+
+```bash
+acc swarms deploy review --yes
+```
+
+The CLI prints each phase (deploy slot claimed, checking project secrets and
+policy, reserving capacity, delivering private files, waiting for the runtime,
+runtime ready). The first deploy of a fresh project also generates the
+project's runtime secrets and takes a few minutes. Then:
+
+```bash
+acc swarms status review
+```
+
+`status: ACTIVE, runtime_ready: true` means it is live.
+
+A second deploy of the same swarm while one is running is refused with
+`SWARM_DEPLOY_IN_PROGRESS` before anything is billed. Wait for the first, then
+check the status.
+
+### 7. Run it in the cloud
+
+```bash
+acc run review --remote --input "Say hello in one sentence."
+```
+
+You get the answer followed by a cost line: the model tokens at list price plus
+the lease share for the run. Add `--json` for the full event stream.
+
+### 8. Talk to it in its room
+
+Every deployed swarm has one private, end-to-end encrypted chat room, and every
+agent is a member.
+
+```bash
+acc swarms room review
+```
+
+It prints the room's six-word passphrase and the join command. Join from the
+terminal and paste the passphrase when asked:
+
+```bash
+acc chat join chat.alternatefutures.ai
+```
+
+Or open the same relay URL in a browser and enter the passphrase. In the room:
+
+- `@researcher find three sources on X` runs that one agent. It answers as
+  itself.
+- `@all summarize what we have` runs the whole team.
+- A message with no mention runs nothing and costs nothing.
+- Agents never react to each other's messages here. Agent-to-agent work
+  happens inside the team's plan.
+
+The member that speaks for your agents is a small bridge that ships inside your
+swarm's deployment, starts and stops with it, and holds a credential that
+reaches this one swarm and nothing else. Adding an agent and deploying again
+adds a member; there is nothing else to configure.
+
+## Optional: let the team answer in Discord
+
+Discord is a second place to talk to the same agents. It is a separate
+conversation: what you say in Discord stays in Discord, what you say in the
+room stays in the room. Discord cannot create bots through its API, so one
+manual step remains, about two minutes:
+
+1. Open `https://discord.com/developers/applications` and click **New
+   Application**. Name it after the team.
+2. In the left menu select **Bot**, click **Reset Token**, and copy the token.
+   You will paste it once, never into chat or a screenshot. On the same page
+   turn on the **Message Content** intent.
+3. In the left menu select **OAuth2**, then **URL Generator**: tick the scope
+   `bot` and the permissions **Send Messages** and **Read Message History**.
+   Open the generated URL, pick your server, authorize.
+4. In Discord, right-click the channel the team should answer in and select
+   **Copy Channel ID**. If the item is missing, turn on Developer Mode under
+   User Settings, Advanced.
+5. Give the token and the channel to the platform. The token is verified with
+   Discord, stored as a project secret, and never shown again.
+
+   In the web app: on **Source**, under **Communication**, open **Discord
+   chat**, paste the token and the channel id, pick who answers, and click
+   **Connect channel**. The banner says the change is not deployed: click
+   **Redeploy** in the footer and confirm **Stop and redeploy**.
+
+   From the CLI, piping the token from the clipboard on macOS:
+
+   ```bash
+   pbpaste | tr -d '[:space:]' | acc swarms discord connect review --channel 123456789012345678 --stdin
+   ```
+
+   Replace the channel id with the one you copied in step 4. Then apply it:
+
+   ```bash
+   acc swarms stop review && acc swarms deploy review --yes
+   ```
+
+From then on a message in that channel runs the team and the answer comes back
+as a reply with the run id and cost. `acc swarms discord status review` shows
+the bot and its channels; `acc swarms discord disconnect review` removes the
+connection, token included.
+
+## Change it, watch it, stop it
+
+**Edit the team.** In the web app, change the agents on **Source** and click
+**Save** in the footer: that registers a new version. The banner then says the
+changes are not deployed; click **Redeploy** and confirm **Stop and
+redeploy**. From the CLI, edit the files, then stop and deploy:
+
+```bash
+acc swarms stop review && acc swarms deploy review --yes
+```
+
+Deploying while the same version is already live changes nothing: the
+platform replays the running deployment and the CLI prints `Nothing changed`.
+Stop first when you want a rebuild.
+
+**Watch it.** Runs and their costs are on the service's **Overview** under
+**Spend Controls**, **Inference**, and under **Billing**, **Usage** filtered by
+service. From the CLI:
+
+```bash
+acc swarms logs review --tail 200
+```
+
+**Stop it.** Stop closes the lease and you stop paying. The team definition,
+its versions, and the room passphrase stay, so you can deploy it again later.
+
+```bash
+acc swarms stop review
+```
+
+In the web app, use the footer of the service panel.
+
+**Bring your own model key** (optional). Under **Org**, **Models** in the web
+app, or with `acc orgs providers set openai --stdin`, every request of the
+organization uses your key at cost. For one project only, pipe the bare key
+into `acc secrets set OPENAI_API_KEY --stdin`. A key change reaches the next
+rebuilt deployment: stop, then deploy.
+
+## What you learned
+
+- A swarm is a team of named agents plus a shape that says how work flows
+  between them. Saving compiles a version; deploying runs the newest one.
+- No keys are needed. Models run through the platform and every run carries
+  its own cost.
+- Every deployed swarm has one private room. Mentions run agents; plain
+  messages are free.
+- Discord is optional and separate, and needs a stop-then-deploy to apply.
+- A deploy of a version that is already live changes nothing. Stop first to
+  rebuild.
+
+## Next steps
+
+- [How billing works](/guides/how-billing-works)
+- [Deploy an AI agent](/guides/deploy-an-agent), a single agent with a chat UI from a template
+- [Command reference](/cli/commands), every `acc swarms` command and flag
+- [Docs for AI agents](/ai-agents), for running these steps from CI or another agent

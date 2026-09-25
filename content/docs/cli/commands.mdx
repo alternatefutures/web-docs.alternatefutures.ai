@@ -40,6 +40,50 @@ Show your identity and active project
 |--------|-------------|
 | `--json` | Machine-readable JSON output (for agents/CI). |
 
+### `acc orgs`
+
+Your organizations and their model-provider keys
+
+### `acc orgs list`
+
+List the organizations you belong to
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Machine-readable JSON output |
+
+### `acc orgs providers`
+
+Bring your own model-provider key: requests then go to the provider at cost
+
+### `acc orgs providers list`
+
+Show which providers have your key and how they are billed
+
+| Option | Description |
+|--------|-------------|
+| `--org <idOrSlug>` | Organization (default: your first) |
+| `--json` | Machine-readable JSON output |
+
+### `acc orgs providers set <provider>`
+
+Store your key for a provider (openai, anthropic, …), read from a pipe; it is verified and never printed
+
+| Option | Description |
+|--------|-------------|
+| `--stdin` | Read the key from a pipe |
+| `--org <idOrSlug>` | Organization (default: your first) |
+| `--json` | Machine-readable JSON output |
+
+### `acc orgs providers unset <provider>`
+
+Remove your key; requests use the platform key again
+
+| Option | Description |
+|--------|-------------|
+| `--org <idOrSlug>` | Organization (default: your first) |
+| `--json` | Machine-readable JSON output |
+
 ## Compute
 
 ### `acc projects`

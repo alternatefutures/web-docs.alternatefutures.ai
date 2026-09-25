@@ -22,27 +22,33 @@ import { join, resolve } from 'path';
 
 /** Command groups mirroring src/cli.ts COMMAND_GROUPS (display order). */
 export const GROUPS = [
-  { title: 'Account', dirs: ['auth', 'whoami'] },
+  { title: 'Account', dirs: ['auth', 'whoami', 'orgs'] },
   {
     title: 'Compute',
     dirs: ['projects', 'services', 'deployments', 'regions', 'templates', 'ssh', 'cp', 'attest'],
   },
   { title: 'Chat', dirs: ['chat'] },
-  { title: 'Billing', dirs: ['billing', 'pat'] },
-  // Merged in the CLI but not usable until the swarm runtime control plane is
-  // live; rendered only with DOCS_INCLUDE_UNRELEASED_SURFACES=1 (see the GraphQL
-  // generator for the matching API filter).
-  // Names mirror COMMAND_GROUPS['Agents & Swarms'] in the CLI's src/cli.ts: these
-  // modules register top-level commands, so the group is matched by command name.
+  // Swarm groups mirror COMMAND_GROUPS in the CLI's src/cli.ts (2026-09-21
+  // split: the normal path, the advanced commands, identity). These modules
+  // register top-level commands, so each group is matched by command name.
+  // Rendered only with DOCS_INCLUDE_UNRELEASED_SURFACES=1 until the launch
+  // flip (AF_DOCS_PIPELINE.md §4); the GraphQL generator has the matching gate.
   {
-    title: 'Agents & swarms',
-    dirs: [
-      'init', 'create', 'dev', 'serve', 'eval', 'run', 'replay', 'agent', 'agents', 'swarms',
-      'tasks', 'watch', 'trace', 'fork', 'state', 'mcp', 'models', 'skills', 'tools', 'bench',
-      'tee', 'secrets', 'identities', 'cards', 'delegations', 'proofs',
-    ],
+    title: 'Swarms',
+    dirs: ['init', 'add', 'create', 'agents', 'swarms', 'run', 'tasks', 'secrets', 'models'],
     unreleased: true,
   },
+  {
+    title: 'Swarms, advanced',
+    dirs: ['agent', 'state', 'fork', 'watch', 'trace', 'replay', 'mcp', 'skills', 'tools', 'eval', 'dev', 'serve', 'tee'],
+    unreleased: true,
+  },
+  {
+    title: 'Identity',
+    dirs: ['identities', 'cards', 'delegations', 'proofs'],
+    unreleased: true,
+  },
+  { title: 'Billing', dirs: ['billing', 'pat'] },
 ];
 
 /** Commands registered directly on the program in src/cli.ts. */
@@ -114,7 +120,7 @@ function parseRegistrations(content, fileLabel, en) {
     const seg = content.slice(hits[i].start, hits[i + 1]?.start ?? content.length);
     const desc = seg.match(new RegExp(`\\.description\\(\\s*${STR}`));
     const optRe = new RegExp(
-      `\\.option\\(\\s*${STR}\\s*,\\s*${STR2}(?:\\s*,\\s*(?:${STR3}|[^)]+))?`,
+      `\\.(?:option|requiredOption)\\(\\s*${STR}\\s*,\\s*${STR2}(?:\\s*,\\s*(?:${STR3}|[^)]+))?`,
       'g',
     );
     const options = [...seg.matchAll(optRe)].map((o) => ({
@@ -124,7 +130,7 @@ function parseRegistrations(content, fileLabel, en) {
       ...parseFlag(o[2]),
     }));
     // Options described with t('key') do not match optRe's string-literal shape.
-    const optTRe = new RegExp(`\\.option\\(\\s*${STR}\\s*,\\s*${T_CALL.replace(/\\1/g, '\\3')}`, 'g');
+    const optTRe = new RegExp(`\\.(?:option|requiredOption)\\(\\s*${STR}\\s*,\\s*${T_CALL.replace(/\\1/g, '\\3')}`, 'g');
     for (const o of seg.matchAll(optTRe)) {
       if (!options.some((x) => x.flag === o[2])) {
         options.push({ flag: o[2], description: en[o[4]] ?? '', defaultValue: undefined, ...parseFlag(o[2]) });
@@ -145,7 +151,7 @@ function parseRegistrations(content, fileLabel, en) {
 function parseRootOptions(cliTs) {
   const firstCommand = cliTs.search(/\.command\(/);
   const head = firstCommand === -1 ? cliTs : cliTs.slice(0, firstCommand);
-  const optRe = new RegExp(`\\.option\\(\\s*${STR}\\s*,\\s*(?:${STR2}|${T_CALL.replace(/\\1/g, '\\3')})`, 'g');
+  const optRe = new RegExp(`\\.(?:option|requiredOption)\\(\\s*${STR}\\s*,\\s*(?:${STR2}|${T_CALL.replace(/\\1/g, '\\3')})`, 'g');
   const options = [];
   for (const o of head.matchAll(optRe)) {
     options.push({ flag: o[2], description: o[4] ?? '', defaultValue: undefined, ...parseFlag(o[2]) });

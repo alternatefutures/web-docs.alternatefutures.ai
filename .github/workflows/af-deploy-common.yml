@@ -116,6 +116,8 @@ jobs:
         run: pnpm generate:cli
         env:
           AF_CLI_REPO: ${{ github.workspace }}/alternate-clouds-cli
+          # Swarm launch flip (2026-09-25): render the swarm/identity surfaces. AF_DOCS_PIPELINE.md §4.
+          DOCS_INCLUDE_UNRELEASED_SURFACES: '1'
 
       - name: Generate SDK documentation
         continue-on-error: true
@@ -127,6 +129,8 @@ jobs:
         run: pnpm generate:api
         env:
           AF_API_REPO: ${{ github.workspace }}/alternate-clouds-api
+          # Swarm launch flip (2026-09-25): render the swarm/identity surfaces. AF_DOCS_PIPELINE.md §4.
+          DOCS_INCLUDE_UNRELEASED_SURFACES: '1'
 
       # Visibility comes from the production API's public `templates` query
       # (platform feature flags live in its database). If production is

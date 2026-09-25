@@ -17,7 +17,7 @@ export function agentContext(origin: string): string {
     `- Agent guide: ${origin}/ai-agents`,
     `- GraphQL API reference (generated from the server schema): ${origin}/api · template catalog: ${origin}/templates/catalog`,
     `- Web app: ${platform.appUrl} (sign in with email or an Ethereum wallet; 14-day trial, no card)`,
-    `- CLI: npm install -g ${platform.cliPackage} && acc login. Command groups: projects, services, deployments, regions, templates, ssh, cp, attest, chat, billing, pat. Any command accepts --help.`,
+    `- CLI: npm install -g ${platform.cliPackage} && acc login. Command groups: projects, services, deployments, regions, templates, ssh, cp, attest, chat, swarms (init, add, create, agents, swarms, run, tasks, secrets, models), orgs, billing, pat. Any command accepts --help.`,
     '- Non-interactive use: export AF_TOKEN (from acc pat create) and AF_PROJECT_ID, add -y to skip prompts, run acc whoami --json as a pre-flight check.',
     `- Agent skills plugin for Claude Code, Cursor, and Codex: ${platform.skillsRepo}`,
     '- The retired af CLI (sites, storage, functions, IPFS) is not acc; its commands do not exist. /legacy explains what replaced each part, and old /guides/<af-topic> URLs redirect there.',

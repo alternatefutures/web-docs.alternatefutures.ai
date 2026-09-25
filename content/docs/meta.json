@@ -11,6 +11,7 @@
     "guides/index",
     "guides/quickstart",
     "guides/deploy-an-agent",
+    "guides/deploy-a-swarm",
     "guides/authentication",
     "guides/dashboard",
     "guides/account-model",
