@@ -11,6 +11,368 @@ Generated from the API server source (@alternatefutures/backend 0.1.2) on every 
 See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
+## Other
+
+### beginIdentityImport
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `BeginIdentityImportInput!` · [BeginIdentityImportInput](/api/inputs#beginidentityimportinput) |  |
+
+Returns `DidControlChallenge!` · [DidControlChallenge](/api/objects#didcontrolchallenge).
+
+### completeIdentityImport
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `CompleteIdentityImportInput!` · [CompleteIdentityImportInput](/api/inputs#completeidentityimportinput) |  |
+
+Returns `IdentityPrincipal!` · [IdentityPrincipal](/api/objects#identityprincipal).
+
+### rotateIdentity
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `RotateIdentityInput!` · [RotateIdentityInput](/api/inputs#rotateidentityinput) |  |
+
+Returns `IdentityPrincipal!` · [IdentityPrincipal](/api/objects#identityprincipal).
+
+### deactivateIdentity
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `DeactivateIdentityInput!` · [DeactivateIdentityInput](/api/inputs#deactivateidentityinput) |  |
+
+Returns `IdentityPrincipal!` · [IdentityPrincipal](/api/objects#identityprincipal).
+
+### createIdentityVerificationPolicy
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `policy` | `JSON!` |  |
+
+Returns `IdentityVerificationPolicy!` · [IdentityVerificationPolicy](/api/objects#identityverificationpolicy).
+
+### issueIdentityCard
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `IssueIdentityCardInput!` · [IssueIdentityCardInput](/api/inputs#issueidentitycardinput) |  |
+
+Returns `IssuedIdentityCard!` · [IssuedIdentityCard](/api/objects#issuedidentitycard).
+
+### registerIdentityCard
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `card` | `JSON!` |  |
+
+Returns `IdentityCredential!` · [IdentityCredential](/api/objects#identitycredential).
+
+### revokeIdentityCredential
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `RevokeIdentityCredentialInput!` · [RevokeIdentityCredentialInput](/api/inputs#revokeidentitycredentialinput) |  |
+
+Returns `IdentityCredential!` · [IdentityCredential](/api/objects#identitycredential).
+
+### publishIdentityCard
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `PublishIdentityCardInput!` · [PublishIdentityCardInput](/api/inputs#publishidentitycardinput) |  |
+
+Returns `IdentityCardPublication!` · [IdentityCardPublication](/api/objects#identitycardpublication).
+
+### createIdentityProofRequest
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `CreateIdentityProofRequestInput!` · [CreateIdentityProofRequestInput](/api/inputs#createidentityproofrequestinput) |  |
+
+Returns `JSON!`.
+
+### registerA2aAgentCard
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `RegisterA2aAgentCardInput!` · [RegisterA2aAgentCardInput](/api/inputs#registera2aagentcardinput) |  |
+
+Returns `A2aAgentBinding!` · [A2aAgentBinding](/api/objects#a2aagentbinding).
+
+### issueA2aAccessToken
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `IssueA2aAccessTokenInput!` · [IssueA2aAccessTokenInput](/api/inputs#issuea2aaccesstokeninput) |  |
+
+Returns `A2aAccessToken!` · [A2aAccessToken](/api/objects#a2aaccesstoken).
+
+### issueIdentityDelegation
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `IssueIdentityDelegationInput!` · [IssueIdentityDelegationInput](/api/inputs#issueidentitydelegationinput) |  |
+
+Returns `IssuedIdentityDelegation!` · [IssuedIdentityDelegation](/api/objects#issuedidentitydelegation).
+
+### authorizeCapabilityInvocation
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `credentialId` | `ID!` |  |
+| `invocation` | `JSON!` |  |
+
+Returns `JSON!`.
+
+### submitSwarmRun
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `SubmitSwarmRuntimeRunInput!` · [SubmitSwarmRuntimeRunInput](/api/inputs#submitswarmruntimeruninput) |  |
+
+Returns `SwarmRuntimeRun!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### replaySwarmRun
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+| `idempotencyKey` | `String!` |  |
+| `checkpointSequence` | `String` |  |
+
+Returns `SwarmRuntimeRun!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### cancelSwarmRun
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+
+Returns `SwarmRuntimeRun!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### registerSwarmDefinition
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `RegisterSwarmDefinitionInput!` · [RegisterSwarmDefinitionInput](/api/inputs#registerswarmdefinitioninput) |  |
+
+Returns `SwarmDefinitionVersion!` · [SwarmDefinitionVersion](/api/objects#swarmdefinitionversion).
+
+### registerSwarmDefinitionFromSpec
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `RegisterSwarmDefinitionFromSpecInput!` · [RegisterSwarmDefinitionFromSpecInput](/api/inputs#registerswarmdefinitionfromspecinput) |  |
+
+Returns `SwarmDefinitionVersion!` · [SwarmDefinitionVersion](/api/objects#swarmdefinitionversion).
+
+### issueSwarmDefinitionBootstrap
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `IssueSwarmDefinitionBootstrapInput!` · [IssueSwarmDefinitionBootstrapInput](/api/inputs#issueswarmdefinitionbootstrapinput) |  |
+
+Returns `SwarmDefinitionBootstrapCredential!` · [SwarmDefinitionBootstrapCredential](/api/objects#swarmdefinitionbootstrapcredential).
+
+### revokeSwarmDefinitionBootstrap
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `grantId` | `ID!` |  |
+
+Returns `Boolean!`.
+
+### revokeOtherSwarmDefinitionBootstraps
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `serviceId` | `ID!` |  |
+| `provider` | `String!` |  |
+| `deploymentId` | `ID!` |  |
+| `keepGrantId` | `ID!` |  |
+
+Returns `Int!`.
+
+### bindSwarmDeployment
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `BindSwarmDeploymentInput!` · [BindSwarmDeploymentInput](/api/inputs#bindswarmdeploymentinput) |  |
+
+Returns `SwarmDeployment!` · [SwarmDeployment](/api/objects#swarmdeployment).
+
+### deploySwarmRuntime
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `DeploySwarmRuntimeInput!` · [DeploySwarmRuntimeInput](/api/inputs#deployswarmruntimeinput) |  |
+
+Returns `SwarmDeployment!` · [SwarmDeployment](/api/objects#swarmdeployment).
+
+### startSwarmDeploy
+
+Same gates and flow as deploySwarmRuntime, but returns as soon as the deploy
+slot is claimed; poll swarmDeployProgress until phase is ready or failed,
+then read swarmDeployment. Avoids the edge's 100 s response ceiling.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `DeploySwarmRuntimeInput!` · [DeploySwarmRuntimeInput](/api/inputs#deployswarmruntimeinput) |  |
+
+Returns `SwarmDeployProgress!` · [SwarmDeployProgress](/api/objects#swarmdeployprogress).
+
+### setSwarmModel
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `model` | `String!` |  |
+| `baseUrl` | `String` |  |
+
+Returns `SwarmModelConfig!` · [SwarmModelConfig](/api/objects#swarmmodelconfig).
+
+### connectSwarmDiscord
+
+Connect a Discord channel to a swarm (E-MVP M4): verifies the bot token
+with Discord (bot accounts only) and that the bot can see the channel,
+stores the token as a project secret and upserts the channel in the map.
+Applied by the next deploy (the bridge sidecar reads the map at deploy
+and the token at boot). Audited; the token is never returned or logged.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `input` | `ConnectSwarmDiscordInput!` · [ConnectSwarmDiscordInput](/api/inputs#connectswarmdiscordinput) |  |
+
+Returns `SwarmDiscordConnection!` · [SwarmDiscordConnection](/api/objects#swarmdiscordconnection).
+
+### disconnectSwarmDiscord
+
+Remove one channel (channelId) or, without it, the whole connection
+including the stored token. Applied by the next deploy.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `channelId` | `String` |  |
+
+Returns `SwarmDiscordConnection!` · [SwarmDiscordConnection](/api/objects#swarmdiscordconnection).
+
+### stopSwarmDeployment
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmDeployment!` · [SwarmDeployment](/api/objects#swarmdeployment).
+
+### scaleSwarmDeployment
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `replicas` | `Int` |  |
+| `min` | `Int` |  |
+| `max` | `Int` |  |
+| `idempotencyKey` | `String!` |  |
+
+Returns `SwarmDeployment!` · [SwarmDeployment](/api/objects#swarmdeployment).
+
+### decideSwarmRunApproval
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+| `input` | `DecideSwarmRuntimeApprovalInput!` · [DecideSwarmRuntimeApprovalInput](/api/inputs#decideswarmruntimeapprovalinput) |  |
+
+Returns `SwarmRuntimeRun!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### controlRuntimeAgent
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `action` | `RuntimeAgentAction!` · [RuntimeAgentAction](/api/enums#runtimeagentaction) |  |
+| `idempotencyKey` | `String!` |  |
+
+Returns `RuntimeAgentLifecycleResult!` · [RuntimeAgentLifecycleResult](/api/objects#runtimeagentlifecycleresult).
+
+### forkRuntimeAgent
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `version` | `String!` |  |
+| `idempotencyKey` | `String!` |  |
+
+Returns `RuntimeAgentForkResult!` · [RuntimeAgentForkResult](/api/objects#runtimeagentforkresult).
+
+### verifyRuntimeState
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+
+Returns `RuntimeStateVerification!` · [RuntimeStateVerification](/api/objects#runtimestateverification).
+
+### attestRuntimeAgent
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `nonce` | `String!` |  |
+
+Returns `RuntimeTeeAttestation!` · [RuntimeTeeAttestation](/api/objects#runtimeteeattestation).
+
+### registerRuntimeMcpServer
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `server` | `RuntimeMcpServerInput!` · [RuntimeMcpServerInput](/api/inputs#runtimemcpserverinput) |  |
+| `idempotencyKey` | `String!` |  |
+
+Returns `RuntimeMcpRegistration!` · [RuntimeMcpRegistration](/api/objects#runtimemcpregistration).
+
+### testRuntimeModel
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `model` | `String` |  |
+| `force` | `Boolean!` |  |
+
+Returns `RuntimeModelDiagnostic!` · [RuntimeModelDiagnostic](/api/objects#runtimemodeldiagnostic).
+
+### setRuntimeSecret
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `name` | `String!` |  |
+| `value` | `String!` |  |
+
+Returns `RuntimeSecretReference!` · [RuntimeSecretReference](/api/objects#runtimesecretreference).
+
 ## Auth - SDK token exchange
 
 ### loginWithPersonalAccessToken

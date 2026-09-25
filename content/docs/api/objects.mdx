@@ -888,6 +888,492 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | `componentName` | `String!` |  |
 | `error` | `String!` |  |
 
+### SwarmRuntimeRun
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `runtimeRunId` | `ID` |  |
+| `projectId` | `ID!` |  |
+| `status` | `SwarmRuntimeRunStatus!` · [SwarmRuntimeRunStatus](/api/enums#swarmruntimerunstatus) |  |
+| `requestSha256` | `String!` |  |
+| `inputSha256` | `String!` |  |
+| `resultSha256` | `String` |  |
+| `replayOfRunId` | `ID` |  |
+| `errorCode` | `String` |  |
+| `output` | `JSON` |  |
+| `approval` | `SwarmRuntimeApproval` · [SwarmRuntimeApproval](/api/objects#swarmruntimeapproval) |  |
+| `usdCost` | `Float` | Informational per-run USD: list-price model token estimate plus the run's wall-clock share of the lease $/h. Never a wallet debit. |
+| `costBreakdown` | `JSON` |  |
+| `createdAt` | `Date!` |  |
+| `updatedAt` | `Date!` |  |
+
+### SwarmRuntimeApproval
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `approvalId` | `ID!` |  |
+| `tool` | `String!` |  |
+| `expiresAt` | `Date!` |  |
+
+### SwarmRuntimeEvent
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schema_version` | `String!` |  |
+| `run_id` | `ID!` |  |
+| `sequence` | `Int!` |  |
+| `event` | `String!` |  |
+| `at` | `Date!` |  |
+| `data` | `JSON` |  |
+
+### SwarmDeployment
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `serviceId` | `ID!` |  |
+| `provider` | `String!` |  |
+| `deploymentId` | `ID!` |  |
+| `definitionVersionId` | `ID` |  |
+| `bundleSha256` | `String` |  |
+| `runtimeImageDigest` | `String` |  |
+| `runtimeReady` | `Boolean!` |  |
+| `status` | `String!` |  |
+| `replicas` | `Int!` |  |
+| `requestSha256` | `String!` |  |
+| `createdAt` | `Date!` |  |
+| `updatedAt` | `Date!` |  |
+
+### SwarmModelConfig
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `model` | `String!` |  |
+| `keyName` | `String` |  |
+| `updatedAt` | `Date!` |  |
+
+### SwarmModel
+
+A model a hosted swarm agent may use. The one list the wizard's selector,
+acc swarms model set, and the pre-spend guard all read. id is provider/model.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `String!` |  |
+| `provider` | `String!` |  |
+| `label` | `String!` |  |
+| `hint` | `String!` |  |
+| `keyName` | `String!` |  |
+| `isDefault` | `Boolean!` |  |
+
+### SwarmRosterAgent
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `String!` |  |
+| `model` | `String!` |  |
+
+### SwarmRoster
+
+The deployed swarm's members and shape, read from its registered bundle.
+Never carries prompts. Agents are in plan order.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `swarmId` | `String!` |  |
+| `shape` | `String!` |  |
+| `agents` | `[SwarmRosterAgent!]!` · [SwarmRosterAgent](/api/objects#swarmrosteragent) |  |
+
+### SwarmRoom
+
+The swarm's encrypted chat room. The passphrase alone selects the room on
+the relay; join with acc chat join or the web client. Reading it is audited.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `swarmId` | `String!` |  |
+| `passphrase` | `String!` |  |
+| `relayUrl` | `String!` |  |
+| `joinCommand` | `String!` |  |
+
+### SwarmRoomSecrets
+
+Room secrets for the platform bridge (passphrase + the seed it derives one
+stable identity per agent from). Same access rule as swarmRoom; audited.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `swarmId` | `String!` |  |
+| `passphrase` | `String!` |  |
+| `identitySeed` | `String!` |  |
+| `relayUrl` | `String!` |  |
+
+### SwarmDiscordBot
+
+The Discord bot connected to a swarm (E-MVP M4). The bot token is never
+returned; only the identity Discord confirmed for it.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `String!` |  |
+| `username` | `String!` |  |
+
+### SwarmDiscordChannel
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `channelId` | `String!` |  |
+| `agent` | `String` | Agent id that answers in this channel, or null when the whole swarm does. |
+| `name` | `String` | Channel name as Discord reported it at connect time (display only). |
+
+### SwarmDiscordConnection
+
+Discord connection of a swarm: a verified bot token stored as a project
+secret (never returned) plus the channel map. The map reaches the swarm's
+bridge sidecar at deploy time, so pendingRedeploy says whether the running
+lease already carries what is stored here.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `swarmId` | `String!` |  |
+| `connected` | `Boolean!` | A verified bot token is stored for this swarm. |
+| `bot` | `SwarmDiscordBot` · [SwarmDiscordBot](/api/objects#swarmdiscordbot) |  |
+| `channels` | `[SwarmDiscordChannel!]!` · [SwarmDiscordChannel](/api/objects#swarmdiscordchannel) |  |
+| `pendingRedeploy` | `Boolean!` | The running deployment's bridge carries a different channel map (or none): redeploy to apply. |
+| `updatedAt` | `Date` |  |
+
+### SwarmDiscordSecrets
+
+The bot token for the swarm's own bridge sidecar. Answered ONLY to the
+bridge credential (sbr_) of that swarm's active deployment; audited.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `swarmId` | `String!` |  |
+| `botToken` | `String!` |  |
+
+### SwarmDeployProgress
+
+Secret-free progress of one swarm deploy (startSwarmDeploy / swarmDeployProgress).
+phase: claimed | preparing | reserving | delivering | retrying | waiting_runtime | ready | failed.
+retrying (E-MVP M1): the first lease's provider kept the swarm control port closed; the lease was
+closed and the same claim bids once more without that provider (deploymentId is null until then).
+ready and failed are terminal (finishedAt set); errorCode/errorMessage only on failed.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `serviceId` | `ID!` |  |
+| `phase` | `String!` |  |
+| `provider` | `String` |  |
+| `deploymentId` | `ID` |  |
+| `errorCode` | `String` |  |
+| `errorMessage` | `String` |  |
+| `claimedAt` | `Date!` |  |
+| `updatedAt` | `Date!` |  |
+| `finishedAt` | `Date` |  |
+
+### SwarmDefinitionVersion
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `version` | `Int!` |  |
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `bundleSha256` | `String!` |  |
+| `rootSha256` | `String!` |  |
+| `planSha256` | `String!` |  |
+| `createdAt` | `Date!` |  |
+
+### SwarmDefinitionSpecAgent
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String!` |  |
+| `model` | `String!` |  |
+| `job` | `String` | The job sentence the persona was rendered from; null when the persona was hand-written from files. |
+
+### SwarmDefinitionSpecEdge
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `from` | `String!` |  |
+| `to` | `String!` |  |
+
+### SwarmDefinitionSpec
+
+The authored spec of a registered version, read back from its bundle for the
+web Definition editor (E-MVP M3): shape, agents in plan order, reducer /
+supervisor / maxIterations / edges as SwarmSpecInput would carry them.
+Personas never leave the API: job is the sentence they were rendered from,
+or null. editable is false when any agent has no job (authored from files),
+so the editor shows that version read-only.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `versionId` | `ID!` |  |
+| `version` | `Int!` |  |
+| `swarmId` | `String!` |  |
+| `shape` | `String!` |  |
+| `agents` | `[SwarmDefinitionSpecAgent!]!` · [SwarmDefinitionSpecAgent](/api/objects#swarmdefinitionspecagent) |  |
+| `reducer` | `String` |  |
+| `supervisor` | `String` |  |
+| `maxIterations` | `Int` |  |
+| `edges` | `[SwarmDefinitionSpecEdge!]!` · [SwarmDefinitionSpecEdge](/api/objects#swarmdefinitionspecedge) |  |
+| `editable` | `Boolean!` |  |
+
+### SwarmDefinitionBootstrapCredential
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `grantId` | `ID!` |  |
+| `credential` | `String!` |  |
+| `path` | `String!` |  |
+| `definitionVersionId` | `ID!` |  |
+| `bundleSha256` | `String!` |  |
+| `runtimeImageDigest` | `String!` |  |
+| `expiresAt` | `Date!` |  |
+| `maxUses` | `Int!` |  |
+
+### SwarmDeploymentLogs
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `logs` | `String!` |  |
+| `provider` | `String!` |  |
+| `deploymentId` | `ID!` |  |
+| `timestamp` | `Date!` |  |
+
+### RuntimeWatchSnapshot
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `observedAt` | `Date!` |  |
+| `topology` | `JSON!` |  |
+| `backpressure` | `JSON!` |  |
+| `spend` | `JSON!` |  |
+
+### RuntimeTrace
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `traceId` | `ID!` |  |
+| `rootSpanId` | `ID!` |  |
+| `spans` | `JSON!` |  |
+
+### RuntimeStateHistory
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `checkpoints` | `JSON!` |  |
+| `nextCursor` | `String` |  |
+
+### RuntimeStateVerification
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agentId` | `ID!` |  |
+| `verified` | `Boolean!` |  |
+| `checkedRecords` | `Int!` |  |
+| `checkpointHead` | `String!` |  |
+| `auditChainHead` | `String!` |  |
+
+### RuntimeAgentLifecycleResult
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agentId` | `ID!` |  |
+| `lifecycle` | `String!` |  |
+| `checkpointSequence` | `String` |  |
+| `stateVersion` | `String!` |  |
+
+### RuntimeAgentForkResult
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sourceAgentId` | `ID!` |  |
+| `agentId` | `ID!` |  |
+| `sourceVersion` | `String!` |  |
+| `stateVersion` | `String!` |  |
+
+### RuntimeAgentExport
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schemaVersion` | `String!` |  |
+| `format` | `String!` |  |
+| `snapshotSha256` | `String!` |  |
+| `document` | `JSON!` |  |
+
+### RuntimeTeeAttestation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agentId` | `ID!` |  |
+| `verified` | `Boolean!` |  |
+| `quoteFormat` | `String!` |  |
+| `quoteSha256` | `String!` |  |
+| `measuredImageDigest` | `String!` |  |
+| `credential` | `JSON!` |  |
+| `expiresAt` | `Date!` |  |
+| `verifier` | `String!` |  |
+
+### RuntimeMcpRegistration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String!` |  |
+| `configurationSha256` | `String!` |  |
+| `restartRequired` | `Boolean!` |  |
+
+### RuntimeModelDiagnostic
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `model` | `String!` |  |
+| `provider` | `String!` |  |
+| `toolCallProtocol` | `String!` |  |
+| `passed` | `Boolean!` |  |
+| `checkedAt` | `Date!` |  |
+| `expiresAt` | `Date!` |  |
+| `cached` | `Boolean!` |  |
+| `failureCode` | `String` |  |
+
+### RuntimeSecretReference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String!` |  |
+| `version` | `Int!` |  |
+| `backend` | `String!` |  |
+| `updatedAt` | `Date!` |  |
+
+### IdentityPrincipal
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `projectId` | `ID!` |  |
+| `did` | `String!` |  |
+| `didMethod` | `String!` |  |
+| `subjectType` | `IdentitySubjectType!` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+| `status` | `IdentityLifecycleStatus!` · [IdentityLifecycleStatus](/api/enums#identitylifecyclestatus) |  |
+| `canonicalDocument` | `String!` |  |
+| `documentSha256` | `String!` |  |
+| `revision` | `Int!` |  |
+| `createdAt` | `Date!` |  |
+| `updatedAt` | `Date!` |  |
+| `deactivatedAt` | `Date` |  |
+
+### IdentityCredential
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `projectId` | `ID!` |  |
+| `issuerDid` | `String!` |  |
+| `subjectDid` | `String!` |  |
+| `subjectType` | `IdentitySubjectType!` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+| `canonicalJson` | `String!` |  |
+| `sha256` | `String!` |  |
+| `validFrom` | `Date!` |  |
+| `validUntil` | `Date!` |  |
+| `status` | `CredentialLifecycleStatus!` · [CredentialLifecycleStatus](/api/enums#credentiallifecyclestatus) |  |
+| `statusIndex` | `Int!` |  |
+| `createdAt` | `Date!` |  |
+| `revokedAt` | `Date` |  |
+| `revokedReason` | `String` |  |
+
+### IdentityVerificationPolicy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `projectId` | `ID!` |  |
+| `subjectType` | `IdentitySubjectType!` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+| `version` | `Int!` |  |
+| `canonicalJson` | `String!` |  |
+| `sha256` | `String!` |  |
+| `active` | `Boolean!` |  |
+| `createdAt` | `Date!` |  |
+
+### ProofProvider
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `protocol` | `String!` |  |
+| `configured` | `Boolean!` |  |
+
+### DidControlChallenge
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schema_version` | `String!` |  |
+| `id` | `ID!` |  |
+| `did` | `String!` |  |
+| `subject_type` | `String!` |  |
+| `challenge` | `String!` |  |
+| `audience` | `String!` |  |
+| `created_at` | `Date!` |  |
+| `expires_at` | `Date!` |  |
+
+### IssuedIdentityCard
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `credential` | `IdentityCredential!` · [IdentityCredential](/api/objects#identitycredential) |  |
+| `card` | `JSON!` |  |
+| `statusCredential` | `JSON!` |  |
+
+### IdentityCardPublication
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `publicUrl` | `String!` |  |
+| `sha256` | `String!` |  |
+| `domain` | `String!` |  |
+| `active` | `Boolean!` |  |
+| `createdAt` | `Date!` |  |
+
+### A2aAgentBinding
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` |  |
+| `projectId` | `ID!` |  |
+| `agentKey` | `String!` |  |
+| `agentDid` | `String!` |  |
+| `identityCredentialId` | `ID!` |  |
+| `identityCardSha256` | `String!` |  |
+| `agentCardSha256` | `String!` |  |
+| `interfaceOrigin` | `String!` |  |
+| `identityCardUrl` | `String!` |  |
+| `freshnessUrl` | `String!` |  |
+| `freshnessExpiresAt` | `Date!` |  |
+| `active` | `Boolean!` |  |
+
+### A2aAccessToken
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `access_token` | `String!` |  |
+| `token_type` | `String!` |  |
+| `expires_in` | `Int!` |  |
+
+### IssuedIdentityDelegation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `credential` | `JSON!` |  |
+| `binding` | `JSON!` |  |
+
 ## Queries
 
 ### OrgBillingRunway

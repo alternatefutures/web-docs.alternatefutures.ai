@@ -11,6 +11,245 @@ Generated from the API server source (@alternatefutures/backend 0.1.2) on every 
 See the [GraphQL API overview](/api) for how to call it. Left out on purpose: provider-specific types, fields and arguments; operations of the retired hosting product (sites, IPFS storage, functions) and admin-only operations.
 </Callout>
 
+## Other
+
+### identities
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `subjectType` | `IdentitySubjectType` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+| `status` | `IdentityLifecycleStatus` · [IdentityLifecycleStatus](/api/enums#identitylifecyclestatus) |  |
+
+Returns `[IdentityPrincipal!]!` · [IdentityPrincipal](/api/objects#identityprincipal).
+
+### identity
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `did` | `String!` |  |
+
+Returns `IdentityPrincipal` · [IdentityPrincipal](/api/objects#identityprincipal).
+
+### identityCards
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `subjectDid` | `String` |  |
+| `status` | `CredentialLifecycleStatus` · [CredentialLifecycleStatus](/api/enums#credentiallifecyclestatus) |  |
+
+Returns `[IdentityCredential!]!` · [IdentityCredential](/api/objects#identitycredential).
+
+### identityVerificationPolicy
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `subjectType` | `IdentitySubjectType!` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+
+Returns `IdentityVerificationPolicy` · [IdentityVerificationPolicy](/api/objects#identityverificationpolicy).
+
+### proofProviders
+
+Returns `[ProofProvider!]!` · [ProofProvider](/api/objects#proofprovider).
+
+### agentIamBinding
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `agentKey` | `String!` |  |
+
+Returns `A2aAgentBinding` · [A2aAgentBinding](/api/objects#a2aagentbinding).
+
+## Swarm runtime (distinct from the agent chat resource below)
+
+### swarmRun
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+
+Returns `SwarmRuntimeRun!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### swarmRuns
+
+Runs of a project, newest first; serviceId narrows to the runs of one runtime service (the web Runs tab).
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `limit` | `Int` |  |
+| `serviceId` | `ID` |  |
+
+Returns `[SwarmRuntimeRun!]!` · [SwarmRuntimeRun](/api/objects#swarmruntimerun).
+
+### swarmRunEvents
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `ID!` |  |
+
+Returns `[SwarmRuntimeEvent!]!` · [SwarmRuntimeEvent](/api/objects#swarmruntimeevent).
+
+### swarmDeployment
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmDeployment!` · [SwarmDeployment](/api/objects#swarmdeployment).
+
+### swarmDeployProgress
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmDeployProgress` · [SwarmDeployProgress](/api/objects#swarmdeployprogress).
+
+### swarmDefinitionVersions
+
+Registered definition versions of one swarm, newest first (metadata only; bundles never leave the API).
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `limit` | `Int` |  |
+
+Returns `[SwarmDefinitionVersion!]!` · [SwarmDefinitionVersion](/api/objects#swarmdefinitionversion).
+
+### swarmDefinitionSpec
+
+The authored spec of one registered version (the newest when versionId is omitted); see SwarmDefinitionSpec.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `versionId` | `ID` |  |
+
+Returns `SwarmDefinitionSpec!` · [SwarmDefinitionSpec](/api/objects#swarmdefinitionspec).
+
+### swarmModels
+
+Returns `[SwarmModel!]!` · [SwarmModel](/api/objects#swarmmodel).
+
+### swarmRoster
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmRoster!` · [SwarmRoster](/api/objects#swarmroster).
+
+### swarmRoom
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmRoom!` · [SwarmRoom](/api/objects#swarmroom).
+
+### swarmRoomSecrets
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmRoomSecrets!` · [SwarmRoomSecrets](/api/objects#swarmroomsecrets).
+
+### swarmDiscord
+
+The swarm's Discord connection (bot identity, channel map, redeploy state); never the token.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmDiscordConnection!` · [SwarmDiscordConnection](/api/objects#swarmdiscordconnection).
+
+### swarmDiscordSecrets
+
+Bridge credential only: the bot token the swarm's sidecar logs in with.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmDiscordSecrets!` · [SwarmDiscordSecrets](/api/objects#swarmdiscordsecrets).
+
+### swarmDeploymentLogs
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `tail` | `Int` |  |
+
+Returns `SwarmDeploymentLogs!` · [SwarmDeploymentLogs](/api/objects#swarmdeploymentlogs).
+
+### runtimeWatch
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarm` | `String!` |  |
+
+Returns `RuntimeWatchSnapshot!` · [RuntimeWatchSnapshot](/api/objects#runtimewatchsnapshot).
+
+### runtimeTrace
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `runId` | `ID!` |  |
+
+Returns `RuntimeTrace!` · [RuntimeTrace](/api/objects#runtimetrace).
+
+### runtimeStateHistory
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `after` | `String` |  |
+| `limit` | `Int!` |  |
+
+Returns `RuntimeStateHistory!` · [RuntimeStateHistory](/api/objects#runtimestatehistory).
+
+### runtimeStateAtVersion
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `version` | `String!` |  |
+
+Returns `JSON!`.
+
+### exportRuntimeAgent
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String` |  |
+| `agentId` | `String!` |  |
+| `format` | `RuntimeAgentExportFormat!` · [RuntimeAgentExportFormat](/api/enums#runtimeagentexportformat) |  |
+
+Returns `RuntimeAgentExport!` · [RuntimeAgentExport](/api/objects#runtimeagentexport).
+
 ## Version
 
 ### version

@@ -375,6 +375,1056 @@ Participate as an agent: driver mode (you answer) or --exec bot mode
 | `--timeout <ms>` | Max time for the brain to produce a reply (default 60000) |
 | `--cooldown <ms>` | Minimum gap between replies — throttles runaway loops (default 0) |
 
+## Swarms
+
+### `acc init [directory]`
+
+Create a swarm project in this folder
+
+### `acc add`
+
+Add an agent or a team by answering questions
+
+### `acc add agent [name]`
+
+Add an agent: asks its name, its job, and which model it uses
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID (only used when a key is pasted) |
+
+### `acc add swarm [name]`
+
+Add a team: asks how the agents work together and who is on it
+
+### `acc create`
+
+Create an agent, team, or skill from flags (acc add asks instead)
+
+### `acc create agent <name>`
+
+Create an agent and the instructions it follows
+
+| Option | Description |
+|--------|-------------|
+| `--template <template>` | Agent template (default) |
+| `--model <provider/model>` | Model the hosted runtime routes, openai/\<model> or anthropic/\<model> (default openai/gpt-5.6-sol) |
+| `--from <source>` | Import eliza:, crewai:, or letta: |
+
+### `acc create swarm <name>`
+
+Create a team of agents and how work flows between them
+
+| Option | Description |
+|--------|-------------|
+| `--shape <shape>` | sequential\|parallel\|loop\|supervisor\|handoff\|graph |
+| `--members <agent,...>` | Member agents; omitted for graph |
+| `--reducer <agent>` | Required reducer for parallel |
+| `--supervisor <agent>` | Required supervisor for supervisor shape |
+| `--max-iterations <n>` | Required 1..100 bound for loop |
+| `--edges <from:to,...>` | Required edges for graph |
+
+### `acc create skill <name>`
+
+Create a skill an agent can use (a SKILL.md file)
+
+| Option | Description |
+|--------|-------------|
+| `--description <text>` | Discovery description |
+| `--license <license>` | License identifier |
+| `--compatibility <text>` | Environment compatibility |
+| `--allowed-tools <tool,...>` | Tighten-only tool subset |
+
+### `acc agents`
+
+List and show the agents in this project
+
+### `acc agents list`
+
+List the agents in this project
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable agent-list envelope |
+
+### `acc agents show <agent>`
+
+Show one agent: its job, model, and skills
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable agent envelope |
+
+### `acc swarms`
+
+Deploy and operate swarms in the cloud
+
+### `acc swarms init [directory]`
+
+Create a swarm project in this folder (same as acc init)
+
+### `acc swarms list`
+
+List the teams in this project
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable swarm-list envelope |
+
+### `acc swarms show <swarm>`
+
+Show one team: its shape and members
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable swarm envelope |
+
+### `acc swarms deploy <swarm>`
+
+Deploy a team from this project to the cloud
+
+| Option | Description |
+|--------|-------------|
+| `--service <id>` | Existing digest-pinned Swarm Runtime service ID/name |
+| `--image <ref>` | Digest-pinned runtime image (ghcr.io/...@sha256:...); with neither --service nor --image the released image is resolved from the signed runtime-image-current release |
+| `--service-name <name>` | Name of the runtime service created for --image (default swarm-runtime-\<swarm>) |
+| `--project <id>` | Project ID |
+| `--idempotency-key <key>` | Stable retry key for the transaction |
+| `-y, --yes` | Confirm provider capacity reservation and spend |
+| `--force` | Register even if the cloud moved past the version you last pulled |
+| `--json` | Emit secret-free stable deployment metadata |
+
+### `acc swarms pull <swarm>`
+
+Record the cloud's newest version of a team and compare it with this folder
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable pull envelope |
+
+### `acc swarms push <swarm>`
+
+Register this folder's definition of a team as the cloud's newest version
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--force` | Register even if the cloud moved past the version you last pulled |
+| `--idempotency-key <key>` | Stable retry key |
+| `--json` | Emit the stable push envelope |
+
+### `acc swarms status <swarm>`
+
+Show whether a deployed swarm is starting, ready, or stopped
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--watch` | Poll until the deployment becomes terminal |
+| `--interval <ms>` | Watch interval, 250..60000 (default: `2000`) |
+| `--json` | Emit stable deployment metadata |
+
+### `acc swarms logs <swarm>`
+
+Print the deployed swarm logs
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--tail <n>` | Number of log lines, 1..10000 (default: `200`) |
+
+### `acc swarms room <swarm>`
+
+The swarm's encrypted chat room: passphrase and join command (@\<agent> asks one agent, @all the whole swarm)
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable room envelope |
+
+### `acc swarms discord`
+
+Let the team answer in Discord channels (bot token stored on the platform, never shown; redeploy to apply)
+
+### `acc swarms discord connect <swarm>`
+
+Bind a Discord channel to the whole team or to one agent; asks for the bot token once (hidden), or reads it from a pipe with --stdin
+
+| Option | Description |
+|--------|-------------|
+| `--channel <id>` | Numeric channel id (Discord: Developer Mode, right-click the channel, Copy Channel ID) |
+| `--agent <name>` | Only this agent answers in the channel |
+| `--swarm` | The whole team answers in the channel (default) |
+| `--stdin` | Read the bot token from a pipe instead of the hidden prompt (also replaces a stored token) |
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable connection envelope (never the token) |
+
+### `acc swarms discord disconnect <swarm>`
+
+Remove one channel (--channel) or the whole Discord connection including the stored bot token
+
+| Option | Description |
+|--------|-------------|
+| `--channel <id>` | Only unbind this channel; the token stays |
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable connection envelope |
+
+### `acc swarms discord status <swarm>`
+
+Show the bot, the bound channels and whether a redeploy is needed
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable connection envelope |
+
+### `acc swarms stop <swarm>`
+
+Stop a deployed swarm and stop paying for it
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit stable deployment metadata |
+
+### `acc swarms model`
+
+Set the model the deployed swarm uses
+
+### `acc swarms model set <provider/model>`
+
+Set the project model (openai/…, anthropic/…, or compat/… with --base-url); applied by the next rebuilt deployment (stop a running one first)
+
+| Option | Description |
+|--------|-------------|
+| `--base-url <https-url>` | OpenAI-compatible base URL for compat/… |
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable model envelope |
+
+### `acc swarms scale <swarm>`
+
+Set how many copies of the swarm run
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--replicas <n>` | Exact fixed replica count |
+| `--min <n>` | Minimum replicas (must equal max on fixed providers) |
+| `--max <n>` | Maximum replicas (must equal min on fixed providers) |
+| `--idempotency-key <key>` | Stable retry key |
+| `--json` | Emit stable deployment metadata |
+
+### `acc run [target]`
+
+Run an agent or team here (models through the platform); add --remote for the deployed swarm
+
+| Option | Description |
+|--------|-------------|
+| `--input <text>` | Input text |
+| `--input-file <path>` | Read input from a regular file |
+| `--stdin` | Read input from standard input |
+| `--json` | Emit the stable result envelope |
+| `--ag-ui` | Emit canonical AG-UI JSON events |
+| `--timeout <ms>` | Integer timeout in milliseconds (default: `120000`) |
+| `--remote` | Run through the authenticated cloud control plane |
+| `--service <id>` | Swarm Runtime service ID (required with --remote) |
+| `--project <id>` | Project ID (defaults to the active project) |
+| `--idempotency-key <key>` | Stable retry key for remote submission |
+
+### `acc tasks`
+
+List, follow, and control runs
+
+### `acc tasks list`
+
+List the runs in a project
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID (defaults to the active project) |
+| `--limit <n>` | Number of runs, 1..100 (default: `50`) |
+| `--json` | Emit the stable list envelope |
+
+### `acc tasks status <run-id>`
+
+Show one run
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable run envelope |
+
+### `acc tasks events <run-id>`
+
+Show what happened during a run, in order
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable event-list envelope |
+
+### `acc tasks cancel <run-id>`
+
+Ask a run to stop
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable result envelope |
+
+### `acc tasks approve <run-id>`
+
+Approve the tool call a run is waiting on
+
+| Option | Description |
+|--------|-------------|
+| `--idempotency-key <key>` | Stable retry key for this decision |
+| `--json` | Emit the stable approval-result envelope |
+
+### `acc tasks reject <run-id>`
+
+Reject the tool call a run is waiting on
+
+| Option | Description |
+|--------|-------------|
+| `--idempotency-key <key>` | Stable retry key for this decision |
+| `--json` | Emit the stable approval-result envelope |
+
+### `acc tasks edit <run-id>`
+
+Approve the pending tool call, with different arguments
+
+| Option | Description |
+|--------|-------------|
+| `--input <json>` | Replacement JSON object, at most 64 KiB |
+| `--idempotency-key <key>` | Stable retry key for this decision |
+| `--json` | Emit the stable approval-result envelope |
+
+### `acc tasks respond <run-id>`
+
+Answer the run in words instead of running the tool
+
+| Option | Description |
+|--------|-------------|
+| `--response <text>` | Human response, at most 8 KiB |
+| `--idempotency-key <key>` | Stable retry key for this decision |
+| `--json` | Emit the stable approval-result envelope |
+
+### `acc secrets`
+
+Store a model key for this project
+
+### `acc secrets set <name>`
+
+Store one secret for this project, read from a pipe
+
+| Option | Description |
+|--------|-------------|
+| `--stdin` | Read the secret value from a pipe |
+| `--project <id>` | Project ID |
+| `--json` | Emit metadata only; never echo secret material |
+
+### `acc models`
+
+See which models your organization can use, and test one
+
+### `acc models list`
+
+List the models your organization can use, with list price and how each is billed
+
+| Option | Description |
+|--------|-------------|
+| `--org <idOrSlug>` | Organization (default: your first) |
+| `--all` | Include models switched off for this organization |
+| `--json` | Machine-readable JSON output |
+
+### `acc models test [model]`
+
+Check a model works with the deployed swarm; it must make a real tool call
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--force` | Bypass the durable capability cache and re-probe |
+| `--json` | Emit the stable model-diagnostic envelope |
+
+## Swarms, advanced
+
+### `acc agent`
+
+Import, export, freeze, and restore a single agent
+
+### `acc agent list`
+
+List the agents in this project
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable agent-list envelope |
+
+### `acc agent show <agent>`
+
+Show one agent: its job, model, and skills
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable agent envelope |
+
+### `acc agent import <source>`
+
+Import an agent from another framework (eliza:, crewai:, letta:)
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Override the imported agent ID |
+
+### `acc agent export <agent>`
+
+Write an agent out to a file, locally or from the cloud
+
+| Option | Description |
+|--------|-------------|
+| `--format <format>` | af\|json (default: `af`) |
+| `--output <path>` | Write a local compiled definition here |
+| `--remote` | Export a durable state snapshot from the control plane |
+| `--project <id>` | Project ID |
+| `--swarm <name>` | $\{SWARM_OPTION_TEXT} (with --remote) |
+| `--json` | Emit a stable JSON envelope |
+
+### `acc agent freeze <agent>`
+
+Pause a deployed agent and save its state
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit a stable lifecycle envelope |
+
+### `acc agent hydrate <agent>`
+
+Bring a frozen agent back from its saved state
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit a stable lifecycle envelope |
+
+### `acc state`
+
+Read and verify an agent's saved state
+
+### `acc state read <agent> <version>`
+
+Read one saved version of an agent's state and verify it
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable state-at-version envelope |
+
+### `acc state history <agent>`
+
+List the saved versions of an agent's state
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--after <sequence>` | Exclusive checkpoint cursor |
+| `--limit <n>` | Checkpoint count, 1..100 (default: `50`) |
+| `--json` | Emit the stable history envelope |
+
+### `acc state verify <agent>`
+
+Check an agent's saved state has not been tampered with
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable verification envelope |
+
+### `acc fork <agent>`
+
+Start a new agent from an exact saved version of another
+
+| Option | Description |
+|--------|-------------|
+| `--at <version>` | Exact immutable state version |
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable fork envelope |
+
+### `acc watch <swarm>`
+
+Watch a running swarm: who is working, what is queued, what it costs
+
+| Option | Description |
+|--------|-------------|
+| `--project <id>` | Project ID |
+| `--interval <ms>` | Refresh interval, 250..60000 (default: `1000`) |
+| `--once` | Read one production snapshot and exit |
+| `--json` | Emit NDJSON snapshots |
+
+### `acc trace <run-id>`
+
+Show the step-by-step trace of one run
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable trace envelope |
+
+### `acc replay <run-id>`
+
+Run one past run again, optionally from a saved point in its state
+
+| Option | Description |
+|--------|-------------|
+| `--idempotency-key <key>` | Stable retry key for replay submission |
+| `--from <checkpoint-sequence>` | Fork isolated state from this checkpoint |
+| `--json` | Emit the stable replay-result envelope |
+
+### `acc mcp`
+
+Connect agents to outside tool servers that speak MCP
+
+### `acc mcp add <server>`
+
+Add a tool server; --remote registers it with the deployed swarm
+
+| Option | Description |
+|--------|-------------|
+| `--url <https-url>` | MCP Streamable HTTP endpoint |
+| `--token-file <absolute-path>` | Runtime-mounted 0400 bearer-token file |
+| `--capability <list>` | Non-empty comma-separated declared capabilities |
+| `--remote` | Register with the authenticated deployed runtime |
+| `--project <id>` | Project ID |
+| `--swarm <name>` | $\{SWARM_OPTION_TEXT} (with --remote) |
+| `--json` | Emit the stable registration envelope |
+
+### `acc skills`
+
+Attach and check the skills an agent can use
+
+### `acc skills add <skill>`
+
+Give a skill to an agent
+
+| Option | Description |
+|--------|-------------|
+| `--agent <agent>` | Agent receiving this skill |
+
+### `acc skills list`
+
+List the skills in this project
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable skill-list envelope |
+
+### `acc skills show <skill>`
+
+Show one skill
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable skill envelope |
+
+### `acc skills test <skill>`
+
+Check a skill is valid before an agent uses it
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable validation envelope |
+
+### `acc tools`
+
+List and try the tools agents can call
+
+### `acc tools list`
+
+List the tools agents can call
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable tool-list envelope |
+
+### `acc tools show <tool>`
+
+Show one tool and the arguments it takes
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the full descriptor and JSON Schema |
+
+### `acc tools test <tool>`
+
+Call one tool yourself with the arguments you pass
+
+| Option | Description |
+|--------|-------------|
+| `--args <json>` | Strict JSON object passed to the tool |
+| `--yes` | Confirm execution of a side-effecting tool |
+| `--json` | Emit the stable tool-test envelope |
+
+### `acc eval`
+
+Run test suites against your agents and compare the reports
+
+### `acc eval run <suite>`
+
+Run the suite named in evals/suites/\<suite>.toml
+
+| Option | Description |
+|--------|-------------|
+| `--config <path>` | Suite TOML (defaults to evals/suites/\<suite>.toml) |
+| `--output <path>` | Write the immutable JSON report here |
+
+### `acc eval report <report>`
+
+Read one eval report, or compare it against an earlier one
+
+| Option | Description |
+|--------|-------------|
+| `--baseline <report>` | Compare accuracy and tokens/query |
+
+### `acc dev`
+
+Run a swarm on this machine with the inspector; models through the platform by default
+
+| Option | Description |
+|--------|-------------|
+| `--port <port>` | Loopback control port (default: `4111`) |
+| `--no-inspector` | Disable the local inspector UI |
+
+### `acc serve`
+
+Serve a swarm from this machine over HTTP; models through the platform by default
+
+| Option | Description |
+|--------|-------------|
+| `--port <port>` | Loopback control port (default: `4111`) |
+| `--no-inspector` | Disable the local inspector UI |
+| `--mcp` | Expose the MCP 2026-07-28 endpoint at /mcp |
+
+### `acc tee`
+
+Check the hardware attestation of a running agent
+
+### `acc tee attest <agent>`
+
+| Option | Description |
+|--------|-------------|
+| `--nonce <nonce>` | Verifier challenge, 32..128 base64url characters |
+| `--project <id>` | Project ID |
+| `--json` | Emit the stable attestation envelope |
+
+## Identity
+
+### `acc identities`
+
+Create, control, and resolve W3C decentralized identities
+
+### `acc identities create <name>`
+
+| Option | Description |
+|--------|-------------|
+| `--subject-type <human\|agent>` | Authoritative identity type |
+| `--did-method <key\|web>` | W3C DID method adapter |
+| `--domain <domain>` | Required for did:web |
+| `--path <path>` | Optional did:web path components |
+| `--output <path>` | Write the DID document as a new 0600 file |
+| `--json` | Emit stable JSON |
+
+### `acc identities challenge <did>`
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Local name for the imported identity |
+| `--subject-type <human\|agent>` | Authoritative identity type |
+| `--output <path>` | Write the challenge as a new 0600 file |
+| `--remote` | Create the challenge in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities prove-control <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--challenge <path>` | Fresh control challenge |
+| `--output <path>` | Write the proof as a new 0600 file |
+| `--remote` | Sign a cloud-issued challenge locally |
+| `--json` | Emit stable JSON |
+
+### `acc identities import <name>`
+
+| Option | Description |
+|--------|-------------|
+| `--subject-type <human\|agent>` | Must match the challenge |
+| `--did <did>` | DID being imported |
+| `--challenge <path>` | Fresh CLI-generated challenge |
+| `--proof <path>` | Authentication-method control proof |
+| `--remote` | Complete import in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities list`
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | List cloud Agent IAM identities |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities show <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Read a cloud Agent IAM identity by DID |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities resolve <did>`
+
+Resolve a did:key or SSRF-safe did:web document
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit the stable DID resolution envelope |
+
+### `acc identities rotate <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--purpose <purpose>` | authentication\|assertion\|capability-invocation\|capability-delegation |
+| `--output <path>` | Write the replacement DID document |
+| `--document <path>` | Published replacement DID document for --remote |
+| `--remote` | Rotate in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities deactivate <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Deactivate in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc identities publish <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--document <path>` | Canonical did:web DID document |
+| `--yes` | Confirm publication to the configured web root |
+| `--expected-current-sha256 <digest>` | Required compare-and-swap digest when replacing a published DID |
+| `--json` | Emit stable JSON |
+
+### `acc cards`
+
+Issue and verify human or agent W3C identity credentials
+
+### `acc cards list`
+
+List registered cloud Agent IAM cards
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--subject <did>` | Filter by exact subject DID |
+| `--status <status>` | active\|revoked |
+| `--json` | Emit the stable cloud card list envelope |
+
+### `acc cards get-policy`
+
+Read the active cloud Agent IAM verification policy
+
+| Option | Description |
+|--------|-------------|
+| `--subject-type <human\|agent>` | Policy subject type |
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit the stable cloud policy envelope |
+
+### `acc cards draft <did-or-name>`
+
+| Option | Description |
+|--------|-------------|
+| `--proof-initiation-uri <url>` | Generic one-time proof initiation endpoint |
+| `--output <path>` | Write the unsigned draft |
+| `--json` | Emit stable JSON |
+
+### `acc cards set-policy <path>`
+
+Install an Agent IAM verification policy in the cloud
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit the stable cloud policy envelope |
+
+### `acc cards register <path>`
+
+Validate and register an externally issued card in cloud Agent IAM
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit the stable cloud credential envelope |
+
+### `acc cards issue <draft>`
+
+| Option | Description |
+|--------|-------------|
+| `--issuer <did-or-name>` | Locally controlled issuer DID |
+| `--status-url <url>` | Shared Bitstring Status List URL |
+| `--expires-in <seconds>` | Credential lifetime in integer seconds |
+| `--output <path>` | Write an additional credential copy |
+| `--remote` | Issue through cloud Agent IAM custody |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc cards show <path-or-url>`
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit stable JSON |
+
+### `acc cards verify <path-or-url>`
+
+| Option | Description |
+|--------|-------------|
+| `--policy <path>` | Strict local verification policy |
+| `--offline` | Use only a policy-bound fresh status snapshot |
+| `--json` | Emit stable JSON |
+
+### `acc cards status <path-or-url>`
+
+| Option | Description |
+|--------|-------------|
+| `--policy <path>` | Strict verification and status policy |
+| `--offline` | Use the policy-bound status snapshot |
+| `--json` | Emit stable JSON |
+
+### `acc cards revoke <credential-id>`
+
+| Option | Description |
+|--------|-------------|
+| `--reason <reason>` | superseded\|key-compromise\|affiliation-ended\|policy-revoked |
+| `--remote` | Revoke in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc cards publish <path>`
+
+| Option | Description |
+|--------|-------------|
+| `--domain <domain>` | Publication domain |
+| `--yes` | Confirm public publication |
+| `--consent <path>` | Required human-card correlation/retention consent |
+| `--remote` | Publish a cloud-issued credential through Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc cards publish-status <issuer>`
+
+| Option | Description |
+|--------|-------------|
+| `--url <url>` | Exact statusListCredential URL |
+| `--yes` | Confirm status-list publication |
+| `--expected-current-sha256 <digest>` | Required compare-and-swap digest when replacing a status list |
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a`
+
+Create and verify pinned A2A v1.0 Agent Cards
+
+### `acc cards a2a create <agent-id>`
+
+| Option | Description |
+|--------|-------------|
+| `--identity-card <path-or-url>` | Current AF agent identity credential |
+| `--identity-card-url <url>` | Same-origin published identity credential URL |
+| `--freshness-url <url>` | Same-origin freshness verifier |
+| `--interface-url <url>` | A2A HTTP+JSON v1.0 endpoint |
+| `--name <name>` | Public agent name |
+| `--description <description>` | Public agent description |
+| `--output <path>` | Write the unsigned Agent Card |
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a sign <path>`
+
+| Option | Description |
+|--------|-------------|
+| `--identity <did-or-name>` | Locally controlled agent identity |
+| `--verification-method <did-url>` | Exact assertion method |
+| `--output <path>` | Write the signed Agent Card |
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a show <path-or-url>`
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a verify <path-or-url>`
+
+| Option | Description |
+|--------|-------------|
+| `--policy <path>` | Strict local verification policy |
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a publish <path>`
+
+| Option | Description |
+|--------|-------------|
+| `--domain <domain>` | A2A discovery domain |
+| `--yes` | Confirm public publication |
+| `--expected-current-sha256 <digest>` | Required compare-and-swap digest when replacing the Agent Card |
+| `--json` | Emit stable JSON |
+
+### `acc cards a2a binding <agent-key>`
+
+Read the active cloud Agent IAM A2A binding
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit the stable cloud binding envelope |
+
+### `acc cards a2a register <path>`
+
+Verify and bind a signed Agent Card in cloud Agent IAM
+
+| Option | Description |
+|--------|-------------|
+| `--agent-key <key>` | Durable runtime agent key |
+| `--remote` | Acknowledge the cloud authority boundary |
+| `--project <id>` | Cloud project ID/name |
+| `--service <id>` | Bound cloud service ID |
+| `--deployment <id>` | Bound provider deployment ID |
+| `--json` | Emit the stable cloud binding envelope |
+
+### `acc delegations`
+
+Issue and enforce least-privilege agent delegations
+
+### `acc delegations issue <agent>`
+
+| Option | Description |
+|--------|-------------|
+| `--controller <did-or-name>` | Human or root controller |
+| `--issuer <did-or-name>` | Locally controlled issuer |
+| `--tenant <tenant>` | Exact tenant scope |
+| `--project <project>` | Exact project scope |
+| `--resource <resource>` | Exact agent or resource scope |
+| `--actions <action,...>` | Closed allowed action set |
+| `--audience <url>` | Exact HTTPS relying-party origin |
+| `--expires-in <seconds>` | Credential lifetime |
+| `--status-url <url>` | Issuer Bitstring Status List URL |
+| `--max-chain-depth <count>` | Maximum child delegation depth (default: `0`) |
+| `--allow-redelegation` | Permit a strictly narrower child delegation |
+| `--parent <path>` | Immediate parent credential |
+| `--parent-chain <path,...>` | Ancestors after the immediate parent |
+| `--parent-policy <path>` | Policy authenticating the parent root |
+| `--offline` | Use policy-bound fresh status snapshots |
+| `--output <path>` | Write an additional credential copy |
+| `--remote` | Issue through cloud Agent IAM custody |
+| `--cloud-project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc delegations verify <credential>`
+
+| Option | Description |
+|--------|-------------|
+| `--policy <path>` | Root issuer and status policy |
+| `--tenant <tenant>` | Exact tenant scope |
+| `--project <project>` | Exact project scope |
+| `--resource <resource>` | Exact resource scope |
+| `--action <action>` | Requested action |
+| `--audience <url>` | Exact HTTPS relying-party origin |
+| `--parents <path,...>` | Parent chain, immediate parent first |
+| `--offline` | Use policy-bound fresh status snapshots |
+| `--json` | Emit stable JSON |
+
+### `acc delegations invoke <credential>`
+
+| Option | Description |
+|--------|-------------|
+| `--identity <did-or-name>` | Delegated agent identity |
+| `--tenant <tenant>` | Exact tenant scope |
+| `--project <project>` | Exact project scope |
+| `--resource <resource>` | Exact resource scope |
+| `--action <action>` | Requested action |
+| `--audience <url>` | Exact HTTPS relying-party origin |
+| `--output <path>` | Write the signed invocation |
+| `--json` | Emit stable JSON |
+
+### `acc delegations authorize <invocation>`
+
+| Option | Description |
+|--------|-------------|
+| `--credential <path>` | Delegation credential |
+| `--policy <path>` | Root issuer and status policy |
+| `--parents <path,...>` | Parent chain, immediate parent first |
+| `--offline` | Use policy-bound fresh status snapshots |
+| `--remote` | Authorize through cloud Agent IAM |
+| `--cloud-project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc delegations revoke <credential-id>`
+
+| Option | Description |
+|--------|-------------|
+| `--reason <reason>` | superseded\|key-compromise\|affiliation-ended\|policy-revoked |
+| `--json` | Emit stable JSON |
+
+### `acc proofs`
+
+Create and verify request-bound OpenID4VP presentations
+
+### `acc proofs providers`
+
+| Option | Description |
+|--------|-------------|
+| `--remote` | Read provider configuration from cloud Agent IAM |
+| `--json` | Emit stable JSON |
+
+### `acc proofs request`
+
+| Option | Description |
+|--------|-------------|
+| `--purpose <purpose>` | unique-human\|subject-type |
+| `--audience <url>` | Verifier client_id (required for OpenID4VP) |
+| `--response-uri <url>` | Same-origin direct_post endpoint (required for OpenID4VP) |
+| `--policy <path>` | Frozen verification policy |
+| `--subject <did-or-name>` | Privately bind a subject |
+| `--provider <provider>` | Proof provider (default: `af-identity-card`) |
+| `--output <path>` | Write the public request |
+| `--remote` | Create the transaction in cloud Agent IAM |
+| `--project <id>` | Cloud project ID/name |
+| `--json` | Emit stable JSON |
+
+### `acc proofs present <request-uri-or-path>`
+
+| Option | Description |
+|--------|-------------|
+| `--identity <did-or-name>` | Holder identity (required for OpenID4VP) |
+| `--card <path>` | Credential override; otherwise use local wallet |
+| `--provider <provider>` | Proof provider (default: `af-identity-card`) |
+| `--output <path>` | Write the presentation response |
+| `--submit` | Deliver the presentation using OpenID4VP direct_post form encoding |
+| `--json` | Emit stable JSON |
+
+### `acc proofs verify <presentation>`
+
+| Option | Description |
+|--------|-------------|
+| `--request <path>` | Original public request |
+| `--policy <path>` | Exact policy used to create the request |
+| `--offline` | Use a policy-authorized fresh status snapshot |
+| `--json` | Emit stable JSON |
+
 ## Billing
 
 ### `acc billing`

@@ -258,6 +258,284 @@ Input for exchanging a Personal Access Token for an access token
 | `resourceOverrides` | `ResourceOverrideInput` · [ResourceOverrideInput](/api/inputs#resourceoverrideinput) |  |
 | `policy` | `DeploymentPolicyInput` · [DeploymentPolicyInput](/api/inputs#deploymentpolicyinput) |  |
 
+### DecideSwarmRuntimeApprovalInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `approvalId` | `ID!` |  |
+| `idempotencyKey` | `String!` |  |
+| `action` | `SwarmRuntimeApprovalAction!` · [SwarmRuntimeApprovalAction](/api/enums#swarmruntimeapprovalaction) |  |
+| `input` | `JSON` |  |
+| `response` | `String` |  |
+
+### SubmitSwarmRuntimeRunInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `serviceId` | `ID!` |  |
+| `agent` | `String!` |  |
+| `kind` | `String!` |  |
+| `input` | `JSON!` |  |
+| `idempotencyKey` | `String!` |  |
+| `timeoutMs` | `Int!` |  |
+| `executionPlan` | `JSON` |  |
+
+### ConnectSwarmDiscordInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `channelId` | `String!` | Numeric channel id (Developer Mode: Copy Channel ID). |
+| `agent` | `String` | Agent id from the newest registered definition; omit for the whole swarm. |
+| `token` | `String` | Bot token; required when none is stored for the swarm, otherwise replaces it. Never echoed. |
+
+### BindSwarmDeploymentInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `serviceId` | `ID!` |  |
+| `provider` | `String!` |  |
+| `deploymentId` | `ID!` |  |
+| `definitionVersionId` | `ID!` |  |
+| `runtimeImageDigest` | `String!` |  |
+| `idempotencyKey` | `String!` |  |
+
+### DeploySwarmRuntimeInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `serviceId` | `ID!` |  |
+| `definitionVersionId` | `ID!` |  |
+| `bundleSha256` | `String!` |  |
+| `runtimeImageDigest` | `String!` |  |
+| `idempotencyKey` | `String!` |  |
+
+### RegisterSwarmDefinitionInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `bundle` | `JSON!` |  |
+| `idempotencyKey` | `String!` |  |
+| `parentVersionId` | `ID` | Optimistic-concurrency guard (acc swarms push/deploy, 2026-09-18): the version the client last pulled. Refused with SWARM_DEFINITION_STALE when it is no longer the swarm's newest version. |
+
+### SwarmAgentSpecInput
+
+One agent of a swarm spec (E-MVP M2). name: the agent id and @mention
+(lowercase letters, digits, - or _, 1 to 64). job: one sentence, 3 to 400
+characters; it becomes the persona ("You are \<name>. \<job>." plus the house
+rule), exactly as acc add agent writes it. model: an id from swarmModels.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String!` |  |
+| `job` | `String!` |  |
+| `model` | `String!` |  |
+
+### SwarmEdgeSpecInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `from` | `String!` |  |
+| `to` | `String!` |  |
+
+### SwarmSpecInput
+
+What the wizard authors. shape: sequential | parallel | loop | supervisor |
+handoff | graph. agents are the members in order. parallel needs reducer
+(one of the agents; the others are the members), supervisor needs
+supervisor (likewise), loop takes exactly one agent and maxIterations
+(1 to 100, default 5), handoff exactly two agents, graph needs edges over
+every agent (acyclic). Anything else is refused with SWARM_SPEC_INVALID.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `shape` | `String!` |  |
+| `agents` | `[SwarmAgentSpecInput!]!` · [SwarmAgentSpecInput](/api/inputs#swarmagentspecinput) |  |
+| `reducer` | `String` |  |
+| `supervisor` | `String` |  |
+| `maxIterations` | `Int` |  |
+| `edges` | `[SwarmEdgeSpecInput!]` · [SwarmEdgeSpecInput](/api/inputs#swarmedgespecinput) |  |
+
+### RegisterSwarmDefinitionFromSpecInput
+
+Server-side compile (E-MVP M2): the platform renders the same project files
+acc would write, compiles them with the signed swarm-local in a cluster Job
+and registers the bundle like registerSwarmDefinition. Waits waitSeconds
+(0 to 60, default 30) for the result; still running afterwards =>
+SWARM_COMPILE_PENDING (extensions.compileId): call again with the SAME
+idempotencyKey to attach, a finished compile replays its version. Failures:
+SWARM_SPEC_INVALID, SWARM_MODEL_UNSUPPORTED, SWARM_COMPILE_UNAVAILABLE
+(not configured or the Job could not start), SWARM_COMPILE_FAILED
+(compiler refused the sources), SWARM_DEFINITION_STALE, CONFLICT.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+| `spec` | `SwarmSpecInput!` · [SwarmSpecInput](/api/inputs#swarmspecinput) |  |
+| `idempotencyKey` | `String!` |  |
+| `parentVersionId` | `ID` |  |
+| `waitSeconds` | `Int` |  |
+
+### IssueSwarmDefinitionBootstrapInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `serviceId` | `ID!` |  |
+| `provider` | `String!` |  |
+| `deploymentId` | `ID!` |  |
+| `definitionVersionId` | `ID!` |  |
+| `bundleSha256` | `String!` |  |
+| `runtimeImageDigest` | `String!` |  |
+| `expiresInSeconds` | `Int!` |  |
+| `maxUses` | `Int!` |  |
+| `revokeExisting` | `Boolean!` |  |
+| `idempotencyKey` | `String!` |  |
+
+### RuntimeMcpServerInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String!` |  |
+| `url` | `String!` |  |
+| `bearerTokenFile` | `String!` |  |
+| `capabilities` | `[String!]!` |  |
+
+### BeginIdentityImportInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `did` | `String!` |  |
+| `subjectType` | `IdentitySubjectType!` · [IdentitySubjectType](/api/enums#identitysubjecttype) |  |
+
+### CompleteIdentityImportInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `challengeId` | `ID!` |  |
+| `challenge` | `JSON!` |  |
+| `didDocument` | `JSON!` |  |
+| `verificationMethod` | `String!` |  |
+| `signature` | `String!` |  |
+
+### RotateIdentityInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `did` | `String!` |  |
+| `didDocument` | `JSON!` |  |
+| `expectedRevision` | `Int!` |  |
+| `verificationMethod` | `String!` |  |
+| `signature` | `String!` |  |
+
+### DeactivateIdentityInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `did` | `String!` |  |
+| `verificationMethod` | `String!` |  |
+| `signature` | `String!` |  |
+
+### IssueIdentityCardInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `subjectDid` | `String!` |  |
+| `issuerDid` | `String!` |  |
+| `statusUrl` | `String!` |  |
+| `expiresInSeconds` | `Int!` |  |
+| `proofInitiationUri` | `String` |  |
+
+### RevokeIdentityCredentialInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `credentialId` | `ID!` |  |
+| `reason` | `String!` |  |
+
+### IdentityPublicationConsentInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `fields` | `[String!]!` |  |
+| `correlationReviewed` | `Boolean!` |  |
+| `consentedAt` | `Date!` |  |
+| `retentionUntil` | `Date!` |  |
+
+### PublishIdentityCardInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `credentialId` | `ID!` |  |
+| `domain` | `String!` |  |
+| `consent` | `IdentityPublicationConsentInput` · [IdentityPublicationConsentInput](/api/inputs#identitypublicationconsentinput) |  |
+
+### CreateIdentityProofRequestInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `provider` | `String!` |  |
+| `purpose` | `String!` |  |
+| `policySha256` | `String!` |  |
+| `audience` | `String!` |  |
+| `responseUri` | `String!` |  |
+| `subjectDid` | `String` |  |
+
+### RegisterA2aAgentCardInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `agentKey` | `String!` |  |
+| `card` | `JSON!` |  |
+| `serviceId` | `ID` |  |
+| `deploymentId` | `ID` |  |
+
+### IssueA2aAccessTokenInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `agentKey` | `String!` |  |
+| `credentialId` | `ID!` |  |
+| `invocation` | `JSON!` |  |
+| `expiresInSeconds` | `Int!` |  |
+
+### IssueIdentityDelegationInput
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | `ID!` |  |
+| `issuerDid` | `String!` |  |
+| `controllerDid` | `String!` |  |
+| `agentDid` | `String!` |  |
+| `tenant` | `String!` |  |
+| `resource` | `String!` |  |
+| `actions` | `[String!]!` |  |
+| `audience` | `String!` |  |
+| `expiresInSeconds` | `Int!` |  |
+| `statusUrl` | `String!` |  |
+| `maxChainDepth` | `Int!` |  |
+| `redelegation` | `Boolean!` |  |
+| `parentSha256` | `String` |  |
+
 ## Mutations
 
 ### CreateProjectDataInput
