@@ -42,7 +42,8 @@ result from the CLI later.
    finishes what the first started. If unsure, pick **One after another**.
 2. **Agents**: add each agent with a one-word name (that is how you will
    `@mention` it), one sentence under **What it does**, and a model from the
-   list.
+   list. **Edit the full persona** under the sentence opens the whole text the
+   agent follows, if one sentence is not enough.
 3. Click **Save** in the footer. The platform compiles the team and lists it
    under **Version history** on the **Deployments** tab.
 
@@ -110,7 +111,8 @@ acc add agent
 - **What is this agent called?** One word, for example `researcher`. This is
   how you will `@mention` it in the room.
 - **What is its job?** One sentence. It becomes the first line of
-  `personas/researcher.md`; edit that file any time.
+  `personas/researcher.md`; edit that file any time, or the persona text under
+  the agent on **Source › Agents** in the web app.
 - **Which AI model should it think with?** A list; arrow keys and Enter. Every
   model on the list works on the hosted runtime.
 - **Paste the provider key now?** Say no. No key is needed.
@@ -250,10 +252,12 @@ connection, token included.
 
 ## Change it, watch it, stop it
 
-**Edit the team.** In the web app, change the agents on **Source** and click
-**Save** in the footer: that registers a new version. The banner then says the
-changes are not deployed; click **Redeploy** and confirm **Stop and
-redeploy**. From the CLI, edit the files, then stop and deploy:
+**Edit the team.** In the web app, change the agents on **Source** (name,
+model, what it does or the full persona) and click **Save** in the footer:
+that registers a new version. The banner then says the changes are not
+deployed; click **Redeploy** and confirm **Stop and redeploy**. The model a
+team runs is the one set on its agents; a deploy applies it. From the CLI,
+edit the files, then stop and deploy:
 
 ```bash
 acc swarms stop review && acc swarms deploy review --yes
