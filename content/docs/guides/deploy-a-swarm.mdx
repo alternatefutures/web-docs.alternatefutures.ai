@@ -286,9 +286,9 @@ In the web app, use the footer of the service panel.
 
 **Bring your own model key** (optional). Under **Org**, **Models** in the web
 app, or with `acc orgs providers set openai --stdin`, every request of the
-organization uses your key at cost. For one project only, pipe the bare key
-into `acc secrets set OPENAI_API_KEY --stdin`. A key change reaches the next
-rebuilt deployment: stop, then deploy.
+organization uses your key at cost, still through the platform, so usage and
+limits keep working. That is the only place for a key: a deployed swarm never
+calls a provider directly, and `acc secrets set OPENAI_API_KEY` is refused.
 
 ## What you learned
 
