@@ -952,7 +952,7 @@ measurement was ACTIVE in the org's allowlist at registration time.
 | Field | Type | Description |
 |-------|------|-------------|
 | `model` | `String!` |  |
-| `keyName` | `String` | Always null since 2026-09-26: a project never runs on its own key; the model is reached through the platform proxy. |
+| `keyName` | `String` |  |
 | `updatedAt` | `Date!` |  |
 
 ### SwarmModel
@@ -1090,31 +1090,6 @@ ready and failed are terminal (finishedAt set); errorCode/errorMessage only on f
 | `rootSha256` | `String!` |  |
 | `planSha256` | `String!` |  |
 | `createdAt` | `Date!` |  |
-| `policy` | `SwarmPolicyRekey` · [SwarmPolicyRekey](/api/objects#swarmpolicyrekey) | How the project's tool-grant bundle relates to this version, set on a registration response only (null elsewhere). See SwarmPolicyRekey. |
-
-### SwarmPolicyRekey
-
-Outcome of keeping the project's tool-grant bundle (SWARM_RUNTIME_POLICY_BUNDLE)
-in step with a registered definition (2026-09-26). Grants are pinned to persona
-digests. When a project owner or admin registers a version, every edited agent's
-grants are copied under its new digest and a brand-new agent gets an entry with
-no grants; the move is audited as swarm_runtime.policy_rekeyed. Other members get
-the same report without a write.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `status` | `String!` | none: the project has no bundle · empty: deny-all bundle, nothing pinned · current: every agent already keyed · rekeyed: entries written · stale: entries missing and the actor is not a project admin (a deploy will be refused) · unavailable: the secret backend or the definition could not be read |
-| `rekeyed` | `[SwarmPolicyRekeyEntry!]!` · [SwarmPolicyRekeyEntry](/api/objects#swarmpolicyrekeyentry) |  |
-| `added` | `[String!]!` | Agents that received an entry with no grants (no earlier persona of theirs was keyed). |
-| `stale` | `[String!]!` | Agents still without an entry: a deploy is refused until a project admin re-keys. |
-
-### SwarmPolicyRekeyEntry
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `agent` | `String!` |  |
-| `from` | `String!` |  |
-| `to` | `String!` |  |
 
 ### SwarmDefinitionSpecAgent
 

@@ -594,10 +594,11 @@ Set the model the deployed swarm uses
 
 ### `acc swarms model set <provider/model>`
 
-Set the project model until the next deploy (openai/… or anthropic/…, always through the platform); every deploy applies the model the agents declare
+Set the project model (openai/…, anthropic/…, or compat/… with --base-url); applied by the next rebuilt deployment (stop a running one first)
 
 | Option | Description |
 |--------|-------------|
+| `--base-url <https-url>` | OpenAI-compatible base URL for compat/… |
 | `--project <id>` | Project ID |
 | `--json` | Emit the stable model envelope |
 
@@ -709,7 +710,7 @@ Answer the run in words instead of running the tool
 
 ### `acc secrets`
 
-Store a runtime secret for this project (bot tokens, policy files); provider keys are set under Org › Models
+Store a model key for this project
 
 ### `acc secrets set <name>`
 
