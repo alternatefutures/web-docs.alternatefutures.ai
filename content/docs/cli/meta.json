@@ -1,6 +1,10 @@
 {
-  "title": "CLI (acc)",
+  "title": "CLI",
   "description": "The acc command line interface: install, sign in, and the full command reference.",
-  "defaultOpen": true,
-  "pages": ["index", "installation", "commands"]
+  "defaultOpen": false,
+  "pages": [
+    "index",
+    "installation",
+    "commands"
+  ]
 }

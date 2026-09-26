@@ -10,22 +10,38 @@ Every page is one of four kinds. Say which in the first sentence and do not mix.
 
 | Kind | Answers | Sidebar group | Example |
 |---|---|---|---|
-| Tutorial | "Show me" | Start here | Quick start |
-| How-to guide | "How do I ..." | Guides | Custom domains |
+| Tutorial | "Show me" | Get started / Deploy | First deployment with the CLI |
+| How-to guide | "How do I ..." | Deploy / Manage / Help | Manage projects |
 | Reference | "What exactly is ..." | Reference | Command reference |
-| Explanation | "Why / what is ..." | Start here | What is Alternate Clouds? |
+| Explanation | "Why / what is ..." | Get started / Deploy / Manage | What is Alternate Clouds? |
 
 Sidebar rules (`content/docs/meta.json`):
 
-- Two top-level blocks, each with an icon header: the company (Alternate
-  Futures: overview, brand, changelog) and the product (Alternate Clouds).
-- Inside the product: Start here, Guides, Reference, Archive.
-  Add a group only when it will hold three or more pages.
-- Never nest deeper than one folder. Folders are for a tool with several pages
-  (CLI, SDK) or an archive, not for topics.
-- Retired content is not kept as pages. Archive holds one explanation page
-  (What changed from af); retired URLs get a permanent redirect to it in
-  `vercel.json` so old links and agents' bookmarks still land on an answer.
+- Keep separate icon headers for Alternate Futures (the company) and Alternate
+  Clouds (the product). Company pages are Overview, Brand guide and Changelog.
+- Inside Alternate Clouds, organize around the user journey: Get started, Deploy,
+  Manage, Reference, Help.
+- Get started stays short: What is Alternate Clouds?, Sign in, First deployment with the CLI,
+  Dashboard tour. Authentication comes before deployment tutorials.
+- Use short, specific labels. Keep CLI, SDK and API folders collapsed unless active.
+- Keep Legacy docs in sidebar utility navigation.
+- Keep existing page URLs stable, including pages reached through contextual links.
+- Link billing concepts from Billing and credits. The company Overview links to
+  the product introduction under Alternate Clouds.
+- Generated reference pages retain their generator ownership and existing routes.
+
+## Screenshots and videos in procedures
+
+- Use a descriptive numbered heading for each tutorial step so it has a stable
+  anchor and appears in the table of contents.
+- Put instructions first, then the screenshot or video that demonstrates that
+  step, then the expected result. Keep text instructions complete on their own.
+- Use responsive images with useful alt text and a short caption when needed.
+- Use native video controls, no autoplay, and `preload="none"`. Provide captions
+  for speech and a text transcript. Set explicit width and height on media to
+  prevent layout shifts; use a poster for video when available.
+- Keep media in the reading column. Do not add empty media placeholders or a
+  second media sidebar. Code examples must remain selectable text.
 
 ## Titles and headings
 
@@ -45,7 +61,7 @@ Sidebar rules (`content/docs/meta.json`):
 - Say "select" for menus and checkboxes, "click" for buttons and links. Bold
   UI labels: select **Deploy**.
 - Plain words first, jargon second and defined: "a trusted execution
-  environment (TEE)". Assume a curious non-developer can follow the Start here
+  environment (TEE)". Assume a curious non-developer can follow the Get started
   pages; assume a developer for Reference.
 - No em-dashes in copy. Use a period, a comma, or a colon.
 - Link text is the destination's title or a short noun phrase. Never "here".

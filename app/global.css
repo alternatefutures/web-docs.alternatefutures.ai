@@ -63,3 +63,23 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+/* Step media stays inside the reading column on desktop and mobile. */
+.prose :where(img, video) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+}
+
+.prose video {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-fd-border);
+}
+
+.prose figcaption {
+  margin-top: 0.75rem;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.875rem;
+  text-align: center;
+}

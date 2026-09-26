@@ -1,6 +1,11 @@
 {
-  "title": "SDK (TypeScript)",
+  "title": "TypeScript SDK",
   "description": "The @alternatefutures/sdk package for programmatic access.",
-  "defaultOpen": true,
-  "pages": ["index", "installation", "quickstart", "api"]
+  "defaultOpen": false,
+  "pages": [
+    "index",
+    "installation",
+    "quickstart",
+    "api"
+  ]
 }
