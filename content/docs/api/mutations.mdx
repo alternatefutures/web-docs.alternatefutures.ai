@@ -171,6 +171,20 @@ Returns `SwarmDefinitionVersion!` · [SwarmDefinitionVersion](/api/objects#swarm
 
 Returns `SwarmDefinitionVersion!` · [SwarmDefinitionVersion](/api/objects#swarmdefinitionversion).
 
+### rekeySwarmPolicyBundle
+
+Re-key the project's tool-grant bundle to the swarm's newest definition
+(2026-09-26): project owner or admin only. Use after a deploy was refused
+with SWARM_POLICY_BUNDLE_STALE because a member without admin rights saved
+a persona. Returns the same report a registration carries.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `projectId` | `ID!` |  |
+| `swarmId` | `String!` |  |
+
+Returns `SwarmPolicyRekey!` · [SwarmPolicyRekey](/api/objects#swarmpolicyrekey).
+
 ### issueSwarmDefinitionBootstrap
 
 | Argument | Type | Description |
@@ -231,18 +245,18 @@ Returns `SwarmDeployProgress!` · [SwarmDeployProgress](/api/objects#swarmdeploy
 ### setSwarmModel
 
 acc swarms model set: overwrite the project's model-provider config
-server-side (a listed provider/model through the platform proxy or the
-project's own key, or compat/\<model> with baseUrl for a self-hosted
-endpoint); the runtime reads it at boot. Every deploy re-renders the config
-from the model the agents declare (2026-09-26), so a listed model set here
-lasts only until the next deploy, while compat/\<model> stays as long as the
-agents declare it.
+server-side with a listed provider/model, always through the platform
+proxy; the runtime reads it at boot. Every deploy re-renders the config
+from the model the agents declare (2026-09-26), so a model set here lasts
+only until the next deploy. compat/\<model> with baseUrl (a self-hosted
+endpoint) and a project's own provider key are refused since 2026-09-26
+(SWARM_MODEL_UNSUPPORTED): bring-your-own-key is an Org › Models setting.
 
 | Argument | Type | Description |
 |----------|------|-------------|
 | `projectId` | `ID!` |  |
 | `model` | `String!` |  |
-| `baseUrl` | `String` |  |
+| `baseUrl` | `String` | Refused since 2026-09-26 (SWARM_MODEL_UNSUPPORTED); kept so older clients get a coded error. |
 
 Returns `SwarmModelConfig!` · [SwarmModelConfig](/api/objects#swarmmodelconfig).
 
@@ -372,6 +386,12 @@ Returns `RuntimeMcpRegistration!` · [RuntimeMcpRegistration](/api/objects#runti
 Returns `RuntimeModelDiagnostic!` · [RuntimeModelDiagnostic](/api/objects#runtimemodeldiagnostic).
 
 ### setRuntimeSecret
+
+acc secrets set: store one runtime secret for the project (bot tokens,
+policy bundles). OPENAI_API_KEY and ANTHROPIC_API_KEY are refused since
+2026-09-26 (SWARM_MODEL_KEY_NOT_ALLOWED): a deployed swarm always runs
+through the platform inference; bring-your-own-key is an Org › Models
+setting.
 
 | Argument | Type | Description |
 |----------|------|-------------|
