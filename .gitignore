@@ -40,3 +40,4 @@ pnpm-debug.log*
 alternate-clouds-cli/
 alternate-clouds-sdk/
 alternate-clouds-api/
+alternate-auth-sdk/

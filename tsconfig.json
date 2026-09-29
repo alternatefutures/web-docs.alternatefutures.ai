@@ -34,6 +34,7 @@
     "node_modules",
     "alternate-clouds-cli",
     "alternate-clouds-sdk",
-    "alternate-clouds-api"
+    "alternate-clouds-api",
+    "alternate-auth-sdk"
   ]
 }
