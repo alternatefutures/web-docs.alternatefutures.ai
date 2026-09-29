@@ -1,0 +1,176 @@
+---
+title: "Add sign in with Alternate Clouds"
+description: "Tutorial: let users of your app sign in with their Alternate Clouds account in a Next.js app or a single-page React app, with the prebuilt button, sign-in card and account menu."
+unreleased: true
+---
+
+This tutorial takes you from an Alternate Clouds account to an app of your
+own where users click **Continue with Alternate Clouds**, sign in on the
+Alternate Clouds page, and land back in your app with their name, email,
+organization and wallet. It takes about five minutes.
+
+There are two paths, and they end in the same place. **Next.js** keeps the
+tokens on your server in an encrypted cookie (the recommended shape for any
+app with a server). **Vite + React** runs the whole flow in the browser and
+keeps the tokens in memory (for a single-page app with no server).
+
+## Before you start
+
+- An Alternate Clouds account, signed in at
+  [clouds.alternatefutures.ai](https://clouds.alternatefutures.ai), and an
+  organization you administer (every account has a personal one).
+- Node.js 20.9 or later (`node --version`).
+
+## 1. Create a client
+
+A client identifies your app to Alternate Clouds and pins where users may be
+sent back to.
+
+1. Open your organization, then **Developer**, then **New client**.
+2. Type: **public** (the app has no secret to keep; the flow uses PKCE).
+   Choose **confidential** only for a server that can hold a secret.
+3. Redirect URI: `http://localhost:3000/api/auth/callback` for the Next.js
+   path, `http://localhost:5173/callback` for the Vite path. Add your
+   production URL later; the match is exact.
+4. Post-logout redirect URI (optional): `http://localhost:3000/` or
+   `http://localhost:5173/`. With it, signing out of your app also ends the
+   Alternate Clouds session.
+5. Scopes: keep `openid`, `profile`, `email`; add `wallet` for the user's
+   verified wallet and `org` if your app works per organization (the user
+   then picks one when they approve).
+
+Copy the client id (`ac_...`). A confidential client also shows its secret
+once.
+
+## Path A: Next.js
+
+### 1. Create the app
+
+```bash
+npx create-next-app@latest my-app -e https://github.com/alternatefutures/alternate-auth-starter-next
+cd my-app
+```
+
+### 2. Configure it
+
+```bash
+cp .env.example .env.local
+```
+
+Set `ALTERNATE_CLOUDS_CLIENT_ID` to your client id and `AUTH_SECRET` to a
+random value (`openssl rand -base64 32`). Leave the issuer at its default.
+
+### 3. Run it and sign in
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and click **Continue
+with Alternate Clouds**. Sign in on the Alternate Clouds page with email, SMS
+or a wallet, approve the app, and you land on the starter's dashboard with
+your account details. The header shows the account menu.
+
+### What is in the starter
+
+| File | Role |
+|---|---|
+| `lib/auth-config.ts` | The one config object: scopes and the post-logout URI. Ids and secrets come from the environment. |
+| `lib/auth.ts` | `createAuth()`: `auth()` for server code, the route `handlers`. |
+| `app/api/auth/[...auth]/route.ts` | Mounts the handlers: `signin`, `callback`, `signout`, `session`. |
+| `proxy.ts` | Refreshes the session cookie (the only place tokens rotate) and protects `/dashboard`. |
+| `app/layout.tsx` | Reads the session on the server and hands it to `<AuthProvider>`, so the first paint is right. |
+| `app/page.tsx`, `components/Header.tsx` | `<SignIn>`, `<SignInButton>`, `<UserButton>`, `<SignedIn>` and `<SignedOut>`. |
+
+### Add it to an existing Next.js app
+
+```bash
+npm install @alternatefutures/ac-auth-next
+```
+
+Then copy the four files above from the starter, or follow the
+[package reference](/sdk/sign-in-api). In a Server Component or Route
+Handler:
+
+```ts
+import { auth } from '@/lib/auth';
+
+const session = await auth();
+if (!session) redirect(signInPath('/dashboard'));
+session.user.email; // and .name, .picture, .wallet, .org
+```
+
+## Path B: Vite + React
+
+### 1. Create the app
+
+```bash
+npx degit alternatefutures/alternate-auth-starter-vite-react my-app
+cd my-app && npm install
+```
+
+### 2. Configure it
+
+```bash
+cp .env.example .env.local
+```
+
+Set `VITE_ALTERNATE_CLOUDS_CLIENT_ID` to your client id.
+
+### 3. Run it and sign in
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) and click **Continue
+with Alternate Clouds**. After approving, you are back on the dashboard.
+
+### What is in the starter
+
+| File | Role |
+|---|---|
+| `src/auth.ts` | `createAuthClient()`: issuer, client id, redirect URI, scopes. |
+| `src/main.tsx` | `<AuthProvider client={auth}>`; the provider finishes the sign-in on `/callback` by itself. |
+| `src/App.tsx` | The components and a dashboard built from the platform's UI primitives. |
+
+### Add it to an existing React app
+
+```bash
+npm install @alternatefutures/ac-auth @alternatefutures/ac-auth-react
+```
+
+```tsx
+import '@alternatefutures/ac-auth-react/styles.css';
+import { createAuthClient } from '@alternatefutures/ac-auth';
+import { AuthProvider, SignIn, SignedIn, SignedOut, UserButton } from '@alternatefutures/ac-auth-react';
+
+const auth = createAuthClient({ clientId: 'ac_...', redirectUri: `${location.origin}/callback` });
+
+<AuthProvider client={auth}>
+  <SignedOut><SignIn appName="My app" /></SignedOut>
+  <SignedIn><UserButton /></SignedIn>
+</AuthProvider>
+```
+
+## What you get
+
+- **The user**: `user.key` is the value to store your local user under (the
+  wallet DID when the user has a verified wallet, otherwise the account id),
+  plus `name`, `email`, `emailVerified`, `picture`, `wallet`, `wallets` and
+  `org` (`id`, `slug`, `name`, `role`) when those scopes were granted.
+- **A session that survives**: refresh tokens rotate safely, and when the
+  sign-in service cannot be reached, a signed-in user stays signed in for up
+  to a day (never more than a week after the tokens were issued).
+- **Control for the user**: under **Account › Connected apps** on Alternate
+  Clouds, the user can disconnect your app; its sessions end at the next
+  refresh.
+
+## Next steps
+
+- [Sign in with Auth.js](/guides/sign-in-with-authjs) if your app already
+  uses Auth.js.
+- [Sign-in SDK reference](/sdk/sign-in-api) for every option, hook and
+  component.
+- [Sign in](/guides/authentication) for how accounts and sign-in methods work
+  on Alternate Clouds itself.

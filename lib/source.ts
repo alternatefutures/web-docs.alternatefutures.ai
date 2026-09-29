@@ -4,10 +4,17 @@ import { defineDocs } from 'fumadocs-mdx/macro';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
 import { resolveIcon } from './icons';
 
+// Pages that describe a surface a customer cannot use yet carry
+// `unreleased: true` in their frontmatter (AF_DOCS_PIPELINE.md §4). They are
+// dropped from the site, the sitemap and llms.txt unless the build sets
+// DOCS_INCLUDE_SIGN_IN=1 (the sign-in SDK is the only such surface today).
+const INCLUDE_UNRELEASED_PAGES = process.env.DOCS_INCLUDE_SIGN_IN === '1';
+
 const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    schema: pageSchema,
+    // `unreleased` is an optional boolean like `full`; reusing its schema avoids a direct zod dependency.
+    schema: pageSchema.extend({ unreleased: pageSchema.shape.full }),
     postprocess: {
       includeProcessedMarkdown: true,
     },
@@ -30,6 +37,16 @@ export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
   plugins: [
+    {
+      name: 'af:unreleased',
+      transformStorage({ storage }) {
+        if (INCLUDE_UNRELEASED_PAGES) return;
+        for (const path of storage.getFiles()) {
+          const file = storage.read(path);
+          if (file?.format === 'page' && (file.data as { unreleased?: boolean }).unreleased) storage.delete(path);
+        }
+      },
+    },
     {
       name: 'af:icons',
       transformPageTree: {

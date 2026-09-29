@@ -1,0 +1,97 @@
+---
+title: "Sign in with Auth.js"
+description: "How-to: add Alternate Clouds as a provider to an app that uses Auth.js (next-auth v5, SvelteKit, SolidStart, Express) with one line of configuration."
+unreleased: true
+---
+
+This guide adds **Continue with Alternate Clouds** to an app that already
+signs users in with [Auth.js](https://authjs.dev). Nothing changes in how
+your app reads the session; Alternate Clouds becomes one more provider.
+
+## Before you start
+
+- An app on Auth.js v5 (`next-auth@beta`, `@auth/sveltekit`,
+  `@auth/solid-start`, `@auth/express`, ...).
+- A **public** client created under your organization's **Developer**
+  page with the callback URL `<your origin>/api/auth/callback/alternate-clouds`
+  (Next.js) or the callback path your framework uses. See
+  [Add sign in with Alternate Clouds](/guides/add-sign-in#1-create-a-client).
+
+## 1. Install the provider
+
+```bash
+npm install @alternatefutures/ac-auth-js
+```
+
+## 2. Configure it
+
+```
+# .env.local
+AUTH_SECRET=                     # npx auth secret
+AUTH_ALTERNATE_CLOUDS_ID=ac_...  # your client id
+```
+
+```ts
+// auth.ts
+import NextAuth from 'next-auth';
+import AlternateClouds from '@alternatefutures/ac-auth-js';
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  providers: [AlternateClouds()],
+});
+```
+
+That is the whole change. The provider configures PKCE, `state` and `nonce`
+(all three are required), reads the issuer's discovery document, verifies
+the ID token and maps the claims to the Auth.js user.
+
+## 3. Sign in
+
+```tsx
+import { signIn } from '@/auth';
+
+<form action={async () => { 'use server'; await signIn('alternate-clouds'); }}>
+  <button type="submit">Continue with Alternate Clouds</button>
+</form>
+```
+
+The Auth.js default sign-in page (`/api/auth/signin`) lists the provider too.
+
+## Options
+
+```ts
+AlternateClouds({
+  scope: 'openid profile email wallet org', // default: openid profile email
+  issuer: 'https://auth.staging.alternatefutures.ai', // default: production
+  clientSecret: process.env.AUTH_ALTERNATE_CLOUDS_SECRET, // confidential clients only
+});
+```
+
+## The user record
+
+`user.id` is the wallet DID (`did:pkh:eip155:1:0x...`) when the user has a
+verified wallet, otherwise the account id, the same rule the other Alternate
+Clouds packages follow. `name`, `email` and `image` come from the `profile`
+and `email` scopes. Keep other claims with a `jwt` callback:
+
+```ts
+callbacks: {
+  jwt({ token, profile }) {
+    if (profile) {
+      token.org = profile.org;          // { id, slug, name, role } with the org scope
+      token.wallets = profile.wallets;  // every verified address with the wallet scope
+    }
+    return token;
+  },
+  session({ session, token }) {
+    session.org = token.org;
+    return session;
+  },
+}
+```
+
+## Next steps
+
+- [Add sign in with Alternate Clouds](/guides/add-sign-in) for the prebuilt
+  components and the Next.js starter.
+- [Sign-in SDK reference](/sdk/sign-in-api).

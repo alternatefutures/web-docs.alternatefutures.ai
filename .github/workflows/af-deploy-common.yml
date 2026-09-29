@@ -63,6 +63,17 @@ jobs:
           ref: main
           token: ${{ secrets.gh_pat || github.token }}
 
+      # The sign-in SDK reference (Sign in with Alternate Clouds) tracks main
+      # of alternate-auth-sdk; unreleased until DOCS_INCLUDE_SIGN_IN is set
+      # (AF_DOCS_PIPELINE.md §4).
+      - name: Checkout alternate-auth-sdk repo
+        uses: actions/checkout@v7
+        with:
+          repository: alternatefutures/alternate-auth-sdk
+          path: alternate-auth-sdk
+          ref: main
+          token: ${{ secrets.gh_pat || github.token }}
+
       # The GraphQL schema reference and the template catalog come from the API
       # server source (private repo, needs gh_pat). No install: the generators
       # read typeDefs.ts and run the template registry, which has no dependencies.
@@ -124,6 +135,21 @@ jobs:
         run: pnpm generate:sdk
         env:
           AF_SDK_REPO: ${{ github.workspace }}/alternate-clouds-sdk
+
+      # TypeDoc needs the SDK's own dependencies for type resolution (jose,
+      # react, next, @auth/core). Best effort, like the SDK step above.
+      - name: Install auth SDK dependencies (for TypeDoc type resolution)
+        continue-on-error: true
+        working-directory: alternate-auth-sdk
+        run: npm ci --ignore-scripts || npm install --ignore-scripts
+
+      - name: Generate sign-in SDK reference
+        continue-on-error: true
+        run: pnpm generate:sign-in
+        env:
+          AF_AUTH_SDK_REPO: ${{ github.workspace }}/alternate-auth-sdk
+          # Flip to '1' once the issuer is on production (AF_DOCS_PIPELINE.md §4).
+          # DOCS_INCLUDE_SIGN_IN: '1'
 
       - name: Generate GraphQL API reference
         run: pnpm generate:api

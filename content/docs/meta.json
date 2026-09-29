@@ -10,6 +10,8 @@
     "---Get started---",
     "guides/index",
     "guides/authentication",
+    "guides/add-sign-in",
+    "guides/sign-in-with-authjs",
     "guides/quickstart",
     "guides/dashboard",
     "---Deploy---",

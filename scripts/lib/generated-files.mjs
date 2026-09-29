@@ -8,6 +8,7 @@
 export const GENERATED_FILES = [
   'content/docs/cli/commands.mdx',
   'content/docs/sdk/api.mdx',
+  'content/docs/sdk/sign-in-api.mdx',
   'content/docs/api/queries.mdx',
   'content/docs/api/mutations.mdx',
   'content/docs/api/objects.mdx',

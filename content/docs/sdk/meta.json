@@ -6,6 +6,7 @@
     "index",
     "installation",
     "quickstart",
-    "api"
+    "api",
+    "sign-in-api"
   ]
 }
