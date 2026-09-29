@@ -148,8 +148,9 @@ jobs:
         run: pnpm generate:sign-in
         env:
           AF_AUTH_SDK_REPO: ${{ github.workspace }}/alternate-auth-sdk
-          # Flip to '1' once the issuer is on production (AF_DOCS_PIPELINE.md §4).
-          # DOCS_INCLUDE_SIGN_IN: '1'
+          # Sign-in surfaces released 2026-09-30: the issuer is on production and the
+          # SDK packages are on npm (AF_DOCS_PIPELINE.md §4).
+          DOCS_INCLUDE_SIGN_IN: '1'
 
       - name: Generate GraphQL API reference
         run: pnpm generate:api
@@ -171,6 +172,9 @@ jobs:
       # MDX that does not compile.
       - name: Build (Next.js static export)
         run: pnpm build
+        env:
+          # lib/source.ts drops `unreleased: true` pages unless this is set at build time.
+          DOCS_INCLUDE_SIGN_IN: '1'
 
       - name: Upload built site
         uses: actions/upload-artifact@v7
