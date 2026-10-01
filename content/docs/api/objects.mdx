@@ -152,6 +152,7 @@ stay end-to-end encrypted and opaque to the platform.
 | `failoverPolicy` | `JSON` | Optional health-aware auto-failover policy. Shape: JSON object with enabled (boolean), maxAttempts (default 3, clamped 1-10), and windowHours (default 24, clamped 1-720). When enabled, the sweeper redeploys to a different provider on provider-side failures rather than plain-closing the deployment. Refused for services with persistent volumes (data-loss risk) and for application-side failures. |
 | `failoverHistory` | `FailoverHistory` · [FailoverHistory](/api/objects#failoverhistory) | Live failover history derived from this service's deployment chain. Null when no failover has ever fired for this service. |
 | `internalHostname` | `String` |  |
+| `hostnames` | `[String!]!` | Public hostnames this service answers on through the platform proxy: the generated \<slug>-app and \<slug>-agent names under the deploy domain plus any operator-managed custom domain routed to this slug. Exactly the accept list its the standard compute tier SDL carries. |
 | `createdByUserId` | `ID` |  |
 | `parentServiceId` | `ID` |  |
 | `sdlServiceName` | `String` |  |
