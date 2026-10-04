@@ -20,7 +20,7 @@ run one of them, it is out of date.
 | You used | Now |
 |---|---|
 | `af sites` (static sites on IPFS, Filecoin, or Arweave) | Not in `acc`. Serve your build output from a container, for example an `nginx` image, with `acc services create --kind docker`. See [Quick start](/guides/quickstart). |
-| `af agents` (Eliza and other agents) | Templates. `acc templates list --category AI_ML`, then follow [Deploy an AI agent](/guides/deploy-an-agent). |
+| `af agents` (Eliza and other agents) | An agent service: follow [Deploy an AI agent](/guides/deploy-an-agent). Other AI workloads are templates: `acc templates list --category AI_ML`. |
 | `af functions` | Functions deploy from the web app **Deploy** page. The CLI's `--kind function` is not available yet. |
 | `af applications` | Projects and services. See [Manage projects](/guides/projects). |
 | `af api-keys` | Personal access tokens: `acc pat create`. See [Create and use access tokens](/guides/api-keys). |

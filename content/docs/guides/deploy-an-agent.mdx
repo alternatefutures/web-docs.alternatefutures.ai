@@ -1,120 +1,172 @@
 ---
 title: "Deploy an AI agent"
-description: "Tutorial: deploy the Alternate Agent template from the web app with a monthly budget cap, give it a name and instructions, chat with it at its URL, then manage and shut it down from the CLI."
+description: "Tutorial: create one AI agent from the web app or the acc CLI, deploy it, talk to it by name in its private chat room, optionally answer in Discord, then change it and shut it down."
 ---
 
-This tutorial takes you from a signed-in account to a running AI agent with a
-chat UI, a spending limit, and a clean shutdown. It takes about ten minutes.
-You will use the **Alternate Agent** template, which bills its model usage to
-your Alternate Clouds credits, so no third-party AI keys are needed.
+This tutorial takes you from a signed-in account to one running AI agent that
+answers when you mention it by name in its own private chat room. It takes
+about ten minutes. You set no API key: the agent calls its model through the
+platform, billed to your organization.
 
-The agent is a composite template (the agent plus its own PostgreSQL database),
-and composite templates deploy from the web app only; the CLI does not support
-them yet. Everything after the deploy works from the CLI.
+An agent is a service of its own. It runs on the same runtime as a
+[team of agents](/guides/deploy-a-swarm), has the same chat room and the same
+Discord option, and can grow into a team later without starting over. There
+are two ways in, and they end in the same place: the **web app** needs nothing
+installed; the **CLI** gives you a folder you can keep in Git.
 
 ## Before you start
 
-- You have finished the [Quick start](/guides/quickstart): `acc` is installed,
-  you are logged in, and a project is active (`acc whoami` shows it).
-- You are signed in to the web app at `https://clouds.alternatefutures.ai`
-  with the same account.
-- Your organization has credits or an active trial.
+- You are signed in at `https://clouds.alternatefutures.ai`, or you have
+  finished the [Quick start](/guides/quickstart) so `acc` is installed and
+  logged in.
+- Your organization has credits or an active trial. A deploy is refused before
+  anything is billed if the wallet is empty.
 
-## 1. Look at the template
+## Path A: the web app
 
-```bash
-acc templates info alternate-agent
-```
+### 1. Create the agent
 
-The output lists the resources (1 vCPU, 2 GiB memory, 2 GiB storage), the
-port, and the environment variables. Two of them are filled in by the platform
-when you deploy:
+1. Open a project (or create one), click **Add Service**, and choose the
+   **Alternate Agent** card.
+2. Give it a **name**: lowercase letters, digits and hyphens, for example
+   `atlas`. This is the agent's name and the service's name, and it is how you
+   will `@mention` it. If another agent or team in the project already has
+   that name, the form says so.
+3. Write one sentence under **What it does**, for example
+   `Answers questions about the Atlas project.`, and pick a **model** from the
+   list. Every model on the list runs on the platform.
+4. Click **Create agent**. The service opens on its **Source** tab with
+   version 1 already saved: one **Agent** card with the name fixed, the
+   sentence and the model editable, and **Edit the full persona** under the
+   sentence if one sentence is not enough. There is no shape to pick for one
+   agent.
 
-| Variable | What the platform does |
-|---|---|
-| `AF_API_KEY` | Creates a scoped access token for the agent. The agent uses it to pay for chat, image, and video inference from your credits. |
-| `AF_ORG_ID` | Fills in your organization id. |
+If the platform could not compile the first version right away, **Source**
+says why and keeps what you typed; click **Save** in the footer to try again.
 
-Everything else has a default. You will set `AGENT_NAME` and
-`AGENT_INSTRUCTIONS` to make it yours.
+### 2. Deploy
 
-## 2. Deploy from the web app with a budget cap
+Click **Deploy** in the footer. A banner under the header shows each phase:
+checking the project, reserving capacity, delivering private files, waiting
+for the runtime. The **Deployments** tab shows the lease and lists the saved
+version under **Version history**.
 
-1. Open **Deploy a template** at `https://clouds.alternatefutures.ai/deploy`
-   and choose **Alternate Agent**.
-2. Set `AGENT_NAME` (for example `Atlas`) and `AGENT_INSTRUCTIONS` (for example
-   `You are a concise assistant for the Atlas project.`). Leave `AF_API_KEY`
-   and `AF_ORG_ID` as the platform pre-fills them.
-3. Under **Budget Cap**, set a **Monthly limit** of 20. The platform stops the
-   service once it has spent 20 dollars in a month; your machine is not
-   involved.
-4. Deploy.
+### 3. Talk to it
 
-The template creates two services in your project, the agent and its database.
-The deployment now goes through placement and start;
-[How a deployment works](/guides/how-deployments-work) explains each stage.
+On **Source**, under **Talk to your agent**:
 
-## 3. Watch it come up
+- **Web chat** shows the room link. Open it and enter the passphrase.
+- **Terminal chat** shows the `acc chat join` line for the same room.
+- **Copy passphrase** (top right of either row) copies the room passphrase.
+  Revealing it is recorded in the audit log.
 
-```bash
-acc services list
-```
+In the room there is one member with the agent's name. `@atlas what is the
+Atlas project?` runs the agent once and it answers in the thread; `@all` does
+the same. A message with no mention runs nothing and costs nothing, so people
+can talk freely.
 
-Run it again every twenty seconds or so until the agent service shows as
-active with a URL of the form `https://my-agent-app.alternatefutures.ai`. If it
-is still waiting after a few minutes, see
-[The deployment stays in a waiting or creating state](/troubleshooting#the-deployment-stays-in-a-waiting-or-creating-state).
+## Path B: the CLI
 
-To see the agent starting, use the id `acc services list` printed:
-
-```bash
-acc services logs <serviceId> --tail 100
-```
-
-## 4. Talk to it
-
-Open the URL from step 3 in a browser. The chat UI loads with the name you
-set. Ask it something; the reply is billed to your credits through the token
-the platform created for it, and you can see the charge later under
-**Billing**, **Usage** in the web app.
-
-## 5. Change it without redeploying by hand
-
-Environment variables live on the service. To give the agent a different
-personality:
+The agent and its team carry the **same name**, so `@<name>` in the room
+reaches it and the web app shows it as an agent.
 
 ```bash
-acc services env set <serviceId> AGENT_INSTRUCTIONS "You answer only with haiku."
-acc services deploy <serviceId>
+acc swarms init my-agent && cd my-agent
+acc create agent atlas --model openai/gpt-5.6-sol
+acc create swarm atlas --shape sequential --members atlas
+acc swarms deploy atlas --yes
 ```
 
-The redeploy creates a new deployment; the URL does not change.
-
-## 6. Shut it down
-
-Close both services the template created, so nothing keeps billing:
+`acc create agent` writes `agents/atlas.toml` and `personas/atlas.md`; edit
+the persona file to change what the agent follows. `acc add agent` asks the
+same things as questions (name, what it does, model) and prints the flags at
+the end. The deploy resolves the runtime, generates every project secret the
+runtime needs, and ends with the agent's room:
 
 ```bash
-acc services list
-acc services close <serviceId>   # once for the agent, once for its database
+acc swarms room atlas                  # passphrase and join command
+acc chat join chat.alternatefutures.ai # then: @atlas hello
 ```
 
-`acc services close` keeps the service definition so you can deploy it again
-later. `acc services delete <serviceId>` removes it entirely.
+`acc swarms deploy` refuses a model outside the list with
+`SWARM_MODEL_UNSUPPORTED` and names the list; the same list is on **Org**,
+**Models** in the web app.
+
+## Optional: let the agent answer in Discord
+
+The room is where your agent lives. Discord is an optional second place to
+talk to it, and a separate conversation: nothing is mirrored between the two.
+
+In the web app, on **Source**, click **Connect Discord**, paste the bot token
+and the channel id, then **Connect channel**. An agent always answers itself,
+so there is nothing to pick. From the CLI:
+
+```bash
+pbpaste | tr -d '[:space:]' | acc swarms discord connect atlas --channel <channel id> --stdin
+acc swarms stop atlas && acc swarms deploy atlas --yes
+```
+
+The channel map reaches the agent on the next deploy, so the banner asks for a
+**Redeploy** (confirm **Stop and redeploy**). Under every reply in Discord a
+footer reads `atlas · <model>`: who answered and which model.
+
+## Change it, watch it, stop it
+
+**Edit the agent.** On **Source**, change the sentence, the model or the full
+persona and click **Save** in the footer: that registers a new version. The
+banner then says the changes are not deployed; click **Redeploy** and confirm
+**Stop and redeploy**. From the CLI, edit the files, then stop and deploy:
+
+```bash
+acc swarms stop atlas && acc swarms deploy atlas --yes
+```
+
+**Make it a team.** Click **Add another agent** on **Source**. The shape
+picker and the agents' id inputs appear; the first agent keeps its name. From
+then on the service is a team: [Deploy a swarm](/guides/deploy-a-swarm)
+continues from there. Removing agents back to one makes it an agent again.
+
+**The name stays.** An agent's name is fixed once its first version is saved,
+and the web app saves that version when you create it, because the room and
+every mention use the name. For a different name, create a new agent.
+
+**Watch it.** Runs and their costs are on the service's **Overview** under
+**Spend Controls**, **Inference**, and under **Billing**, **Usage** filtered by
+service. From the CLI:
+
+```bash
+acc swarms logs atlas --tail 200
+```
+
+**Stop it.** Stop closes the lease and you stop paying. The agent, its
+versions and the room passphrase stay, so you can deploy it again later.
+
+```bash
+acc swarms stop atlas
+```
+
+In the web app, use the footer of the service panel.
+
+**Bring your own model key** (optional). Under **Org**, **Models** in the web
+app, or with `acc orgs providers set openai --stdin`, every request of the
+organization uses your key at cost, still through the platform, so usage and
+limits keep working. That is the only place for a key: a deployed agent never
+calls a provider directly.
 
 ## What you learned
 
-- Templates carry their own resources and declare the variables they need;
-  some variables the platform fills in for you.
-- Composite templates deploy from the web app; from then on the CLI manages
-  their services like any other.
-- A per-service budget cap is set at deploy time and enforced server-side.
-- Configuration changes are environment variables plus a redeploy.
-- Closing a service is how you stop paying for it.
+- An agent is one service with one name; `@<name>` in its room is how you ask
+  it, and the same name works from the CLI.
+- No key is set anywhere: the model runs through the platform and is billed to
+  your organization.
+- The name is fixed once the first version is saved; what it does, its model
+  and its persona can change any time, followed by a redeploy.
+- Discord is optional and separate, and needs a stop-then-deploy to apply.
+- One agent can become a team on the same service.
 
 ## Next steps
 
-- [How a deployment works](/guides/how-deployments-work)
+- [Deploy a swarm](/guides/deploy-a-swarm), a team of agents on the same runtime
 - [How billing works](/guides/how-billing-works)
-- [Template catalog](/templates/catalog), every template with its variables
-- [Docs for AI agents](/ai-agents), for running the CLI steps from CI or another agent
+- [Command reference](/cli/commands), every `acc swarms` command and flag
+- [Docs for AI agents](/ai-agents), for running these steps from CI or another agent
