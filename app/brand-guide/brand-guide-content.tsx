@@ -57,7 +57,7 @@ const cssVariablesReference = `:root {
   --af-brand-blue-pressed: #0006A6;
 
   /* HSL equivalents */
-  --af-brand-blue-hsl: 240, 100%, 50%;
+  --af-brand-blue-hsl: 238, 100%, 50%;
   --af-dark-blue-hsl: 240, 100%, 34%;
   --af-medium-blue-hsl: 231, 100%, 82%;
   --af-terracotta-hsl: 21, 100%, 37%;
@@ -146,7 +146,8 @@ export default function BrandGuideContent() {
             <div className="color-rgb">RGB: {hexToRgb('#0000AF')}</div>
             <div className="color-hsl">HSL: {hexToHsl('#0000AF')}</div>
             <div className="color-usage">
-              Dark mode backgrounds, footer, emphasis blocks, immersive sections. Never use for body text.
+              Headings, emphasis blocks, dark mode backgrounds, footer, immersive sections. Never use for body
+              text.
             </div>
           </div>
         </div>
@@ -160,7 +161,8 @@ export default function BrandGuideContent() {
             <div className="color-rgb">RGB: {hexToRgb('#BE4200')}</div>
             <div className="color-hsl">HSL: {hexToHsl('#BE4200')}</div>
             <div className="color-usage">
-              Warnings, urgency, cost emphasis, competitor comparisons. The &quot;attention&quot; color.
+              The alert color: warnings, urgency, cost emphasis. Decorative geometry in marketing materials only.
+              Never body text, primary buttons, or active states.
             </div>
           </div>
         </div>
@@ -179,7 +181,8 @@ export default function BrandGuideContent() {
             <div className="color-rgb">RGB: {hexToRgb('#F9F5EE')}</div>
             <div className="color-hsl">HSL: {hexToHsl('#F9F5EE')}</div>
             <div className="color-usage">
-              Light mode page backgrounds. The warm foundation of the brand. Never use pure white #FFF.
+              Light mode page backgrounds. The warm foundation of the brand. Pages are Cream, never pure white
+              #FFFFFF.
             </div>
           </div>
         </div>
@@ -229,6 +232,12 @@ export default function BrandGuideContent() {
 
       <p>These are the approved color pairings. Every design should use one of these combinations as its foundation.</p>
 
+      <p>
+        <strong>Default pages</strong> are Dark Blue <code>#0000AF</code> headings on Cream <code>#F9F5EE</code>, with
+        body text in <code>#1A1A1A</code>. Body text uses that one near-black value everywhere on light surfaces.
+        Dark Blue is for headings, emphasis blocks, and backgrounds, never body text.
+      </p>
+
       <div className="combo-grid">
         <div className="combo-card" style={{ background: '#000AFF', color: '#fff' }}>
           Brand Blue + White
@@ -236,8 +245,11 @@ export default function BrandGuideContent() {
             Hero, CTA
           </span>
         </div>
-        <div className="combo-card" style={{ background: '#F9F5EE', color: '#0000AF' }}>
+        <div className="combo-card combo-card-stacked" style={{ background: '#F9F5EE', color: '#0000AF' }}>
           Cream + Dark Blue
+          <span className="combo-sub" style={{ color: '#1A1A1A' }}>
+            Body in #1A1A1A
+          </span>
           <span className="combo-label" style={{ color: 'rgba(0,0,175,0.5)' }}>
             Default pages
           </span>
@@ -279,8 +291,9 @@ export default function BrandGuideContent() {
       <div className="brand-callout brand-callout-warning">
         <div className="brand-callout-title">IMPORTANT: The correct Brand Blue is #000AFF</div>
         <p>
-          Do NOT use <code>#0026FF</code> (hue 232). The correct hue is <strong>240</strong> (pure blue), not 232
-          (blue-violet). The 8-degree shift is visible and off-brand. Always verify the hex value when implementing.
+          Do NOT use <code>#0026FF</code> (hue 231). Brand Blue <code>#000AFF</code> sits at hue{' '}
+          <strong>238</strong>. The 7-degree shift toward azure is visible and off-brand. Always verify the hex value
+          when implementing.
         </p>
       </div>
 
@@ -302,6 +315,12 @@ export default function BrandGuideContent() {
 
       <p>The workhorse typeface. Used for all body text, headings, navigation, buttons, and UI elements.</p>
 
+      <p>
+        <strong>Weights:</strong> Display, H1, and H2 are <strong>Bold 700</strong>. H3 and H4 are{' '}
+        <strong>SemiBold 600</strong>. Body text is <strong>Regular 400</strong>. Medium 500 is for UI labels and
+        buttons.
+      </p>
+
       <div className="type-specimen">
         <div className="font-label">Instrument Sans -- Regular 400 / Medium 500 / SemiBold 600 / Bold 700</div>
         <div
@@ -311,8 +330,8 @@ export default function BrandGuideContent() {
           Deploy to the decentralized cloud
         </div>
         <div className="sample-body" style={{ fontFamily: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif" }}>
-          Alternate Futures provides IPFS, Filecoin, and Arweave hosting with serverless functions and AI agent
-          deployment. Build the future with infrastructure that belongs to no one and everyone.
+          Clouds by Alternate Futures deploys containers, AI agents, GPU and confidential workloads from the web
+          app, the acc CLI, or the SDK. Build the future with infrastructure that belongs to no one and everyone.
         </div>
         <div className="sample-small" style={{ fontFamily: "'Instrument Sans', ui-sans-serif, system-ui, sans-serif" }}>
           ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&amp;*()
@@ -340,8 +359,7 @@ export default function BrandGuideContent() {
           Infrastructure that flows, not locks
         </div>
         <div className="sample-body" style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontStyle: 'italic' }}>
-          &quot;We picked up where the Web3 hosting pioneers left off. True decentralization means your data is never
-          held hostage by a single provider.&quot;
+          &quot;True decentralization means your data is never held hostage by a single provider.&quot;
         </div>
         <div className="sample-small" style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
           ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&amp;*()
@@ -370,7 +388,7 @@ export default function BrandGuideContent() {
           className="sample-display"
           style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize: '1.8rem' }}
         >
-          af deploy --network ipfs
+          acc services deploy --region eu
         </div>
         <div className="sample-code" style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
           const af = new AlternateFuturesSdk({'{'}
@@ -407,7 +425,7 @@ export default function BrandGuideContent() {
 
       <div className="type-scale">
         <div className="type-scale-row">
-          <span className="scale-label">6rem / 96px</span>
+          <span className="scale-label">6rem / 96px · 700</span>
           <span
             className="scale-sample"
             style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '3rem', lineHeight: 1 }}
@@ -416,7 +434,7 @@ export default function BrandGuideContent() {
           </span>
         </div>
         <div className="type-scale-row">
-          <span className="scale-label">3rem / 48px</span>
+          <span className="scale-label">3rem / 48px · 700</span>
           <span
             className="scale-sample"
             style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '2.2rem', lineHeight: 1.1 }}
@@ -425,7 +443,7 @@ export default function BrandGuideContent() {
           </span>
         </div>
         <div className="type-scale-row">
-          <span className="scale-label">2rem / 32px</span>
+          <span className="scale-label">2rem / 32px · 700</span>
           <span
             className="scale-sample"
             style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '1.6rem', lineHeight: 1.2 }}
@@ -434,7 +452,7 @@ export default function BrandGuideContent() {
           </span>
         </div>
         <div className="type-scale-row">
-          <span className="scale-label">1.5rem / 24px</span>
+          <span className="scale-label">1.5rem / 24px · 600</span>
           <span
             className="scale-sample"
             style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '1.3rem', lineHeight: 1.3 }}
@@ -443,7 +461,7 @@ export default function BrandGuideContent() {
           </span>
         </div>
         <div className="type-scale-row">
-          <span className="scale-label">1.125rem</span>
+          <span className="scale-label">1.125rem / 18px · 600</span>
           <span
             className="scale-sample"
             style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '1.1rem' }}
@@ -452,8 +470,11 @@ export default function BrandGuideContent() {
           </span>
         </div>
         <div className="type-scale-row">
-          <span className="scale-label">1rem / 16px</span>
-          <span className="scale-sample" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: '1rem' }}>
+          <span className="scale-label">1rem / 16px · 400</span>
+          <span
+            className="scale-sample"
+            style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '1rem' }}
+          >
             Body text at the standard reading size
           </span>
         </div>
@@ -482,8 +503,9 @@ export default function BrandGuideContent() {
 
       <p>
         The AF geometric system is the visual language that makes our brand unmistakable. Stars, circles, rings, and
-        waves are used as decorative elements across all materials. The full SVG library contains{' '}
-        <strong>129 assets</strong> in 7 brand colors at 4 sizes.
+        waves are used as decorative elements across all materials. The master SVG library contains{' '}
+        <strong>124 geometric assets</strong> (plus 2 logo files) in 7 brand colors at 4 sizes. This site serves a
+        38-asset subset from <code>public/brand/</code>; the samples below come from that subset.
       </p>
 
       <h3 id="stars">Stars</h3>
@@ -727,8 +749,8 @@ export default function BrandGuideContent() {
       <h3 id="waves">Waves</h3>
 
       <p>
-        Full-width wave shapes serve as section dividers, footer decorations, and background textures. Available at
-        solid, 10%, 20%, and 30% opacity in all 7 brand colors.
+        Full-width wave shapes serve as section dividers, footer decorations, and background textures. The master
+        library has every wave at solid, 10%, 20%, and 30% opacity in all 7 brand colors.
       </p>
 
       <div className="wave-gallery">
@@ -761,6 +783,7 @@ export default function BrandGuideContent() {
       <p>
         Pre-composed groups of stars, circles, and rings for use as hero decorations and section accents. Three
         color temperature variants: brand (blue-dominant), cool (blue + sky), and warm (terracotta + apricot).
+        The brand and warm variants both contain Terracotta, so in product UI use the cool variant only.
       </p>
 
       <div className="composition-grid">
@@ -830,6 +853,16 @@ export default function BrandGuideContent() {
           </tr>
           <tr>
             <td>
+              <strong>Terracotta shapes</strong>
+            </td>
+            <td>
+              Terracotta stars, rings, waves, and the brand / warm compositions are for marketing materials (site,
+              decks, social, print, campaigns) only. Product UI (app, dashboard, docs UI) never uses Terracotta
+              decoratively
+            </td>
+          </tr>
+          <tr>
+            <td>
               <strong>Opacity range</strong>
             </td>
             <td>Decorative elements at 6-30% opacity on light backgrounds. 8-20% on dark backgrounds</td>
@@ -850,60 +883,45 @@ export default function BrandGuideContent() {
 
       <p>
         The AF logo exists in two forms: the <strong>logomark</strong> (&quot;AF&quot; monogram) and the{' '}
-        <strong>wordmark</strong> (full &quot;AlternateFutures&quot; text). Both use{' '}
-        <code>var(--fill-0, #000AFF)</code> for theme-aware rendering.
+        <strong>wordmark</strong> (full &quot;Alternate Futures&quot; text). When we say &quot;the logo&quot;, we
+        mean the full wordmark. The source SVGs (<code>/logo.svg</code>, <code>/wordmark.svg</code>) fill with{' '}
+        <code>var(--fill-0, #000000)</code>. Black is only a fallback, not a logo color, so always set the fill to
+        the approved logo color for the background (see Approved Backgrounds below).
       </p>
 
       <h3 id="logo-variants">Logo Variants</h3>
 
       <div className="logo-grid">
         <div className="logo-card" style={{ background: '#F9F5EE' }}>
-          <img src="/logo.svg" alt="AF logomark on cream" style={{ maxWidth: '60px' }} />
+          <span className="logo-art logo-art-mark logo-on-light" role="img" aria-label="AF logomark in Brand Blue on Cream" />
           <div className="logo-label">Logomark on Cream</div>
         </div>
         <div className="logo-card" style={{ background: '#000AFF' }}>
-          <img
-            src="/logo.svg"
-            alt="AF logomark on Brand Blue"
-            style={{ maxWidth: '60px', filter: 'brightness(0) invert(1)' }}
-          />
-          <div className="logo-label" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Logomark on Brand Blue
-          </div>
+          <span className="logo-art logo-art-mark logo-on-dark" role="img" aria-label="AF logomark in white on Brand Blue" />
+          <div className="logo-label logo-label-on-dark">Logomark on Brand Blue</div>
         </div>
         <div className="logo-card" style={{ background: '#0000AF' }}>
-          <img
-            src="/logo.svg"
-            alt="AF logomark on Dark Blue"
-            style={{ maxWidth: '60px', filter: 'brightness(0) invert(1)' }}
-          />
-          <div className="logo-label" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Logomark on Dark Blue
-          </div>
+          <span className="logo-art logo-art-mark logo-on-dark" role="img" aria-label="AF logomark in white on Dark Blue" />
+          <div className="logo-label logo-label-on-dark">Logomark on Dark Blue</div>
         </div>
+      </div>
+
+      <div className="logo-grid logo-grid-wordmark">
         <div className="logo-card" style={{ background: '#F9F5EE' }}>
-          <img src="/wordmark.svg" alt="AF wordmark on cream" style={{ maxWidth: '280px' }} />
-          <div className="logo-label">Full Wordmark on Cream</div>
+          <span className="logo-art logo-art-wordmark logo-on-light" role="img" aria-label="Alternate Futures wordmark in Brand Blue on Cream" />
+          <div className="logo-label">Full Wordmark on Cream (280px)</div>
         </div>
         <div className="logo-card" style={{ background: '#000AFF' }}>
-          <img
-            src="/wordmark.svg"
-            alt="AF wordmark on Brand Blue"
-            style={{ maxWidth: '280px', filter: 'brightness(0) invert(1)' }}
-          />
-          <div className="logo-label" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Full Wordmark on Brand Blue
-          </div>
+          <span className="logo-art logo-art-wordmark logo-on-dark" role="img" aria-label="Alternate Futures wordmark in white on Brand Blue" />
+          <div className="logo-label logo-label-on-dark">Full Wordmark on Brand Blue (280px)</div>
         </div>
         <div className="logo-card" style={{ background: '#0A0A0A' }}>
-          <img
-            src="/wordmark.svg"
-            alt="AF wordmark on black"
-            style={{ maxWidth: '280px', filter: 'brightness(0) invert(1)' }}
-          />
-          <div className="logo-label" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Full Wordmark on Dark
-          </div>
+          <span className="logo-art logo-art-wordmark logo-on-dark" role="img" aria-label="Alternate Futures wordmark in white on near-black" />
+          <div className="logo-label logo-label-on-dark">Full Wordmark on Dark (280px)</div>
+        </div>
+        <div className="logo-card logo-card-white">
+          <span className="logo-art logo-art-wordmark logo-on-light" role="img" aria-label="Alternate Futures wordmark in Brand Blue on white" />
+          <div className="logo-label">Full Wordmark on White, co-branding only (280px)</div>
         </div>
       </div>
 
@@ -920,20 +938,35 @@ export default function BrandGuideContent() {
           <span className="cs-label cs-right">1x</span>
           <span className="cs-label cs-bottom">1x</span>
           <span className="cs-label cs-left">1x</span>
-          <img src="/logo.svg" alt="Logo with clear space" style={{ width: '80px' }} />
+          <span className="logo-art logo-art-mark logo-on-light logo-art-clearspace" role="img" aria-label="AF logomark with clear space" />
         </div>
       </div>
 
       <h3 id="minimum-size">Minimum Size</h3>
 
+      <p>
+        <strong>The logo is at least 280px wide.</strong> Wherever the full wordmark is &quot;the logo&quot; (site
+        headers, decks, documents, social cards, partner pages), render it at 280px wide or larger. Never squish it to
+        fit a smaller slot.
+      </p>
+
+      <p>
+        <strong>Where 280px won&apos;t fit, use the AF logomark instead.</strong> Navigation bars, favicons, avatars,
+        app chrome, and other tight spaces get the logomark, not a shrunken wordmark.
+      </p>
+
+      <p>
+        <strong>Legibility floors.</strong> These are technical limits, not targets. Below them, the letterforms
+        become illegible:
+      </p>
+
       <ul>
         <li>
-          <strong>Logomark:</strong> Minimum 24px wide (digital), 10mm (print)
+          <strong>Logomark:</strong> never below 24px wide (digital), 10mm (print)
         </li>
         <li>
-          <strong>Wordmark:</strong> Minimum 120px wide (digital), 40mm (print)
+          <strong>Wordmark:</strong> never below 120px wide (digital), 40mm (print)
         </li>
-        <li>Below these sizes, the letterforms become illegible</li>
       </ul>
 
       <h3 id="approved-backgrounds">Approved Backgrounds</h3>
@@ -965,7 +998,7 @@ export default function BrandGuideContent() {
             <td>
               Brand Blue <code>#000AFF</code>
             </td>
-            <td>Acceptable for partner co-branding</td>
+            <td>Acceptable for partner co-branding. Never as a page background</td>
           </tr>
           <tr>
             <td>
@@ -1094,8 +1127,8 @@ export default function BrandGuideContent() {
             </td>
             <td>Instructional, precise, neutral</td>
             <td>
-              &quot;Run <code>af deploy</code> to push your site to IPFS. The CLI will return a CID and preview
-              URL.&quot;
+              &quot;Run <code>acc services deploy</code> to deploy your service. The CLI follows the deployment and
+              prints your service URL when it is live.&quot;
             </td>
           </tr>
           <tr>
@@ -1124,16 +1157,18 @@ export default function BrandGuideContent() {
             </td>
             <td>Energetic, concise</td>
             <td>
-              &quot;60% cheaper than Vercel. Same features. Decentralized infrastructure. Your margins intact.&quot;
+              &quot;New in Clouds: [feature]. Here is what it does and how to try it today.&quot;{' '}
+              <em>(Illustrative. Any number or comparison needs a cited, dated source.)</em>
             </td>
           </tr>
           <tr>
             <td>
               <strong>Investor materials</strong>
             </td>
-            <td>Confident, data-driven</td>
+            <td>Confident, sourced</td>
             <td>
-              &quot;The Web3 hosting market lost its two largest players in 2025. AF captured the vacuum.&quot;
+              &quot;[Metric] went from [X] to [Y] between [date] and [date] (source: [system of record]).&quot;{' '}
+              <em>(Illustrative. Never invent or overstate figures for buyers or investors.)</em>
             </td>
           </tr>
           <tr>
@@ -1151,7 +1186,10 @@ export default function BrandGuideContent() {
 
       <h3 id="terminology">Terminology</h3>
 
-      <p>Always use these standard terms:</p>
+      <p>
+        Always use these standard terms. The company is <strong>Alternate Futures</strong> (then &quot;AF&quot;). The
+        product is <strong>Clouds by Alternate Futures</strong> on first or formal mention, then &quot;Clouds&quot;.
+      </p>
 
       <table>
         <thead>
@@ -1175,6 +1213,32 @@ export default function BrandGuideContent() {
             </td>
             <td>Acceptable abbreviation after first mention</td>
             <td>Any other abbreviation</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Clouds by Alternate Futures</strong>
+            </td>
+            <td>Full product name (first or formal mention)</td>
+            <td>&quot;Alternate Clouds&quot; (former product name, retired 2026-09-29), &quot;AF Cloud&quot;</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Clouds</strong>
+            </td>
+            <td>Product name after first mention</td>
+            <td>&quot;Alternate Clouds&quot;, &quot;the AF cloud&quot;</td>
+          </tr>
+          <tr>
+            <td>
+              <code>acc</code>
+            </td>
+            <td>
+              The Clouds CLI, published on npm as <code>@alternatefutures/acc</code> (e.g.{' '}
+              <code>acc services deploy</code>)
+            </td>
+            <td>
+              <code>af</code> (old binary name), <code>@alternatefutures/cli</code> (abandoned package)
+            </td>
           </tr>
           <tr>
             <td>
@@ -1238,8 +1302,8 @@ export default function BrandGuideContent() {
         <div className="dodont-card dont-card">
           <div className="dodont-label">DON&apos;T</div>
           <div className="dodont-text">
-            Use <code>#0026FF</code>, <code>#0000FF</code>, or any other blue as a substitute. The 8-degree hue
-            shift between 232 and 240 is visible and off-brand.
+            Use <code>#0026FF</code>, <code>#0000FF</code>, or any other blue as a substitute. <code>#0026FF</code>{' '}
+            sits at hue 231, 7 degrees off Brand Blue&apos;s 238. The shift is visible and off-brand.
           </div>
         </div>
         <div className="dodont-card do-card">
@@ -1253,21 +1317,40 @@ export default function BrandGuideContent() {
           <div className="dodont-label">DON&apos;T</div>
           <div className="dodont-text">
             Use pure white <code>#FFFFFF</code> as a page background. It looks sterile and clashes with the warm
-            palette. White is only for text on dark surfaces.
+            palette. White is only for card surfaces on Cream, text on dark surfaces, and as a co-branding logo
+            background.
           </div>
         </div>
         <div className="dodont-card do-card">
           <div className="dodont-label">DO</div>
           <div className="dodont-text">
-            Use Terracotta exclusively for warnings and urgency. It signals &quot;pay attention&quot; within the
-            palette hierarchy.
+            Use Terracotta as the alert color: warnings, urgency, cost emphasis. In marketing materials (site, decks,
+            social, print, campaigns) it may also appear as decorative geometry, such as library stars, rings, waves,
+            and warm terracotta + apricot compositions, within the shape rules.
           </div>
         </div>
         <div className="dodont-card dont-card">
           <div className="dodont-label">DON&apos;T</div>
           <div className="dodont-text">
-            Use Terracotta for primary buttons, headers, or decorative elements. It is not an accent color -- it is
-            the alert color.
+            Use Terracotta for body text, primary buttons, or active states, anywhere. In product UI (app,
+            dashboard, docs UI) never use it decoratively. There, it is the alert color only.
+          </div>
+        </div>
+      </div>
+
+      <div className="dodont-grid">
+        <div className="dodont-card do-card">
+          <div className="dodont-label">DO</div>
+          <div className="dodont-text">
+            Set body text in <code>#1A1A1A</code> on light surfaces. Use Dark Blue <code>#0000AF</code> for headings,
+            emphasis blocks, and backgrounds.
+          </div>
+        </div>
+        <div className="dodont-card dont-card">
+          <div className="dodont-label">DON&apos;T</div>
+          <div className="dodont-text">
+            Set body text in Dark Blue, Terracotta, or a second near-black such as <code>#333</code> or{' '}
+            <code>#0A0A0A</code>. There is one body text color.
           </div>
         </div>
       </div>
@@ -1459,7 +1542,7 @@ export default function BrandGuideContent() {
           <tr>
             <td>Card/surface background</td>
             <td>
-              White <code>#FFFFFF</code>
+              White <code>#FFFFFF</code> (cards on Cream only)
             </td>
             <td>
               Dark surface <code>#141414</code>
@@ -1484,9 +1567,18 @@ export default function BrandGuideContent() {
             </td>
           </tr>
           <tr>
-            <td>Accent warm</td>
+            <td>Alert (warnings, urgency, cost)</td>
             <td>
               Terracotta <code>#BE4200</code>
+            </td>
+            <td>
+              Apricot <code>#FFC7AA</code> text and borders; Terracotta <code>#BE4200</code> fills
+            </td>
+          </tr>
+          <tr>
+            <td>Warm accent (non-alert)</td>
+            <td>
+              Apricot <code>#FFC7AA</code>
             </td>
             <td>
               Apricot <code>#FFC7AA</code>
@@ -1502,9 +1594,18 @@ export default function BrandGuideContent() {
             </td>
           </tr>
           <tr>
+            <td>Headings</td>
+            <td>
+              Dark Blue <code>#0000AF</code> or <code>#1A1A1A</code>
+            </td>
+            <td>
+              Cream <code>#F9F5EE</code>
+            </td>
+          </tr>
+          <tr>
             <td>Body text</td>
             <td>
-              Dark <code>#1a1a1a</code>
+              Near-black <code>#1A1A1A</code>
             </td>
             <td>
               Cream <code>#F9F5EE</code>
@@ -1512,8 +1613,13 @@ export default function BrandGuideContent() {
           </tr>
           <tr>
             <td>Geometric elements</td>
-            <td>Brand Blue at 6-30% opacity</td>
-            <td>Off-White or Medium Blue at 8-20% opacity</td>
+            <td>
+              Brand Blue at 6-30% opacity. Terracotta shapes in marketing materials only, never in product UI
+            </td>
+            <td>
+              Off-White or Medium Blue at 8-20% opacity. Terracotta shapes in marketing materials only, never in
+              product UI
+            </td>
           </tr>
         </tbody>
       </table>
@@ -1579,7 +1685,9 @@ export default function BrandGuideContent() {
       <h3 id="full-svg-inventory">Full SVG Inventory</h3>
 
       <p>
-        The complete brand asset library contains <strong>129 SVG elements</strong> organized by type:
+        The master brand asset library contains <strong>124 geometric SVGs plus 2 logos (126 files)</strong>,
+        organized by type. This docs site ships a <strong>38-asset subset</strong> in <code>public/brand/</code> (14
+        stars, 7 circles, 7 rings, 6 waves, 4 decorative groups).
       </p>
 
       <table>
@@ -1639,7 +1747,7 @@ export default function BrandGuideContent() {
             <td>2</td>
             <td>Logomark (35x32), Wordmark (600x139)</td>
             <td>
-              Theme-aware <code>var(--fill-0)</code>
+              Fill via <code>var(--fill-0)</code> (falls back to black; always set it)
             </td>
           </tr>
           <tr>
@@ -1647,7 +1755,7 @@ export default function BrandGuideContent() {
               <strong>Total</strong>
             </td>
             <td>
-              <strong>126 + 2 logos</strong>
+              <strong>124 + 2 logos = 126</strong>
             </td>
             <td></td>
             <td></td>
@@ -1683,7 +1791,7 @@ export default function BrandGuideContent() {
 
       <p>
         Examples: <code>star-small-brand-blue.svg</code>, <code>wave-terracotta-20.svg</code>,{' '}
-        <code>decorative-large-warm.svg</code>
+        <code>decorative-large-warm.svg</code> (the last two are in the master library only)
       </p>
 
       <h3 id="source-of-truth">Source of Truth</h3>
@@ -1694,10 +1802,10 @@ export default function BrandGuideContent() {
           <a href="https://www.figma.com/design/wmHC1PQgGehvppFrQnJwW0/AF-Branding-2026">AF-Branding-2026</a>
         </li>
         <li>
-          <strong>SVG source directory:</strong> <code>admin/docs/pitch-deck-assets/</code>
+          <strong>SVG source directory (master library):</strong> <code>admin/docs/pitch-deck/assets/</code>
         </li>
         <li>
-          <strong>Docs public assets:</strong> <code>docs/public/brand/</code>
+          <strong>Docs public assets (38-asset subset):</strong> <code>public/brand/</code>
         </li>
       </ul>
 
@@ -1708,7 +1816,7 @@ export default function BrandGuideContent() {
       {/* ============================================ */}
 
       <div className="section-header">
-        <img src="/brand/star-small-terracotta.svg" alt="" role="presentation" />
+        <img src="/brand/star-small-brand-blue.svg" alt="" role="presentation" />
         <h2 id="quick-reference">Quick Reference</h2>
       </div>
 
@@ -1720,14 +1828,16 @@ export default function BrandGuideContent() {
         <li>
           <input type="checkbox" disabled />
           <span>
-            <strong>Color check:</strong> Only palette colors used? Brand Blue <code>#000AFF</code> present?
+            <strong>Color check:</strong> Only palette colors used? Brand Blue <code>#000AFF</code> present? Body
+            text in <code>#1A1A1A</code>? Terracotta only for alerts (plus decorative geometry in marketing
+            materials)?
           </span>
         </li>
         <li>
           <input type="checkbox" disabled />
           <span>
-            <strong>Typography check:</strong> Instrument Sans for body/headings? Instrument Serif for accents only?
-            JetBrains Mono for code?
+            <strong>Typography check:</strong> Instrument Sans for body/headings? Display/H1/H2 at 700, H3/H4 at 600,
+            body at 400? Instrument Serif for accents only? JetBrains Mono for code?
           </span>
         </li>
         <li>
@@ -1740,14 +1850,22 @@ export default function BrandGuideContent() {
         <li>
           <input type="checkbox" disabled />
           <span>
-            <strong>Logo check:</strong> Correct clear space? Correct color on correct background? No modifications?
+            <strong>Logo check:</strong> Full wordmark at least 280px wide, or the logomark where it won&apos;t fit?
+            Correct clear space? Correct color on correct background? No modifications?
           </span>
         </li>
         <li>
           <input type="checkbox" disabled />
           <span>
             <strong>Tone check:</strong> Developer-to-developer voice? Technical but accessible? Honest about
-            limitations?
+            limitations? Every number cited and dated?
+          </span>
+        </li>
+        <li>
+          <input type="checkbox" disabled />
+          <span>
+            <strong>Naming check:</strong> &quot;Clouds by Alternate Futures&quot; on first mention, then
+            &quot;Clouds&quot;? No &quot;Alternate Clouds&quot;? CLI commands use <code>acc</code>?
           </span>
         </li>
         <li>
@@ -1776,8 +1894,7 @@ export default function BrandGuideContent() {
       <h3 id="contact">Contact</h3>
 
       <p>
-        Brand questions and compliance reviews go to the <strong>Brand Guardian</strong> agent or the Creative
-        Director (Pixel / Yusuke). For urgent brand violations, flag in the <code>#brand-review</code> channel.
+        Brand questions and compliance reviews go to <strong>Amy Lynn Taylor</strong>, Founding Product Designer.
       </p>
 
       <hr />
