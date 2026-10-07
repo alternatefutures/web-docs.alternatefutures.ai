@@ -1157,8 +1157,8 @@ export default function BrandGuideContent() {
             </td>
             <td>Energetic, concise</td>
             <td>
-              &quot;New in Clouds: [feature]. Here is what it does and how to try it today.&quot;{' '}
-              <em>(Illustrative. Any number or comparison needs a cited, dated source.)</em>
+              &quot;Cheaper than Vercel. Same deploy flow. Your margins intact.&quot;{' '}
+              <em>(No percentages or other numeric claims.)</em>
             </td>
           </tr>
           <tr>
@@ -1239,6 +1239,13 @@ export default function BrandGuideContent() {
             <td>
               <code>af</code> (old binary name), <code>@alternatefutures/cli</code> (abandoned package)
             </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Market-capture claims</strong>
+            </td>
+            <td>Banned phrase. Never use, in any context</td>
+            <td>&quot;AF captured the vacuum&quot; (unsupported market-capture claim)</td>
           </tr>
           <tr>
             <td>
