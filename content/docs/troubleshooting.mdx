@@ -131,6 +131,74 @@ acc services logs <id> --tail 100
 acc ssh <id>                     # a shell inside the running container
 ```
 
+### The edge URL returns 404 for every path
+
+The deployment is active and the logs look healthy, but
+`https://<slug>-app.alternatefutures.ai` returns 404 for every route —
+including the app's health endpoint. An `x-af-trace-id` response header
+confirms the request reached the platform edge, so this is a routing problem,
+not an application problem.
+
+First confirm the app really is listening inside the container:
+
+```bash
+acc ssh <id>
+# inside the container:
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:<port>/
+wget -q -O /dev/null http://localhost:<port>/   # if the image has no curl
+```
+
+If localhost answers but the edge URL still 404s, the edge route was never
+registered or points at a stale upstream. Report it with the `x-af-trace-id`
+value from the 404 response, plus the service id and deployment id — that is
+enough for the platform team to trace the request end to end.
+
+```bash
+curl -sI https://<slug>-app.alternatefutures.ai/ | grep x-af-trace-id
+acc deployments --service <id>
+```
+
+### `acc services close` needs an interactive terminal
+
+`close` prompts to select a project and confirm, and it has no `--yes` or
+`--project` flag. Scripts and CI cannot answer those prompts. Close the
+deployment through the GraphQL API instead:
+
+```bash
+curl -X POST https://api.alternatefutures.ai/graphql \
+  -H "Authorization: Bearer $AF_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { closeAkashDeployment(id: \"<deployment-id>\") { id status } }"}'
+```
+
+The deployment id is printed by `acc services deploy` and listed by
+`acc deployments --service <id>`.
+
+### `acc ssh --command` runs the command but prints nothing
+
+Non-interactive commands execute inside the container, but their stdout is
+not streamed back to your terminal. Two workarounds:
+
+```bash
+acc ssh <id>                                    # 1. interactive session
+acc ssh <id> --command 'sh -c "env > /tmp/env.txt"'   # 2. redirect to a file,
+acc cp <id>:/tmp/env.txt ./env.txt                  #    then copy it out
+```
+
+### `acc cp` copies to the host filesystem, not your container
+
+For docker services, `acc cp` moves files to and from the deployment host —
+not the container's filesystem. A file copied to `/tmp` on the host is not
+visible inside your container. To get files in, bake them into the image or
+fetch them at startup; to get files out, have the app expose or ship them.
+
+### Changing a service's image requires a new service
+
+The image is bound when the service is created; `acc services deploy` has no
+`--image` flag. To run a different image, create a new service with the new
+image, verify it, then close the old one. A closed service keeps its name
+reserved, so pick a fresh name for the replacement.
+
 ## Suspended services and billing
 
 ### A service shows as suspended
