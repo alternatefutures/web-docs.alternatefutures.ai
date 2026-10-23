@@ -16,6 +16,7 @@
    dark mode. Ground is pulled toward black so the accent reads. */
 :root {
   --color-fd-primary: #000aff;
+  --color-fd-background: #f9f5ee;
   --color-fd-primary-foreground: #ffffff;
   --color-fd-ring: #000aff;
   --color-fd-info: #000aff; /* info callouts share the accent */

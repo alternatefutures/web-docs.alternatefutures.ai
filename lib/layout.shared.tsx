@@ -11,47 +11,28 @@ export function baseOptions(): BaseLayoutProps {
       // 2026-09-08). The SVGs are var(--fill-0)-driven but load as <img>, which can't
       // read page CSS vars — so each theme gets its own asset. Never use CSS
       // invert() on brand assets (inverted blue = yellow).
-      // Responsive logo per the brand book's two forms — never combined:
-      // logomark (AF monogram) on mobile, full wordmark on md+ screens.
+      // Brand rule (2026-10-07): the full wordmark must render >=280px wide;
+      // where it cannot fit — the nav bar included — use the AF logomark.
+      // The two forms are never combined.
       title: (
-        <>
-          <span className="inline-flex md:hidden">
-            <Image
-              src="/logo.svg"
-              alt="Alternate Futures"
-              width={26}
-              height={24}
-              priority
-              className="dark:hidden"
-            />
-            <Image
-              src="/logo-dark.svg"
-              alt="Alternate Futures"
-              width={26}
-              height={24}
-              priority
-              className="hidden dark:inline"
-            />
-          </span>
-          <span className="hidden md:inline-flex">
-            <Image
-              src="/wordmark.svg"
-              alt="Alternate Futures"
-              width={104}
-              height={24}
-              priority
-              className="dark:hidden"
-            />
-            <Image
-              src="/wordmark-dark.svg"
-              alt="Alternate Futures"
-              width={104}
-              height={24}
-              priority
-              className="hidden dark:inline"
-            />
-          </span>
-        </>
+        <span className="inline-flex">
+          <Image
+            src="/logo.svg"
+            alt="Alternate Futures"
+            width={26}
+            height={24}
+            priority
+            className="dark:hidden"
+          />
+          <Image
+            src="/logo-dark.svg"
+            alt="Alternate Futures"
+            width={26}
+            height={24}
+            priority
+            className="hidden dark:inline"
+          />
+        </span>
       ),
     },
     // No top links: they would duplicate the sidebar tree (DocsLayout renders

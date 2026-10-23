@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s | Alternate Futures Docs',
     default: 'Alternate Futures Docs',
   },
-  description: 'Documentation hub for Alternate Futures products - Alternate Clouds decentralized cloud infrastructure, and more',
+  description: 'Documentation hub for Alternate Futures products - Clouds by Alternate Futures decentralized cloud infrastructure, and more',
   icons: { icon: '/favicon.ico' },
 };
 
